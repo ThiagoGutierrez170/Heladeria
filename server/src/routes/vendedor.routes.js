@@ -1,16 +1,16 @@
 import express from 'express';
-import vendedorController from '../controllers/vendedor.controller.js';
+import vendedorController from '../controllers/vendedores.controller.js';
 
 const vendedorRouter = express.Router();
 
-Vendedorrouter.get('/', vendedorController.obtenerVendedor);
+vendedorRouter.get('/', vendedorController.obtenerVendedor);
 
-Vendedorrouter.get('/:id', vendedorController.obtenerVendedorPorId);
+vendedorRouter.get('/:id', vendedorController.obtenerVendedorPorId);
 
-Vendedorrouter.post('/', vendedorController.crearVendedor);
+vendedorRouter.post('/', vendedorController.crearVendedor);
 
-Vendedorrouter.put('/:id', vendedorController.actualizarVendedor);
+vendedorRouter.put('/:id', vendedorController.actualizarVendedor);
 
-Vendedorrouter.delete('/:id', vendedorController.eliminarVendedor);
+vendedorRouter.delete('/:id', vendedorController.eliminarVendedor);
 
 export default vendedorRouter;

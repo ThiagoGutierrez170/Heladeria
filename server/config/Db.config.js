@@ -9,7 +9,7 @@ const URL_DB = process.env.MONGO_URI;
 async function conectDB() {
     try {
         await mongoose.connect(URL_DB, {
-            dbName: 'Crud',
+            dbName: 'Heladeria',
         })
         console.log('Connectado con MongoDB');
     } catch (error) {

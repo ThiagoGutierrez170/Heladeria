@@ -1,7 +1,7 @@
 import Helado from '../models/helado.models.js';
 import mongoose from 'mongoose';
 
-const heladoController = { 
+const heladoController = {
     crearHelado: async (req, res) => {
         try {
             const { nombre, imagen, costo, precioBase, precioVenta, cantidadCaja, stock } = req.body;

@@ -1,4 +1,4 @@
-import Nota from "../models/notas.models.js";
+import Nota from "../models/nota.models.js";
 
 // Crear una nueva nota
 const create = async (req, res) => {

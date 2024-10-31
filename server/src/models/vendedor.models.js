@@ -10,7 +10,9 @@ const vendedorSchema = new mongoose.Schema({
 
     ci: { type: String, required: true },
 
-    contacto: { type: String, required: false }
+    contacto: { type: String, required: false },
+
+    estado: {type:Boolean, required: true}
 },
     {
         timestamps: true

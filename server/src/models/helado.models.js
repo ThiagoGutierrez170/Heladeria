@@ -13,7 +13,9 @@ const heladoSchema = new Schema({
 
     cantidadCaja: { type: Number, required: true },
 
-    stock: { type: Number, required: true }
+    stock: { type: Number, required: true },
+
+    estado: {type:Boolean, required: true}
 }, {
     timestamps: true
 });

@@ -16,11 +16,11 @@ app.use(cors());
 
 import vendedorRouter from './src/routes/vendedor.routes.js';
 import heladoRouter from './src/routes/helado.routes.js';
-//import notaRouter from './src/routes/nota.routes.js';
+import notaRouter from './src/routes/nota.routes.js';
 
 app.use('/api/vendedor', vendedorRouter);
 app.use('/api/helado', heladoRouter);
-//app.use('/api/nota', notaRouter);
+app.use('/api/nota', notaRouter);
 
 conectDB();
 

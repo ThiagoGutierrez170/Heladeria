@@ -12,11 +12,15 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@faker-js/faker": "^9.1.0",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
     "@mui/x-data-grid": "^7.22.0",
     "axios": "^1.7.7",
     "client": "file:",
+    "datatables.net": "^2.1.8",
+    "datatables.net-dt": "^2.1.8",
+    "datatables.net-plugins": "^2.1.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",
@@ -25,8 +29,7 @@
     "reactstrap": "^9.2.3",
     "sass": "^1.80.5",
     "sass-embedded": "^1.80.5",
-    "sweet-alert": "^2.0.5",
-    "sweetalert2": "^11.14.4"
+    "sweetalert2": "^11.6.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

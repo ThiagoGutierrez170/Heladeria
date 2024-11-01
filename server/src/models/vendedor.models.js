@@ -12,7 +12,7 @@ const vendedorSchema = new mongoose.Schema({
 
     contacto: { type: String, required: false },
 
-    estado: {type:Boolean, required: true}
+    estado: {type:Boolean, required: true, default: true},
 },
     {
         timestamps: true

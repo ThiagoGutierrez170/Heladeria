@@ -16,7 +16,7 @@ const VendedoresForm = () => {
     const [edad, setEdad] = useState("");
     const [ci, setCi] = useState("");
     const [contacto, setContacto] = useState("");
-    const [estado, setEstado] = useState(false);
+    const [estado, setEstado] = useState(true);
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState("");
     const navigate = useNavigate();

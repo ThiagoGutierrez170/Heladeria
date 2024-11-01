@@ -7,6 +7,8 @@ import {
     CircularProgress,
     Box,
     Stack,
+    Checkbox,
+    FormControlLabel
 } from '@mui/material';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -39,6 +41,10 @@ const EditarVendedor = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setVendedor({ ...vendedor, [name]: value });
+    };
+
+    const handleEstadoChange = (e) => {
+        setVendedor({ ...vendedor, estado: e.target.checked });
     };
 
     const handleCancel = () => {
@@ -136,6 +142,31 @@ const EditarVendedor = () => {
                         variant="outlined"
                         sx={{ mb: 3 }}
                         required
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={vendedor.estado}
+                                onChange={handleEstadoChange}
+                                sx={{
+                                    '&.Mui-checked': {
+                                        color: '#1976d2',
+                                    },
+                                    '&.Mui-checked:hover': {
+                                        backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                                    },
+                                    '& .MuiSvgIcon-root': {
+                                        fontSize: 28,
+                                    },
+                                }}
+                            />
+                        }
+                        label="Estado"
+                        sx={{
+                            marginBottom: 3,
+                            fontSize: '16px',
+                            color: '#333',
+                        }}
                     />
                     <Stack direction="row" spacing={2} justifyContent="center">
                         <Button

@@ -4,16 +4,32 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import CloseIcon from '@mui/icons-material/Close';
 
 const InfoModal = ({ open, onClose, vendedor }) => (
     <Dialog
         open={open}
         onClose={onClose}
-        maxWidth="sm" // Ajustar el tamaño máximo del diálogo
-        fullWidth // Hace que el diálogo use el ancho completo
+        maxWidth="sm" 
+        fullWidth 
     >
-        <DialogTitle sx={{ fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center' }}>
+        <DialogTitle 
+            sx={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 'bold', 
+                textAlign: 'center', 
+                backgroundColor: '#1976d2', 
+                color: 'white', 
+                padding: '16px 0' 
+            }}
+        >
             Detalles del Vendedor
+            <Button 
+                onClick={onClose} 
+                sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }} 
+            >
+                <CloseIcon />
+            </Button>
         </DialogTitle>
         <DialogContent sx={{ padding: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -32,8 +48,18 @@ const InfoModal = ({ open, onClose, vendedor }) => (
                 <strong>Estado:</strong> {vendedor?.estado ? 'Activo' : 'Inactivo'}
             </Typography>
         </DialogContent>
-        <DialogActions>
-            <Button onClick={onClose} variant="contained" color="primary">
+        <DialogActions sx={{ padding: 2 }}>
+            <Button 
+                onClick={onClose} 
+                variant="contained" 
+                color="primary" 
+                sx={{ 
+                    textTransform: 'none', 
+                    fontSize: '1rem',
+                    padding: '8px 16px',
+                    marginLeft: 'auto' 
+                }}
+            >
                 Cerrar
             </Button>
         </DialogActions>

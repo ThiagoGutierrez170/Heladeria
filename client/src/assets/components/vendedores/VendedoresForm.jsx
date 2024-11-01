@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import {
-    Button, Container, Grid, TextField, Typography, FormControlLabel, Checkbox
-} from "@mui/material";
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import 'sweetalert2/src/sweetalert2.scss';
 import axios from 'axios';
-import { Helmet } from 'react-helmet';
 import CancelIcon from '@mui/icons-material/Cancel';
-import AddIcon from '@mui/icons-material/Add'; // Importar el icono de agregar
+import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 
 const VendedoresForm = () => {
@@ -71,12 +74,7 @@ const VendedoresForm = () => {
 
     return (
         <>
-            <Helmet>
-                <meta charSet="UTF-8" />
-                <link rel="icon" type="image/svg+xml" href="/src/assets/images/formulario.png" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>Formulario de Vendedor</title>
-            </Helmet>
+
             <Container
                 maxWidth="sm"
                 sx={{

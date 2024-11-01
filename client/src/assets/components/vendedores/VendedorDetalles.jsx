@@ -49,19 +49,6 @@ const InfoModal = ({ open, onClose, vendedor }) => (
             </Typography>
         </DialogContent>
         <DialogActions sx={{ padding: 2 }}>
-            <Button 
-                onClick={onClose} 
-                variant="contained" 
-                color="primary" 
-                sx={{ 
-                    textTransform: 'none', 
-                    fontSize: '1rem',
-                    padding: '8px 16px',
-                    marginLeft: 'auto' 
-                }}
-            >
-                Cerrar
-            </Button>
         </DialogActions>
     </Dialog>
 );

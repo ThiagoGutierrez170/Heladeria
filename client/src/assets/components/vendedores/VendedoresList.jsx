@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Typography, Paper, CircularProgress, IconButton, Button } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import {DataGrid}  from '@mui/x-data-grid';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,7 +14,19 @@ import InfoIcon from '@mui/icons-material/Info';
 import InfoModal from './VendedorDetalles';
 import AddIcon from '@mui/icons-material/Add';
 
-
+const ActionButtons = React.memo(({ onEdit, onDelete, onInfo }) => (
+    <div style={{ display: 'flex' }}>
+        <IconButton color="default" onClick={onInfo} sx={{ marginRight: '8px' }}>
+            <InfoIcon />
+        </IconButton>
+        <IconButton color="primary" onClick={onEdit} sx={{ marginRight: '8px' }}>
+            <EditIcon />
+        </IconButton>
+        <IconButton color="error" onClick={onDelete}>
+            <DeleteIcon />
+        </IconButton>
+    </div>
+));
 
 const VendedoresList = () => {
     const [vendedores, setVendedores] = useState([]);
@@ -21,30 +36,38 @@ const VendedoresList = () => {
     const [selectedVendedor, setSelectedVendedor] = useState(null);
     const [openInfoModal, setOpenInfoModal] = useState(false);
 
-    useEffect(() => {
-        fetchVendedores();
-    }, []);
+
 
     const fetchVendedores = async () => {
         try {
             const response = await axios.get('http://localhost:5000/api/vendedor/');
-            setVendedores(response.data);
+            if (Array.isArray(response.data)) {
+                setVendedores(response.data);
+            } else {
+                console.error('Expected an array but got:', response.data);
+                setVendedores([]);
+            }
         } catch (error) {
-            setError(true);
+            console.error('Error al obtener los vendedores:', error);
+            Swal.fire('Error', 'Error al obtener los vendedores', 'error');
         } finally {
             setLoading(false);
         }
     };
 
 
+    useEffect(() => {
+        fetchVendedores();
+    }, []);
 
-    const handleDelete = async (vendedorId) => {
+    const handleDelete = useCallback(async (vendedorId) => {
         const result = await Swal.fire({
             title: '¿Estás seguro?',
             text: "¡No podrás recuperar este vendedor!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Eliminar',
+            confirmButtonText: 'Sí, eliminar!',
+            cancelButtonText: 'Cancelar',
         });
         if (result.isConfirmed) {
             try {
@@ -55,19 +78,19 @@ const VendedoresList = () => {
                 Swal.fire('Error', 'Hubo un problema al eliminar el vendedor.', 'error');
             }
         }
-    };
+    }, []);
 
-    const handleEdit = (vendedorId) => {
+    const handleEdit = useCallback((vendedorId) => {
         navigate(`/editar-vendedor/${vendedorId}`);
-    };
+    }, [navigate]);
 
-    const handleInfo = (vendedorId) => {
+    const handleInfo = useCallback((vendedorId) => {
         const vendedor = vendedores.find(v => v._id === vendedorId);
         setSelectedVendedor(vendedor);
         setOpenInfoModal(true);
-    };
+    }, [vendedores]);
 
-    const columns = [
+    const columns = useMemo(() => [
         { field: 'nombre', headerName: 'Nombre', flex: 1 },
         { field: 'apellido', headerName: 'Apellido', flex: 1 },
         { field: 'ci', headerName: 'C.I.', flex: 1 },
@@ -78,31 +101,19 @@ const VendedoresList = () => {
             headerName: 'Acciones',
             width: 180,
             renderCell: (params) => (
-                <div style={{ display: 'flex' }}>
-                    <IconButton color="info" onClick={() => handleInfo(params.row.id)} sx={{ marginRight: '8px' }}>
-                        <InfoIcon />
-                    </IconButton>
-                    <IconButton color="primary" onClick={() => handleEdit(params.row.id)} sx={{ marginRight: '8px' }}>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton color="secondary" onClick={() => handleDelete(params.row.id)}>
-                        <DeleteIcon />
-                    </IconButton>
-                </div>
+                <ActionButtons
+                    onInfo={() => handleInfo(params.row.id)}
+                    onEdit={() => handleEdit(params.row.id)}
+                    onDelete={() => handleDelete(params.row.id)}
+                />
             ),
         },
-    ];
+    ], [handleInfo, handleEdit, handleDelete]);
 
     return (
         <>
-            <Helmet>
-                <meta charSet="UTF-8" />
-                <link rel="icon" type="image/svg+xml" href="/src/assets/images/vendedor.png" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>Lista de Vendedores</title>
-            </Helmet>
 
-            <Typography variant="h3" align="center" gutterBottom color="secondary">
+            <Typography variant="h2" align="center" gutterBottom color="secondary">
                 Lista de Vendedores
             </Typography>
             <Button
@@ -146,7 +157,6 @@ const VendedoresList = () => {
                         pageSize={10}
                         rowsPerPageOptions={[10, 20, 30]}
                         checkboxSelection
-
                         sx={{
                             border: 0,
                             '& .MuiDataGrid-cell': {

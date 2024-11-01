@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const URL_DB = process.env.MONGO_URI;
+const URL_DB = process.env.MONGODB_URI;
 
 async function conectDB() {
     try {

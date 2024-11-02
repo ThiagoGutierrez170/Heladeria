@@ -1,18 +1,22 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useMemo, useCallback, useEffect, useRef } from 'react'; // Agrega useRef aquí
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
-import {DataGrid}  from '@mui/x-data-grid';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-import InfoModal from './VendedorDetalles';
+const InfoModal = lazy(() => import('../vendedores/VendedorDetalles'));
 import AddIcon from '@mui/icons-material/Add';
+import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 
 const ActionButtons = React.memo(({ onEdit, onDelete, onInfo }) => (
     <div style={{ display: 'flex' }}>
@@ -35,15 +39,23 @@ const VendedoresList = () => {
     const navigate = useNavigate();
     const [selectedVendedor, setSelectedVendedor] = useState(null);
     const [openInfoModal, setOpenInfoModal] = useState(false);
+    const gridRef = useRef(null);
 
+    const onExportClick = useCallback((type) => {
+        const gridApi = gridRef.current.api;
+        if (type === 'csv') {
+            gridApi.exportDataAsCsv();
+        } else if (type === 'excel') {
+            gridApi.exportDataAsExcel();
+        }
+    }, []);
 
-
-    const fetchVendedores = async () => {
+    const fetchVendedores = async (page = 1, pageSize = 10) => {
+        setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/vendedor/');
-            if (Array.isArray(response.data)) {
-                setVendedores(response.data);
-            } else {
+            const response = await axios.get(`http://localhost:5000/api/vendedor?page=${page}&pageSize=${pageSize}`);
+            setVendedores(response.data);
+            if (!Array.isArray(response.data)) {
                 console.error('Expected an array but got:', response.data);
                 setVendedores([]);
             }
@@ -54,7 +66,6 @@ const VendedoresList = () => {
             setLoading(false);
         }
     };
-
 
     useEffect(() => {
         fetchVendedores();
@@ -91,31 +102,88 @@ const VendedoresList = () => {
     }, [vendedores]);
 
     const columns = useMemo(() => [
-        { field: 'nombre', headerName: 'Nombre', flex: 1 },
-        { field: 'apellido', headerName: 'Apellido', flex: 1 },
-        { field: 'ci', headerName: 'C.I.', flex: 1 },
-        { field: 'contacto', headerName: 'Contacto', flex: 2 },
-        { field: 'estado', headerName: 'Estado', flex: 0.5 },
         {
-            field: 'acciones',
-            headerName: 'Acciones',
-            width: 180,
-            renderCell: (params) => (
-                <ActionButtons
-                    onInfo={() => handleInfo(params.row.id)}
-                    onEdit={() => handleEdit(params.row.id)}
-                    onDelete={() => handleDelete(params.row.id)}
-                />
-            ),
+            groupId: "vendedoresGroupId",
+            headerName: "Vendedores",
+            children: [
+                {
+                    headerName: "Nombre",
+                    field: "nombre",
+                    flex: 1,
+                    minWidth: 200,
+                    columnChooserParams: {
+                        suppressColumnFilter: true,
+                        suppressColumnSelectAll: true,
+                        suppressColumnExpandAll: true,
+                    },
+                },
+                {
+                    headerName: "Apellido",
+                    field: "apellido",
+                    flex: 1,
+                    minWidth: 200,
+                    columnChooserParams: {
+                        suppressColumnFilter: true,
+                        suppressColumnSelectAll: true,
+                        suppressColumnExpandAll: true,
+                    },
+                },
+                {
+                    headerName: "C.I.",
+                    field: "ci",
+                    flex: 0.5,
+                    minWidth: 150,
+                },
+                {
+                    headerName: "Contacto",
+                    field: "contacto",
+                    flex: 1,
+                    minWidth: 200,
+                },
+                {
+                    headerName: "Estado",
+                    field: "estado",
+                    flex: 1,
+                    minWidth: 100,
+                },
+                {
+                    headerName: "Acciones",
+                    field: "acciones",
+                    cellRenderer: (params) => (
+                        <ActionButtons
+                            onInfo={() => handleInfo(params.data.id)}
+                            onEdit={() => handleEdit(params.data.id)}
+                            onDelete={() => handleDelete(params.data.id)}
+                        />
+                    ),
+                },
+            ],
         },
     ], [handleInfo, handleEdit, handleDelete]);
 
+
     return (
         <>
-
-            <Typography variant="h2" align="center" gutterBottom color="secondary">
+            <Typography variant="h5" align="center" gutterBottom color="primary">
                 Lista de Vendedores
             </Typography>
+
+
+
+            <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+                <IconButton
+                    variant="outlined"
+                    onClick={() => onExportClick('excel')}
+                    sx={{ marginLeft: '8px' }}
+                >
+                    <DocumentScannerIcon /> {/* Cambia a PublishIcon si prefieres el icono de publicar */}
+                </IconButton>
+                <Typography variant="button" style={{ marginLeft: '8px' }}>
+                    
+                </Typography>
+            </div>
+
+
             <Button
                 variant="contained"
                 color="primary"
@@ -143,9 +211,10 @@ const VendedoresList = () => {
                     Error al cargar la lista de vendedores
                 </Typography>
             ) : (
-                <Paper sx={{ height: 590, width: '100%', mt: 3 }}>
-                    <DataGrid
-                        rows={vendedores.map(vendedor => ({
+                <Paper sx={{ height: 590, width: '100%', mt: 3 }} className="ag-theme-alpine">
+                    <AgGridReact
+                        ref={gridRef}
+                        rowData={vendedores.map((vendedor) => ({
                             id: vendedor._id,
                             nombre: vendedor.nombre,
                             apellido: vendedor.apellido,
@@ -153,36 +222,22 @@ const VendedoresList = () => {
                             contacto: vendedor.contacto,
                             estado: vendedor.estado ? 'Activo' : 'Inactivo',
                         }))}
-                        columns={columns}
-                        pageSize={10}
-                        rowsPerPageOptions={[10, 20, 30]}
-                        checkboxSelection
-                        sx={{
-                            border: 0,
-                            '& .MuiDataGrid-cell': {
-                                fontSize: 16,
-                            },
-                            '& .MuiDataGrid-columnHeaders': {
-                                backgroundColor: '#1976d2',
-                                color: '#fff',
-                            },
-                            '& .MuiDataGrid-columnHeaderTitle': {
-                                color: 'black',
-                                fontWeight: 'bold',
-                            },
-                            '& .MuiDataGrid-footerContainer': {
-                                backgroundColor: '#f5f5f5',
-                            },
-                        }}
+                        columnDefs={columns}
+                        pagination={true}
+                        paginationPageSize={10}
+                        modules={[ExcelExportModule]}
                     />
                 </Paper>
             )}
-
-            <InfoModal
-                open={openInfoModal}
-                onClose={() => setOpenInfoModal(false)}
-                vendedor={selectedVendedor}
-            />
+            <Suspense fallback={<CircularProgress color="secondary" />}>
+                {openInfoModal && (
+                    <InfoModal
+                        open={openInfoModal}
+                        onClose={() => setOpenInfoModal(false)}
+                        vendedor={selectedVendedor}
+                    />
+                )}
+            </Suspense>
         </>
     );
 };

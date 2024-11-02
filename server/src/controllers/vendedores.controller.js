@@ -4,8 +4,8 @@ import Vendedor from '../models/vendedor.models.js';
 const vendedorController = {
     crearVendedor: async (req, res) => {
         try {
-            const { nombre, apellido, edad, ci, contacto } = req.body;
-            if (!nombre || !apellido || !edad || !ci) {
+            const { nombre, apellido, edad, ci, contacto, estado } = req.body;
+            if (!nombre || !apellido || !edad || !ci || !contacto || !estado) {
                 return res.status(400).json({ error: 'Faltan datos obligatorios' });
             }
             const nuevoVendedor = await Vendedor.create(req.body);
@@ -74,7 +74,7 @@ const vendedorController = {
         } catch (error) {
             return res.status(400).json({ error: 'Error al eliminar el vendedor', detalle: error.message });
         }
-    },
+    }
 };
 
 export default vendedorController;

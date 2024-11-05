@@ -28,7 +28,10 @@ const NotaSchema = new Schema({
         ref: 'Vendedor',  // Referencia al modelo de Vendedor
         required: true
     },
-    catalogo: [CatalogoSchema],  // Array de helados en el catálogo
+    catalogo: {
+        type:[CatalogoSchema],  // Array de helados en el catálogo
+        required:true
+    },
     estado: {
         type: String,
         enum: ['activo', 'finalizado'],  // Valores permitidos

@@ -134,13 +134,15 @@ const VendedoresList = () => {
                     headerName: "Acciones",
                     field: "acciones",
                     cellRenderer: (params) => (
-                        <ActionButtons
-                            onInfo={() => handleInfo(params.data.id)}
-                            onEdit={() => handleEdit(params.data.id)}
-                            onDelete={() => handleDelete(params.data.id)}
-                        />
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <ActionButtons
+                                onInfo={() => handleInfo(params.data.id)}
+                                onEdit={() => handleEdit(params.data.id)}
+                                onDelete={() => handleDelete(params.data.id)}
+                            />
+                        </div>
                     ),
-                },
+                }
             ],
         },
     ], [handleInfo, handleEdit, handleDelete]);
@@ -151,7 +153,7 @@ const VendedoresList = () => {
             <Typography variant="h5" align="center" gutterBottom color="primary">
                 Lista de Vendedores
             </Typography>
-           
+
 
             <Button
                 variant="contained"

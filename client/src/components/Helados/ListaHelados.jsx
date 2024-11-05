@@ -5,14 +5,13 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import InfoIcon from '@mui/icons-material/Info';
 import AddIcon from '@mui/icons-material/Add';
 import Swal from 'sweetalert2';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 const HeladoDetalles = lazy(() => import('./HeladoDetalle'));
+import './helado.modules.css/ListaHelados.css';
 
 const ActionButtons = React.memo(({ onEdit, onDelete, onInfo }) => (
     <div style={{ display: 'flex' }}>
@@ -101,7 +100,7 @@ const ListaHelados = () => {
             headerName: "Nombre",
             field: "nombre",
             flex: 1,
-            minWidth: 200,
+            minWidth: 100,
         },
         {
             headerName: "Imagen",
@@ -116,25 +115,25 @@ const ListaHelados = () => {
             headerName: "Costo",
             field: "costo",
             flex: 0.5,
-            minWidth: 150,
+            minWidth: 100,
         },
         {
             headerName: "Precio Base",
             field: "precioBase",
             flex: 1,
-            minWidth: 200,
+            minWidth: 100,
         },
         {
             headerName: "Precio Venta",
             field: "precioVenta",
             flex: 1,
-            minWidth: 200,
+            minWidth: 100,
         },
         {
             headerName: "Cantidad en Caja",
             field: "cantidadCaja",
             flex: 1,
-            minWidth: 150,
+            minWidth: 100,
         },
         {
             headerName: "Stock Disponible",
@@ -162,13 +161,13 @@ const ListaHelados = () => {
             <Typography variant="h5" align="center" gutterBottom color="primary">
                 Lista de Helados
             </Typography>
-            <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+            <div className="search-container">
                 <TextField
+                    className="search-input"
                     variant="outlined"
                     value={terminoBusqueda}
                     onChange={(e) => setTerminoBusqueda(e.target.value)}
                     placeholder='Buscar helados'
-                    style={{ marginBottom: '16px' }}
                 />
             </div>
             <Button
@@ -217,9 +216,14 @@ const ListaHelados = () => {
             )}
             <Suspense fallback={<CircularProgress />}>
                 {openInfoModal && (
-                    <HeladoDetalles helado={selectedHelado} onClose={() => setOpenInfoModal(false)} />
+                    <HeladoDetalles
+                        open={openInfoModal}
+                        onClose={() => setOpenInfoModal(false)}
+                        helado={selectedHelado}
+                    />
                 )}
             </Suspense>
+
         </>
     );
 };

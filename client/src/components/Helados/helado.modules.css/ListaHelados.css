@@ -1,0 +1,28 @@
+/* styles.css */
+.search-container {
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.search-input {
+    width: 300px; /* Ajusta el ancho según tus necesidades */
+    padding: 10px 40px 10px 20px; /* Espaciado interno */
+    border-radius: 25px; /* Bordes redondeados */
+    border: 1px solid #ccc; /* Color del borde */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Transición suave */
+    font-size: 16px; /* Tamaño de fuente */
+}
+
+.search-input:focus {
+    border-color: #007BFF; /* Color del borde al enfocar */
+    outline: none; /* Sin contorno por defecto */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra al enfocar */
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px; /* Posición del icono */
+    top: 50%; /* Centrado verticalmente */
+    transform: translateY(-50%); /* Ajuste de posición */
+    color: #007BFF; /* Color del icono */
+}

@@ -26,6 +26,7 @@ app.use('/api/nota', notaRouter);
 app.use('/api/sesion',sesion);
 app.use('/api/usuario',usuario);
 
+
 conectDB();
 
 const PORT = process.env.PORT || 5000;

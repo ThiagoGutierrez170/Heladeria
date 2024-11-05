@@ -22,6 +22,7 @@ app.use('/api/vendedor', vendedorRouter);
 app.use('/api/helado', heladoRouter);
 app.use('/api/nota', NotaRouter);
 
+
 conectDB();
 
 const PORT = process.env.PORT || 5000;

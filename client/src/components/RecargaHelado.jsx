@@ -9,7 +9,7 @@ const RecargaHelado = () => {
     useEffect(() => {
         const obtenerHelados = async () => {
             try {
-                const response = await axios.get("http://localhost:9999/api/helados");
+                const response = await axios.get("http://localhost:5000/api/helados");
                 setHelados(response.data);
             } catch (error) {
                 console.error("Error al obtener helados:", error);

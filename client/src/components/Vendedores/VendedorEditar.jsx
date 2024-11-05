@@ -27,7 +27,7 @@ const EditarVendedor = () => {
     useEffect(() => {
         const fetchVendedor = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/vendedor/${id}`);
+                const response = await axios.get(`/api/vendedor/${id}`);
                 setVendedor(response.data);
                 setLoading(false);
             } catch (error) {
@@ -54,7 +54,7 @@ const EditarVendedor = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5000/api/vendedor/${id}`, vendedor);
+            await axios.put(`/api/vendedor/${id}`, vendedor);
             Swal.fire('Éxito', 'El vendedor ha sido actualizado.', 'success');
             navigate('/vendedores');
         } catch (error) {

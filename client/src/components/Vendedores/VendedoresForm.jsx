@@ -43,7 +43,7 @@ const VendedoresForm = () => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                const response = await axios.post('http://localhost:5000/api/vendedor/', {
+                const response = await axios.post('/api/vendedor/', {
                     nombre, apellido, edad, ci, contacto, estado,
                 });
 

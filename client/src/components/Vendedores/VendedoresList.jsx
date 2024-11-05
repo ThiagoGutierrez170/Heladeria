@@ -53,7 +53,7 @@ const VendedoresList = () => {
     const fetchVendedores = async (page = 1, pageSize = 10) => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/vendedor?page=${page}&pageSize=${pageSize}`);
+            const response = await axios.get(`/api/vendedor?page=${page}&pageSize=${pageSize}`);
             setVendedores(response.data);
             if (!Array.isArray(response.data)) {
                 console.error('Expected an array but got:', response.data);
@@ -82,7 +82,7 @@ const VendedoresList = () => {
         });
         if (result.isConfirmed) {
             try {
-                await axios.delete(`http://localhost:5000/api/vendedor/${vendedorId}`);
+                await axios.delete(`/api/vendedor/${vendedorId}`);
                 setVendedores(prev => prev.filter(vendedor => vendedor._id !== vendedorId));
                 Swal.fire('Eliminado!', 'El vendedor ha sido eliminado.', 'success');
             } catch (error) {

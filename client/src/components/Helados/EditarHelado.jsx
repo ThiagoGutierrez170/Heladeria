@@ -21,7 +21,7 @@ const EditarHelado = () => {
     useEffect(() => {
         const getHelado = async () => {
             try {
-                const response = await axios.get(`http://localhost:9999/api/helados/${id}`);
+                const response = await axios.get(`/api/helados/${id}`);
                 setDatosFormulario(response.data); // Rellenar el formulario con los datos del helado
             } catch (error) {
                 console.error('Error al obtener los datos del helado:', error);
@@ -42,7 +42,7 @@ const EditarHelado = () => {
     const manejarEnvio = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`http://localhost:9999/api/helados/${id}`, datosFormulario);
+            const response = await axios.put(`/api/helados/${id}`, datosFormulario);
             console.log('Helado actualizado:', response.data);
             navigate(`/helados`); // Redirige a la lista de helados
         } catch (error) {

@@ -14,7 +14,7 @@ const HeladoDetalle = () => {
 
         const obtenerHelado = async () => {
             try {
-                const response = await axios.get(`http://localhost:9999/api/helados/${id}`);
+                const response = await axios.get(`/api/helados/${id}`);
                 setHelado(response.data);
                 console.log('Datos del helado:', response.data); // Confirmar si los datos son correctos
             } catch (error) {
@@ -35,7 +35,7 @@ const HeladoDetalle = () => {
 
     const eliminarHelado = async () => {
         try {
-            await axios.delete(`http://localhost:9999/api/helados/eliminar/${id}`);
+            await axios.delete(`/api/helados/eliminar/${id}`);
             alert("Helado eliminado correctamente");
             navigate("/helados"); // Redirige a la lista de helados tras eliminar
         } catch (error) {

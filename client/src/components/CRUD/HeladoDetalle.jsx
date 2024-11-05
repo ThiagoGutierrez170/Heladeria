@@ -3,18 +3,18 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const HeladoDetalle = () => {
-    const { id_helado } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [helado, setHelado] = useState(null); // Estado inicial en `null` para mejor control
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        console.log("ID del helado:", id_helado); // Verificar si id_helado es correcto
+        console.log("ID del helado:", id); // Verificar si id es correcto
 
         const obtenerHelado = async () => {
             try {
-                const response = await axios.get(`http://localhost:9999/api/helados/${id_helado}`);
+                const response = await axios.get(`http://localhost:9999/api/helados/${id}`);
                 setHelado(response.data);
                 console.log('Datos del helado:', response.data); // Confirmar si los datos son correctos
             } catch (error) {
@@ -26,16 +26,16 @@ const HeladoDetalle = () => {
             }
         };
 
-        if (id_helado) obtenerHelado(); // Solo llama a la función si `id_helado` está definido
-    }, [id_helado]);
+        if (id) obtenerHelado(); // Solo llama a la función si `id` está definido
+    }, [id]);
 
     const editarHelado = () => {
-        navigate(`/editar/helado/${id_helado}`);
+        navigate(`/editar/helado/${id}`);
     };
 
     const eliminarHelado = async () => {
         try {
-            await axios.delete(`http://localhost:9999/api/helados/eliminar/${id_helado}`);
+            await axios.delete(`http://localhost:9999/api/helados/eliminar/${id}`);
             alert("Helado eliminado correctamente");
             navigate("/helados"); // Redirige a la lista de helados tras eliminar
         } catch (error) {

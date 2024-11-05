@@ -24,7 +24,7 @@ const CrearHelado = () => {
     const manejarEnvio = async (e) => {
         e.preventDefault();
         try {
-            const respuesta = await axios.post('http://localhost:9999/api/helados/crear', datosFormulario);
+            const respuesta = await axios.post('http://localhost:9999/api/helado/', datosFormulario);
             console.log('Helado agregado:', respuesta.data);
 
             // LIMPIEZA
@@ -53,7 +53,7 @@ const CrearHelado = () => {
                         type="text"
                         id="nombre"
                         name="nombre"
-                        className='text-finder'
+                        className='dato-entrada'
                         value={datosFormulario.nombre}
                         onChange={manejarCambio}
                         required
@@ -65,7 +65,7 @@ const CrearHelado = () => {
                         type="text"
                         id="imagen"
                         name="imagen"
-                        className='text-finder'
+                        className='dato-entrada'
                         value={datosFormulario.imagen}
                         onChange={manejarCambio}
                     />
@@ -76,7 +76,7 @@ const CrearHelado = () => {
                         type="number"
                         id="costo"
                         name="costo"
-                        className='text-finder'
+                        className='dato-entrada'
                         value={datosFormulario.costo}
                         onChange={manejarCambio}
                         required
@@ -88,7 +88,7 @@ const CrearHelado = () => {
                         type="number"
                         id="precioBase"
                         name="precioBase"
-                        className='text-finder'
+                        className='dato-entrada'
                         value={datosFormulario.precioBase}
                         onChange={manejarCambio}
                         required
@@ -100,7 +100,7 @@ const CrearHelado = () => {
                         type="number"
                         id="precioVenta"
                         name="precioVenta"
-                        className='text-finder'
+                        className='dato-entrada'
                         value={datosFormulario.precioVenta}
                         onChange={manejarCambio}
                         required
@@ -112,7 +112,7 @@ const CrearHelado = () => {
                         type="number"
                         id="cantidadCaja"
                         name="cantidadCaja"
-                        className='text-finder'
+                        className='dato-entrada'
                         value={datosFormulario.cantidadCaja}
                         onChange={manejarCambio}
                         required
@@ -124,7 +124,7 @@ const CrearHelado = () => {
                         type="number"
                         id="stock"
                         name="stock"
-                        className='text-finder'
+                        className='dato-entrada'
                         value={datosFormulario.stock}
                         onChange={manejarCambio}
                         required

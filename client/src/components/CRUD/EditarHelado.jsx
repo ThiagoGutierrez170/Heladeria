@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const EditarHelado = () => {
-    const { id_helado } = useParams(); // Obtener el ID del helado de la URL
+    const { id } = useParams(); // Obtener el ID del helado de la URL
     const navigate = useNavigate(); // Para redirigir después de la actualización
 
     const [datosFormulario, setDatosFormulario] = useState({
@@ -19,17 +19,17 @@ const EditarHelado = () => {
 
     // Cargar el helado al iniciar el componente
     useEffect(() => {
-        const fetchHelado = async () => {
+        const getHelado = async () => {
             try {
-                const response = await axios.get(`http://localhost:9999/api/helados/${id_helado}`);
+                const response = await axios.get(`http://localhost:9999/api/helados/${id}`);
                 setDatosFormulario(response.data); // Rellenar el formulario con los datos del helado
             } catch (error) {
                 console.error('Error al obtener los datos del helado:', error);
             }
         };
 
-        if (id_helado) fetchHelado();
-    }, [id_helado]);
+        if (id) getHelado();
+    }, [id]);
 
     const manejarCambio = (e) => {
         const { name, value, type, checked } = e.target;
@@ -42,7 +42,7 @@ const EditarHelado = () => {
     const manejarEnvio = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`http://localhost:9999/api/helados/actualizar/${id_helado}`, datosFormulario);
+            const response = await axios.put(`http://localhost:9999/api/helados/${id}`, datosFormulario);
             console.log('Helado actualizado:', response.data);
             navigate(`/helados`); // Redirige a la lista de helados
         } catch (error) {

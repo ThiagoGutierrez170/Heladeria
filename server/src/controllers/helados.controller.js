@@ -75,34 +75,6 @@ const heladoController = {
             return res.status(400).json({ error: 'Error al eliminar el helado', detalle: error.message });
         }
     },
-    recargarHelados: async (req, res) => {
-        try {
-            const { recargas } = req.body; // Array de recargas [{id, cantidadCajas}, ...]
-    
-            for (let recarga of recargas) {
-                const { id, cantidadCajas } = recarga;
-    
-                if (!mongoose.Types.ObjectId.isValid(id)) {
-                    return res.status(400).json({ error: `ID inválido para el helado con id ${id}` });
-                }
-    
-                const helado = await Helado.findById(id);
-                if (!helado) {
-                    return res.status(404).json({ error: `Helado con id ${id} no encontrado.` });
-                }
-    
-                // Aumentar el stock usando la cantidadCaja del helado (cuántos helados por caja)
-                helado.stock += cantidadCajas * helado.cantidadCaja;
-    
-                // Guardar los cambios en la base de datos
-                await helado.save();
-            }
-    
-            return res.status(200).json({ mensaje: 'Recarga completada exitosamente.' });
-        } catch (error) {
-            return res.status(500).json({ error: 'Error al recargar helados', detalle: error.message });
-        }
-    }    
 };
 
 export default heladoController;

@@ -16,15 +16,16 @@ app.use(cors());
 
 import vendedorRouter from './src/routes/vendedor.routes.js';
 import heladoRouter from './src/routes/helado.routes.js';
-import NotaRouter from './src/routes/nota.routes.js';
-import sesionesRouter from "./src/routes/sesiones.routes.js";
-import usuarioRouter from "./src/routes/usuario.routes.js";
+import notaRouter from './src/routes/nota.routes.js';
+import sesion from './src/routes/sesiones.routes.js'
+import usuario from './src/routes/usuario.routes.js'
 
 app.use('/api/vendedor', vendedorRouter);
 app.use('/api/helado', heladoRouter);
-app.use('/api/nota', NotaRouter);
-app.use('/api/sesion', sesionesRouter);
-app.use('/api/usuario', usuarioRouter);
+app.use('/api/nota', notaRouter);
+app.use('/api/sesion',sesion);
+app.use('/api/usuario',usuario);
+
 
 conectDB();
 

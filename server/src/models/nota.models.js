@@ -45,7 +45,7 @@ const NotaSchema = new Schema({
     },
     creador: {
         type: Schema.Types.ObjectId, // Referencia al usuario
-        required: [true, "No se encontró el creador"],
+        required: [false, "No se encontró el creador"],
         ref: 'Usuario' // Referencia al modelo de usuario
     }
 },{ timestamps: true });

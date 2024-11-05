@@ -24,7 +24,7 @@ const CrearHelado = () => {
     const manejarEnvio = async (e) => {
         e.preventDefault();
         try {
-            const respuesta = await axios.post('http://localhost:9999/api/helado/', datosFormulario);
+            const respuesta = await axios.post('/api/helado/', datosFormulario);
             console.log('Helado agregado:', respuesta.data);
 
             // LIMPIEZA

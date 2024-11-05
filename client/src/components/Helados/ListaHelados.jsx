@@ -11,7 +11,7 @@ const ListaHelados = () => {
         const obtenerHelados = async () => {
             try {
                 // Realiza una solicitud GET a la API para obtener la lista de helados
-                const response = await axios.get('http://localhost:9999/api/helados');
+                const response = await axios.get('/api/helados');
                 // Actualiza el estado con la lista de helados obtenida
                 setHelados(response.data);
                 setHeladosFiltrados(response.data); // Inicializa los helados filtrados con la lista completa

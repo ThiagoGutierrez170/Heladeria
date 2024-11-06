@@ -25,48 +25,54 @@ const Navbar = () => {
                         component={Link}
                         to="/"
                     >
-                        Gestión de Vendedores
+                        Gestión de Vendedores y Notas
                     </Typography>
                     <IconButton
                         color="inherit"
                         onClick={handleMenuClick}
-                        sx={{ display: { xs: 'block', md: 'none' } }} // Show only on small screens
+                        sx={{ display: { xs: 'block', md: 'none' } }}
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Button
-                        color="inherit"
-                        component={Link}
-                        to="/vendedores"
-                        sx={{
-                            borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none',
-                            display: { xs: 'none', md: 'block' }, // Hide on small screens
-                        }}
-                    >
+                    
+                    {/* Navegación Principal en Pantallas Grandes */}
+                    <Button color="inherit" component={Link} to="/vendedores"
+                        sx={{ borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
                         Lista de Vendedores
+                    </Button>
+                    <Button color="inherit" component={Link} to="/notas-activas"
+                        sx={{ borderBottom: location.pathname === "/notas-activas" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
+                        Notas Activas
+                    </Button>
+                    <Button color="inherit" component={Link} to="/registro-finalizados"
+                        sx={{ borderBottom: location.pathname === "/registro-finalizados" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
+                        Notas Finalizadas
                     </Button>
 
                 </Toolbar>
             </AppBar>
+            
+            {/* Menú Lateral para Pantallas Pequeñas */}
             <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
-                sx={{ display: { xs: 'block', md: 'none' } }} // Show only on small screens
+                sx={{ display: { xs: 'block', md: 'none' } }}
             >
-                <MenuItem
-                    component={Link}
-                    to="/vendedores"
-                    onClick={handleMenuClose}
-                >
+                <MenuItem component={Link} to="/vendedores" onClick={handleMenuClose}>
                     Lista de Vendedores
                 </MenuItem>
-                <MenuItem
-                    component={Link}
-                    to="/agregar-vendedor"
-                    onClick={handleMenuClose}
-                >
+                <MenuItem component={Link} to="/agregar-vendedor" onClick={handleMenuClose}>
                     Agregar Vendedor
+                </MenuItem>
+                <MenuItem component={Link} to="/notas-activas" onClick={handleMenuClose}>
+                    Notas Activas
+                </MenuItem>
+                <MenuItem component={Link} to="/registro-finalizados" onClick={handleMenuClose}>
+                    Notas Finalizadas
+                </MenuItem>
+                <MenuItem component={Link} to="/agregar-nota" onClick={handleMenuClose}>
+                    Crear Nota
                 </MenuItem>
             </Menu>
         </>

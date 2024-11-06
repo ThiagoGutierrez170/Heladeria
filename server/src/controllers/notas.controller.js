@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 const Crear = async (req, res) => {
     try {
         const { vendedor_id, catalogo, playa, clima } = req.body;
-        const creador = req.user.id;
+        //const creador = req.user.id;
 
         const catalogoConStock = [];
         for (let item of catalogo) {
@@ -27,7 +27,7 @@ const Crear = async (req, res) => {
             catalogo: catalogoConStock,
             playa,
             clima,
-            creador
+            /*creador*/
         });
 
         res.status(201).json(nuevaNota);
@@ -37,7 +37,7 @@ const Crear = async (req, res) => {
 };
 
 // Lista de notas activas (solo información)
-const ListaNortasActivas = async (req, res) => {
+const ListaNotasActivas = async (req, res) => {
     try {
         const notasActivas = await Nota.find({ estado: 'activo' }).populate('vendedor_id', 'nombre apellido');
         res.status(200).json(notasActivas);
@@ -47,18 +47,22 @@ const ListaNortasActivas = async (req, res) => {
 };
 
 // Obtener una nota activa específica
+// Obtener una nota activa específica
 const TraerNotaActiva = async (req, res) => {
     try {
-        const { id } = req.params;
-        const nota = await Nota.findById(id).populate('vendedor_id', 'nombre apellido');
-        if (!nota || nota.estado !== 'activo') {
+        const { id } = req.params; // Tomar el 'id' de los parámetros
+        const notaActiva = await Nota.findById(id).populate('vendedor_id', 'nombre apellido');
+        
+        if (!notaActiva) {
             return res.status(404).json({ error: 'Nota activa no encontrada' });
         }
-        res.status(200).json(nota);
+
+        res.status(200).json(notaActiva);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener la nota activa', detalle: error.message });
     }
 };
+
 
 // Recargar el catálogo de una nota existente
 const RecargarCatalogo = async (req, res) => {
@@ -123,15 +127,16 @@ const EditarNotaActiva = async (req, res) => {
 };
 
 // Lista de notas finalizadas (información y cálculos de ganancias)
-const ListaNortasFinalizada = async (req, res) => {
+const ListaNotasFinalizada = async (req, res) => {
     try {
-        const notasFinalizadas = await Nota.find({ estado: 'finalizado' }).populate('vendedor_id', 'nombre apellido');
+        const notasFinalizadas = await Nota.find({ estado: 'finalizado' }).populate('vendedor_id', 'nombre apellido').populate('catalogo.helado_id', 'costo precioBase precioVenta');
+
         const notasConGanancias = notasFinalizadas.map(nota => {
             const detallesGanancias = nota.catalogo.map(item => {
                 const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
                 const cantidadVendida = cantidadTotal - (item.cantidad_devuelta || 0);
                 return {
-                    helado_id: item.helado_id,
+                    helado_id: item.helado_id._id,
                     gananciaMinima: cantidadVendida * item.helado_id.costo,
                     gananciaBase: cantidadVendida * item.helado_id.precioBase,
                     gananciaTotal: cantidadVendida * item.helado_id.precioVenta
@@ -224,14 +229,53 @@ const Eliminar = async (req, res) => {
     }
 };
 
+// Finalizar una nota activa
+const FinalizarNota = async (req, res) => {
+    try {
+        const { devoluciones } = req.body;
+        const { id } = req.params;
+
+        // Verifica si el ID de la nota es válido
+        const nota = await Nota.findById(id);
+        if (!nota) {
+            return res.status(404).json({ error: 'Nota no encontrada' });
+        }
+
+        // Procesar las devoluciones
+        for (let heladoId in devoluciones) {
+            const cantidadDevuelta = devoluciones[heladoId];
+
+            // Actualiza el stock del helado
+            const helado = await Helado.findById(heladoId);
+            if (helado) {
+                helado.stock += cantidadDevuelta;
+                await helado.save();
+            }
+        }
+
+        // Actualiza el estado de la nota
+        nota.estado = 'Finalizada';
+        await nota.save();
+
+        // Responder con éxito
+        res.status(200).json({ message: 'Nota finalizada correctamente' });
+    } catch (error) {
+        console.error('Error al finalizar la nota:', error);
+        res.status(500).json({ error: 'Error interno en el servidor' });
+    }
+};
+
+
+
 export default {
     Crear,
-    ListaNortasActivas,
+    ListaNotasActivas,
     TraerNotaActiva,
     RecargarCatalogo,
     EditarNotaActiva,
-    ListaNortasFinalizada,
+    ListaNotasFinalizada,
     TraerFactura,
     DetalleNota,
+    FinalizarNota,
     Eliminar
 };

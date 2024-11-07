@@ -7,16 +7,15 @@ import Button from '@mui/material/Button';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { ExcelExportModule } from "@ag-grid-enterprise/excel-export";
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-const InfoModal = lazy(() => import('../vendedores/VendedorDetalles'));
+const InfoModal = lazy(() => import('./VendedorDetalles'));
 import AddIcon from '@mui/icons-material/Add';
-import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
+
 
 const ActionButtons = React.memo(({ onEdit, onDelete, onInfo }) => (
     <div style={{ display: 'flex' }}>
@@ -41,19 +40,12 @@ const VendedoresList = () => {
     const [openInfoModal, setOpenInfoModal] = useState(false);
     const gridRef = useRef(null);
 
-    const onExportClick = useCallback((type) => {
-        const gridApi = gridRef.current.api;
-        if (type === 'csv') {
-            gridApi.exportDataAsCsv();
-        } else if (type === 'excel') {
-            gridApi.exportDataAsExcel();
-        }
-    }, []);
+
 
     const fetchVendedores = async (page = 1, pageSize = 10) => {
         setLoading(true);
         try {
-            const response = await axios.get(`/api/vendedor?page=${page}&pageSize=${pageSize}`);
+            const response = await axios.get(`http://localhost:5000/api/vendedor?page=${page}&pageSize=${pageSize}`);
             setVendedores(response.data);
             if (!Array.isArray(response.data)) {
                 console.error('Expected an array but got:', response.data);
@@ -82,7 +74,7 @@ const VendedoresList = () => {
         });
         if (result.isConfirmed) {
             try {
-                await axios.delete(`/api/vendedor/${vendedorId}`);
+                await axios.delete(`http://localhost:5000/api/vendedor/${vendedorId}`);
                 setVendedores(prev => prev.filter(vendedor => vendedor._id !== vendedorId));
                 Swal.fire('Eliminado!', 'El vendedor ha sido eliminado.', 'success');
             } catch (error) {
@@ -111,22 +103,14 @@ const VendedoresList = () => {
                     field: "nombre",
                     flex: 1,
                     minWidth: 200,
-                    columnChooserParams: {
-                        suppressColumnFilter: true,
-                        suppressColumnSelectAll: true,
-                        suppressColumnExpandAll: true,
-                    },
+
                 },
                 {
                     headerName: "Apellido",
                     field: "apellido",
                     flex: 1,
                     minWidth: 200,
-                    columnChooserParams: {
-                        suppressColumnFilter: true,
-                        suppressColumnSelectAll: true,
-                        suppressColumnExpandAll: true,
-                    },
+
                 },
                 {
                     headerName: "C.I.",
@@ -150,13 +134,15 @@ const VendedoresList = () => {
                     headerName: "Acciones",
                     field: "acciones",
                     cellRenderer: (params) => (
-                        <ActionButtons
-                            onInfo={() => handleInfo(params.data.id)}
-                            onEdit={() => handleEdit(params.data.id)}
-                            onDelete={() => handleDelete(params.data.id)}
-                        />
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <ActionButtons
+                                onInfo={() => handleInfo(params.data.id)}
+                                onEdit={() => handleEdit(params.data.id)}
+                                onDelete={() => handleDelete(params.data.id)}
+                            />
+                        </div>
                     ),
-                },
+                }
             ],
         },
     ], [handleInfo, handleEdit, handleDelete]);
@@ -167,21 +153,6 @@ const VendedoresList = () => {
             <Typography variant="h5" align="center" gutterBottom color="primary">
                 Lista de Vendedores
             </Typography>
-
-
-
-            <div style={{ marginBottom: '16px', textAlign: 'center' }}>
-                <IconButton
-                    variant="outlined"
-                    onClick={() => onExportClick('excel')}
-                    sx={{ marginLeft: '8px' }}
-                >
-                    <DocumentScannerIcon /> {/* Cambia a PublishIcon si prefieres el icono de publicar */}
-                </IconButton>
-                <Typography variant="button" style={{ marginLeft: '8px' }}>
-                    
-                </Typography>
-            </div>
 
 
             <Button
@@ -225,7 +196,8 @@ const VendedoresList = () => {
                         columnDefs={columns}
                         pagination={true}
                         paginationPageSize={10}
-                        modules={[ExcelExportModule]}
+                        paginationPageSizeSelector={[10, 20, 50, 100]}
+
                     />
                 </Paper>
             )}

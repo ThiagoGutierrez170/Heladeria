@@ -13,10 +13,12 @@ import RegistroFinalizados from './components/Notas/RegistroFinalizados';
 import DetalleNota from './components/Notas/DetalleNota';
 import Navbar from './components/utils/Navbar';
 
+
 const App = () => {
   return (
     <>
       <Router>
+        <Titulo />
         <Navbar />
         <Routes>
           {/* Rutas de Vendedores */}
@@ -40,6 +42,7 @@ const App = () => {
 
           {/* Ruta para Crear Nota */}
           <Route path="/agregar-nota" element={<CrearNota />} />
+
         </Routes>
       </Router>
     </>

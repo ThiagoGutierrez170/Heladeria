@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
-import 'sweetalert2/src/sweetalert2.scss';
+//import 'sweetalert2/src/sweetalert2.scss';
 import axios from 'axios';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AddIcon from '@mui/icons-material/Add';
@@ -43,7 +43,7 @@ const VendedoresForm = () => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                const response = await axios.post('/api/vendedor/', {
+                const response = await axios.post('http://localhost:5000/api/vendedor/', {
                     nombre, apellido, edad, ci, contacto, estado,
                 });
 

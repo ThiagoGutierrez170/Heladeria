@@ -42,44 +42,51 @@ const RegistroFinalizados = () => {
             </Typography>
             <Divider sx={{ my: 3 }} />
 
-            {notasFinalizadas.map((nota) => (
-                <Paper key={nota._id} sx={{ p: 3, mb: 3 }}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <Typography variant="body1"><strong>Vendedor:</strong> {nota.vendedor_id.nombre} {nota.vendedor_id.apellido}</Typography>
+            {notasFinalizadas.map((nota) => {
+                // Calcular la ganancia base total sumando cada gananciaBase en detallesGanancias
+                const gananciaBaseTotal = nota.detallesGanancias.reduce((total, detalle) => total + detalle.gananciaBase, 0);
+
+                return (
+                    <Paper key={nota._id} sx={{ p: 3, mb: 3 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography variant="body1"><strong>Vendedor:</strong> {nota.vendedor_id?.nombre} {nota.vendedor_id?.apellido}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography variant="body1"><strong>Playa:</strong> {nota.playa}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography variant="body1"><strong>Clima:</strong> {nota.clima}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography variant="body1"><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
+                            </Grid>
+
+                            {/* Botones para ver detalle y factura */}
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => handleVerDetalle(nota._id)}
+                                    sx={{ mt: 2 }}
+                                >
+                                    Ver Detalle
+                                </Button>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={() => handleVerFactura(nota._id)}
+                                    sx={{ mt: 2 }}
+                                >
+                                    Ver Factura
+                                </Button>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <Typography variant="body1"><strong>Playa:</strong> {nota.playa}</Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <Typography variant="body1"><strong>Clima:</strong> {nota.clima}</Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <Typography variant="body1"><strong>Ganancia Base Total:</strong> ${nota.gananciaBaseTotal?.toFixed(2)}</Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => handleVerDetalle(nota._id)}
-                                sx={{ mt: 2 }}
-                            >
-                                Ver Detalle
-                            </Button>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3}>
-                            <Button
-                                variant="outlined"
-                                color="secondary"
-                                onClick={() => handleVerFactura(nota._id)}
-                                sx={{ mt: 2 }}
-                            >
-                                Ver Factura
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Paper>
-            ))}
+                    </Paper>
+                );
+            })}
         </Container>
     );
 };

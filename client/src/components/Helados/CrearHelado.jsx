@@ -69,6 +69,7 @@ const CrearHelado = () => {
             } catch (error) {
                 Swal.fire('Error!', 'Hubo un problema al registrar el helado.', 'error');
             }
+
         }
     };
 

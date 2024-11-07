@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import './Navbar.css';
+import './Navbar.css';
 
 const Navbar = () => {
     const location = useLocation();
@@ -18,6 +19,7 @@ const Navbar = () => {
 
     return (
         <>
+            <AppBar position="fixed">
             <AppBar position="fixed">
                 <Toolbar>
                     <Typography
@@ -46,6 +48,19 @@ const Navbar = () => {
                     >
                         Lista de Vendedores
                     </Button>
+
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/helados"
+                        sx={{
+                            borderBottom: location.pathname === "/helados" ? '2px solid white' : 'none',
+                            display: { xs: 'none', md: 'block' }, 
+                        }}
+                    >
+                        Lista de Helados
+                    </Button>
+
 
                     <Button
                         color="inherit"
@@ -104,6 +119,20 @@ const Navbar = () => {
                     onClick={handleMenuClose}
                 >
                     Agregar Vendedor
+                </MenuItem>
+                <MenuItem
+                    component={Link}
+                    to="/helados"
+                    onClick={handleMenuClose}
+                >
+                    Lista de helados
+                </MenuItem>
+                <MenuItem
+                    component={Link}
+                    to="/agregar-helado"
+                    onClick={handleMenuClose}
+                >
+                    Agregar helado
                 </MenuItem>
                 <MenuItem
                     component={Link}

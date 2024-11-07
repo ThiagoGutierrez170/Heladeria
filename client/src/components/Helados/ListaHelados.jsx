@@ -161,13 +161,15 @@ const ListaHelados = () => {
             <Typography variant="h5" align="center" gutterBottom color="primary">
                 Lista de Helados
             </Typography>
-            <TextField
-                className="search-input"
-                variant="outlined"
-                value={terminoBusqueda}
-                onChange={(e) => setTerminoBusqueda(e.target.value)}
-                placeholder='Buscar helados'
-            />
+            <div className="search-container">
+                <TextField
+                    className="search-input"
+                    variant="outlined"
+                    value={terminoBusqueda}
+                    onChange={(e) => setTerminoBusqueda(e.target.value)}
+                    placeholder='Buscar helados'
+                />
+            </div>
             <Button
                 variant="contained"
                 color="primary"

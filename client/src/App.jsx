@@ -36,7 +36,7 @@ const App = () => {
           
           {/* Rutas de Notas Finalizadas */}
           <Route path="/registro-finalizados" element={<RegistroFinalizados />} />
-          <Route path="/detalle-nota/:id" element={<DetalleNota />} />
+          <Route path="/nota-detalle/:id" element={<DetalleNota />} />
 
           {/* Ruta para Crear Nota */}
           <Route path="/agregar-nota" element={<CrearNota />} />

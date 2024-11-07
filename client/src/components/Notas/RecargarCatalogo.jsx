@@ -47,6 +47,7 @@ const RecargarCatalogo = () => {
         try {
             // Envía las recargas al backend para actualizar la nota
             await axios.put(`/api/nota/recargar/${id}`, { recargas });
+            console.log(recargas);
             Swal.fire('Recarga Exitosa', 'Las cantidades han sido recargadas en el catálogo.', 'success');
             navigate(`/notas-activas/${id}`);
         } catch (error) {
@@ -65,7 +66,7 @@ const RecargarCatalogo = () => {
                         <Grid item xs={6}>
                             <Typography variant="body1">{item.helado_id.nombre}</Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Cantidad inicial: {item.cantidad_inicial} | Vendido: {item.cantidad_vendida}
+                                Cantidad inicial: {item.cantidad_inicial}
                             </Typography>
                         </Grid>
                         <Grid item xs={6}>

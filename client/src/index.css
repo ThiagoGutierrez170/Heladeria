@@ -72,3 +72,7 @@ button:focus-visible {
 span{
   color: black;
 }
+
+body{
+  background-color: rgb(101, 101, 101);
+}

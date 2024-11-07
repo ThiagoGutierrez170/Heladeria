@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 const Crear = async (req, res) => {
     try {
         const { vendedor_id, catalogo, playa, clima } = req.body;
-        const creador = req.user.id;
+        //const creador = req.user.id;
 
         const catalogoConStock = [];
         for (let item of catalogo) {
@@ -27,7 +27,7 @@ const Crear = async (req, res) => {
             catalogo: catalogoConStock,
             playa,
             clima,
-            creador
+            /*creador*/
         });
 
         res.status(201).json(nuevaNota);
@@ -37,7 +37,7 @@ const Crear = async (req, res) => {
 };
 
 // Lista de notas activas (solo información)
-const ListaNortasActivas = async (req, res) => {
+const ListaNotasActivas = async (req, res) => {
     try {
         const notasActivas = await Nota.find({ estado: 'activo' }).populate('vendedor_id', 'nombre apellido');
         res.status(200).json(notasActivas);
@@ -47,18 +47,25 @@ const ListaNortasActivas = async (req, res) => {
 };
 
 // Obtener una nota activa específica
+// Obtener una nota activa específica
 const TraerNotaActiva = async (req, res) => {
     try {
         const { id } = req.params;
-        const nota = await Nota.findById(id).populate('vendedor_id', 'nombre apellido');
-        if (!nota || nota.estado !== 'activo') {
+        const notaActiva = await Nota.findById(id)
+            .populate('vendedor_id', 'nombre apellido')
+            .populate('catalogo.helado_id', 'nombre'); // Popula el nombre del helado en catalogo
+
+        if (!notaActiva) {
             return res.status(404).json({ error: 'Nota activa no encontrada' });
         }
-        res.status(200).json(nota);
+
+        res.status(200).json(notaActiva);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener la nota activa', detalle: error.message });
     }
 };
+
+
 
 // Recargar el catálogo de una nota existente
 const RecargarCatalogo = async (req, res) => {
@@ -123,15 +130,16 @@ const EditarNotaActiva = async (req, res) => {
 };
 
 // Lista de notas finalizadas (información y cálculos de ganancias)
-const ListaNortasFinalizada = async (req, res) => {
+const ListaNotasFinalizada = async (req, res) => {
     try {
-        const notasFinalizadas = await Nota.find({ estado: 'finalizado' }).populate('vendedor_id', 'nombre apellido');
+        const notasFinalizadas = await Nota.find({ estado: 'finalizado' }).populate('vendedor_id', 'nombre apellido').populate('catalogo.helado_id', 'costo precioBase precioVenta');
+
         const notasConGanancias = notasFinalizadas.map(nota => {
             const detallesGanancias = nota.catalogo.map(item => {
                 const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
                 const cantidadVendida = cantidadTotal - (item.cantidad_devuelta || 0);
                 return {
-                    helado_id: item.helado_id,
+                    helado_id: item.helado_id._id,
                     gananciaMinima: cantidadVendida * item.helado_id.costo,
                     gananciaBase: cantidadVendida * item.helado_id.precioBase,
                     gananciaTotal: cantidadVendida * item.helado_id.precioVenta
@@ -149,11 +157,17 @@ const ListaNortasFinalizada = async (req, res) => {
 const TraerFactura = async (req, res) => {
     try {
         const { id } = req.params;
-        const nota = await Nota.findById(id).populate('catalogo.helado_id');
+
+        // Encuentra la nota por ID y popula el vendedor y el catálogo
+        const nota = await Nota.findById(id)
+            .populate('vendedor_id', 'nombre apellido') // Popula el vendedor
+            .populate('catalogo.helado_id', 'nombre precioBase'); // Popula el nombre y precio base del helado
+
         if (!nota || nota.estado !== 'finalizado') {
             return res.status(404).json({ error: 'Nota finalizada no encontrada' });
         }
 
+        // Crea el detalle de la factura calculando la ganancia base
         const detallesFactura = nota.catalogo.map(item => {
             const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
             const cantidadVendida = cantidadTotal - (item.cantidad_devuelta || 0);
@@ -165,9 +179,19 @@ const TraerFactura = async (req, res) => {
             };
         });
 
+        // Calcula la ganancia total base sumando las ganancias de cada helado
         const gananciaTotalBase = detallesFactura.reduce((acc, detalle) => acc + detalle.gananciaBase, 0);
-        res.status(200).json({ detallesFactura, gananciaTotalBase });
+
+        // Incluye en la respuesta la información completa de la nota
+        res.status(200).json({
+            detallesFactura,
+            gananciaTotalBase,
+            vendedor: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
+            playa: nota.playa,
+            clima: nota.clima
+        });
     } catch (error) {
+        console.error('Error al generar la factura:', error);
         res.status(500).json({ error: 'Error al generar la factura', detalle: error.message });
     }
 };
@@ -205,6 +229,7 @@ const DetalleNota = async (req, res) => {
     }
 };
 
+
 // Eliminar una nota (solo visible para el administrador)
 const Eliminar = async (req, res) => {
     try {
@@ -224,14 +249,68 @@ const Eliminar = async (req, res) => {
     }
 };
 
+// Finalizar una nota activa
+const FinalizarNota = async (req, res) => {
+    try {
+        const { devoluciones } = req.body; // Cantidad devuelta para cada helado
+        const { id } = req.params;
+
+        console.log('ID de la nota:', id);
+        console.log('Devoluciones recibidas:', devoluciones);
+
+        // Encuentra la nota por ID
+        const nota = await Nota.findById(id);
+        if (!nota) {
+            return res.status(404).json({ error: 'Nota no encontrada' });
+        }
+
+        // Procesa cada item en el catálogo de la nota
+        for (let item of nota.catalogo) {
+            const heladoId = item.helado_id.toString();
+            const cantidadDevuelta = devoluciones[heladoId] || 0; // Devolución del frontend para este helado
+
+            // Calcula cantidad total disponible
+            const cantidadTotal = item.cantidad_inicial + (item.recargas || []).reduce((acc, r) => acc + r, 0);
+            
+            // Calcula y asigna cantidad vendida
+            item.cantidad_vendida = cantidadTotal - cantidadDevuelta;
+
+            console.log(`Helado ${heladoId}: Cantidad total = ${cantidadTotal}, Devolución = ${cantidadDevuelta}, Vendida = ${item.cantidad_vendida}`);
+
+            // Actualiza el stock en el modelo Helado
+            const helado = await Helado.findById(heladoId);
+            if (helado) {
+                helado.stock += cantidadDevuelta;
+                await helado.save();
+            } else {
+                console.log(`Helado con ID ${heladoId} no encontrado`);
+            }
+        }
+
+        // Cambia el estado de la nota a 'finalizado'
+        nota.estado = 'finalizado';
+        await nota.save();
+
+        res.status(200).json({ message: 'Nota finalizada correctamente' });
+    } catch (error) {
+        console.error('Error al finalizar la nota:', error);
+        res.status(500).json({ error: 'Error interno en el servidor', detalle: error.message });
+    }
+};
+
+
+
+
+
 export default {
     Crear,
-    ListaNortasActivas,
+    ListaNotasActivas,
     TraerNotaActiva,
     RecargarCatalogo,
     EditarNotaActiva,
-    ListaNortasFinalizada,
+    ListaNotasFinalizada,
     TraerFactura,
     DetalleNota,
+    FinalizarNota,
     Eliminar
 };

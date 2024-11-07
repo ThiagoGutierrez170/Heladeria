@@ -13,13 +13,13 @@ const Titulo = () => {
                 document.title = 'Lista de Helados';
                 break;
             case '/agregar-vendedor':
-                document.title = 'Agregar Vendedor';
+                document.title = 'Formulario de  Vendedor';
                 break;
             case '/editar-vendedor':
                 document.title = 'Editar Vendedor';
                 break;
             case '/agregar-helado':
-                document.title = 'Agregar Helado';
+                document.title = 'Formulario de Helado';
                 break;
             case '/editar-helado':
                 document.title = 'Editar Helado';

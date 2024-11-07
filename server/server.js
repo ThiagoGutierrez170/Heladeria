@@ -23,7 +23,7 @@ import usuario from './src/routes/usuario.routes.js'
 app.use('/api/vendedor', vendedorRouter);
 app.use('/api/helado', heladoRouter);
 app.use('/api/nota', notaRouter);
-app.use('/api/sesion', sesion);
+app.use('/api/sesiones', sesion);
 app.use('/api/usuario', usuario);
 
 

@@ -17,7 +17,7 @@ const EditarNota = () => {
         clima: '',
         estado: '',
         catalogo: [],
-        vendedor: '', // Campo para almacenar el ID del vendedor seleccionado
+        vendedor: '', 
     });
     const [errors, setErrors] = useState({});
     const [vendedores, setVendedores] = useState([]); // Estado para almacenar la lista de vendedores

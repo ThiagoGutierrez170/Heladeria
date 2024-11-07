@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Typography, Paper, CircularProgress, IconButton, Button, TextField } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
@@ -53,43 +52,14 @@ const ListaHelados = () => {
     };
 
     useEffect(() => {
-=======
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-
-const ListaHelados = () => {
-    const [terminoBusqueda, setTerminoBusqueda] = useState(''); // Término de búsqueda
-    const [helados, setHelados] = useState([]); // Lista completa de helados
-    const [heladosFiltrados, setHeladosFiltrados] = useState([]); // Helados filtrados según búsqueda
-
-    useEffect(() => {
-        const obtenerHelados = async () => {
-            try {
-                // Realiza una solicitud GET a la API para obtener la lista de helados
-                const response = await axios.get('/api/helados');
-                // Actualiza el estado con la lista de helados obtenida
-                setHelados(response.data);
-                setHeladosFiltrados(response.data); // Inicializa los helados filtrados con la lista completa
-            } catch (error) {
-                console.error('Error al obtener los helados:', error);
-            }
-        };
-
->>>>>>> c9a7e4295bce673f20b2817298af1e8da77fa1b2
         obtenerHelados();
     }, []);
 
     useEffect(() => {
-<<<<<<< HEAD
-=======
-        // Filtra los helados según el término de búsqueda
->>>>>>> c9a7e4295bce673f20b2817298af1e8da77fa1b2
         const filtrarHelados = () => {
             const filtrados = helados.filter((helado) =>
                 helado.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase())
             );
-<<<<<<< HEAD
             setHeladosFiltrados(filtrados);
         };
         filtrarHelados();
@@ -191,32 +161,13 @@ const ListaHelados = () => {
             <Typography variant="h5" align="center" gutterBottom color="primary">
                 Lista de Helados
             </Typography>
-            <div className="search-container">
-                <TextField
-                    className="search-input"
-                    variant="outlined"
-=======
-            // Actualiza el estado de helados filtrados
-            setHeladosFiltrados(filtrados);
-        };
-
-        filtrarHelados();
-    }, [terminoBusqueda, helados]);
-
-    return (
-        <div className='contenedor-centrado'>
-            <h1>Todos los Helados</h1>
-            <div>
-                <input
-                    type="text"
-                    className="buscador-texto"
->>>>>>> c9a7e4295bce673f20b2817298af1e8da77fa1b2
-                    value={terminoBusqueda}
-                    onChange={(e) => setTerminoBusqueda(e.target.value)}
-                    placeholder='Buscar helados'
-                />
-            </div>
-<<<<<<< HEAD
+            <TextField
+                className="search-input"
+                variant="outlined"
+                value={terminoBusqueda}
+                onChange={(e) => setTerminoBusqueda(e.target.value)}
+                placeholder='Buscar helados'
+            />
             <Button
                 variant="contained"
                 color="primary"
@@ -236,7 +187,6 @@ const ListaHelados = () => {
             >
                 <AddIcon sx={{ mr: 0 }} />
             </Button>
-
             {loading ? (
                 <CircularProgress color="primary" />
             ) : (
@@ -270,20 +220,7 @@ const ListaHelados = () => {
                     />
                 )}
             </Suspense>
-
         </>
-=======
-            <ul>
-                {heladosFiltrados.map((helado) => (
-                    <li key={helado._id}>
-                        <Link to={`/helados/${helado._id}`} className="elemento-helado">
-                            {helado.nombre}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        </div>
->>>>>>> c9a7e4295bce673f20b2817298af1e8da77fa1b2
     );
 };
 

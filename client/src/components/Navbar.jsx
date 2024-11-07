@@ -53,12 +53,36 @@ const Navbar = () => {
                         to="/helados"
                         sx={{
                             borderBottom: location.pathname === "/helados" ? '2px solid white' : 'none',
-                            display: { xs: 'none', md: 'block' }, 
+                            display: { xs: 'none', md: 'block' },
                         }}
                     >
                         Lista de Helados
                     </Button>
 
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/usuarios"  // Ruta para la lista de usuarios
+                        sx={{
+                            borderBottom: location.pathname === "/usuarios" ? '2px solid white' : 'none',
+                            display: { xs: 'none', md: 'block' },  // Mostrar en pantallas grandes
+                        }}
+                    >
+                        Lista de Usuarios
+                    </Button>
+
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/login"
+                        sx={{
+                            borderBottom: location.pathname === "/login" ? '2px solid white' : 'none',
+                            display: { xs: 'none', md: 'block' },
+                        }}
+                    >
+                        Login
+                    </Button>
+                    
                 </Toolbar>
             </AppBar>
             <Menu
@@ -94,6 +118,13 @@ const Navbar = () => {
                     onClick={handleMenuClose}
                 >
                     Agregar helado
+                </MenuItem>
+                <MenuItem
+                    component={Link}
+                    to="/usuarios"  // Opción para la lista de usuarios en el menú
+                    onClick={handleMenuClose}
+                >
+                    Lista de Usuarios
                 </MenuItem>
             </Menu>
         </>

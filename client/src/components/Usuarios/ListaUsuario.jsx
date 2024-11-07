@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { List, ListItem, ListItemText, IconButton, Typography, Container, Box } from '@mui/material';
 
 const ListaUsuario = () => {
     const [usuarios, setUsuarios] = useState([]);
@@ -15,23 +16,38 @@ const ListaUsuario = () => {
         }
 
         const fetchUsuarios = async () => {
-            const res = await axios.get('/api/usuarios/lista');
-            setUsuarios(res.data);
+            try {
+                const res = await axios.get('/api/usuario/lista');
+                setUsuarios(res.data);
+            } catch (error) {
+                console.error("Error al obtener los usuarios", error);
+                alert('No se pudo cargar la lista de usuarios');
+            }
         };
         fetchUsuarios();
     }, [navigate]);
 
     return (
-        <div>
-            <h2>Lista de Usuarios</h2>
-            <ul>
-                {usuarios.map(usuario => (
-                    <li key={usuario.id}>
-                        <Link to={`/usuarios/${usuario.id}`}>{usuario.nombreUsuario}</Link>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <Container component="main" maxWidth="md">
+            <Box sx={{ marginTop: 4 }}>
+                <Typography variant="h4" gutterBottom align="center">
+                    Lista de Usuarios
+                </Typography>
+                <List>
+                    {usuarios.map((usuario) => (
+                        <ListItem key={usuario.id} sx={{ display: 'flex', alignItems: 'center' }}>
+                            <IconButton edge="start" color="primary">
+                                {/* Puedes agregar un icono aquí si es necesario */}
+                            </IconButton>
+                            <ListItemText
+                                primary={usuario.nombreUsuario}
+                                secondary={usuario.correo}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+            </Box>
+        </Container>
     );
 };
 

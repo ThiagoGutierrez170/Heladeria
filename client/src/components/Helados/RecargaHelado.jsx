@@ -9,11 +9,9 @@ const RecargaHelado = () => {
     useEffect(() => {
         const obtenerHelados = async () => {
             try {
-<<<<<<< HEAD:client/src/components/RecargaHelado.jsx
+
                 const response = await axios.get("http://localhost:5000/api/helados");
-=======
-                const response = await axios.get("/api/helados");
->>>>>>> c9a7e4295bce673f20b2817298af1e8da77fa1b2:client/src/components/Helados/RecargaHelado.jsx
+
                 setHelados(response.data);
             } catch (error) {
                 console.error("Error al obtener helados:", error);

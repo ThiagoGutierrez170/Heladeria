@@ -13,7 +13,6 @@ import {
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Helmet } from 'react-helmet';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 
@@ -27,7 +26,7 @@ const EditarVendedor = () => {
     useEffect(() => {
         const fetchVendedor = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/vendedor/${id}`);
+                const response = await axios.get(`/api/vendedor/${id}`);
                 setVendedor(response.data);
                 setLoading(false);
             } catch (error) {
@@ -54,7 +53,7 @@ const EditarVendedor = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5000/api/vendedor/${id}`, vendedor);
+            await axios.put(`/api/vendedor/${id}`, vendedor);
             Swal.fire('Éxito', 'El vendedor ha sido actualizado.', 'success');
             navigate('/vendedores');
         } catch (error) {
@@ -80,12 +79,6 @@ const EditarVendedor = () => {
 
     return (
         <>
-            <Helmet>
-                <meta charSet="UTF-8" />
-                <link rel="icon" type="image/svg+xml" href="/src/assets/images/editar.png" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>Editar Vendedor</title>
-            </Helmet>
             <Container
                 sx={{
                     display: 'flex',
@@ -193,4 +186,3 @@ const EditarVendedor = () => {
 };
 
 export default EditarVendedor;
-

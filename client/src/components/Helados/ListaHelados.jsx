@@ -11,9 +11,10 @@ import Swal from 'sweetalert2';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 const HeladoDetalles = lazy(() => import('./HeladoDetalle'));
+import RecargaHelado from './RecargaHelado';
 import './helado.modules.css/ListaHelados.css';
 
-const ActionButtons = React.memo(({ onEdit, onDelete, onInfo }) => (
+const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga }) => (
     <div style={{ display: 'flex' }}>
         <IconButton color="default" onClick={onInfo} sx={{ marginRight: '8px' }}>
             <InfoIcon />
@@ -24,6 +25,9 @@ const ActionButtons = React.memo(({ onEdit, onDelete, onInfo }) => (
         <IconButton color="error" onClick={onDelete}>
             <DeleteIcon />
         </IconButton>
+        <IconButton color="secondary" onClick={onRecarga} sx={{ marginLeft: '8px' }}>
+            <AddIcon />
+        </IconButton>
     </div>
 ));
 
@@ -33,6 +37,7 @@ const ListaHelados = () => {
     const [terminoBusqueda, setTerminoBusqueda] = useState('');
     const [heladosFiltrados, setHeladosFiltrados] = useState([]);
     const [openInfoModal, setOpenInfoModal] = useState(false);
+    const [openRecargaModal, setOpenRecargaModal] = useState(false);
     const [selectedHelado, setSelectedHelado] = useState(null);
     const gridRef = useRef(null);
     const navigate = useNavigate();
@@ -40,7 +45,7 @@ const ListaHelados = () => {
     const obtenerHelados = async (page = 1, pageSize = 10) => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/helado?page=${page}&pageSize=${pageSize}`);
+            const response = await axios.get(`/api/helado?page=${page}&pageSize=${pageSize}`);
             setHelados(response.data);
             setHeladosFiltrados(response.data);
         } catch (error) {
@@ -68,7 +73,7 @@ const ListaHelados = () => {
     const handleDelete = useCallback(async (heladoId) => {
         const result = await Swal.fire({
             title: '¿Estás seguro?',
-            text: "¡No podrás recuperar este vendedor!",
+            text: "¡No podrás recuperar este helado!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar!',
@@ -76,7 +81,7 @@ const ListaHelados = () => {
         });
         if (result.isConfirmed) {
             try {
-                await axios.delete(`http://localhost:5000/api/helado/${heladoId}`);
+                await axios.delete(`/api/helado/${heladoId}`);
                 setHelados(prev => prev.filter(helado => helado._id !== heladoId));
                 Swal.fire('Eliminado!', 'El helado ha sido eliminado.', 'success');
             } catch (error) {
@@ -95,13 +100,21 @@ const ListaHelados = () => {
         setOpenInfoModal(true);
     }, [helados]);
 
+    const handleRecarga = useCallback((heladoId) => {
+        const helado = helados.find(h => h._id === heladoId);
+        setSelectedHelado(helado);
+        setOpenRecargaModal(true);
+    }, [helados]);
+
     const columns = useMemo(() => [
         {
             headerName: "Nombre",
             field: "nombre",
             flex: 1,
-            minWidth: 100,
+            minWidth: 300,
+
         },
+            
         {
             headerName: "Imagen",
             field: "imagen",
@@ -115,19 +128,19 @@ const ListaHelados = () => {
             headerName: "Costo",
             field: "costo",
             flex: 0.5,
-            minWidth: 100,
+            minWidth: 50,
         },
         {
             headerName: "Precio Base",
             field: "precioBase",
             flex: 1,
-            minWidth: 100,
+            minWidth: 50,
         },
         {
             headerName: "Precio Venta",
             field: "precioVenta",
             flex: 1,
-            minWidth: 100,
+            minWidth: 50,
         },
         {
             headerName: "Cantidad en Caja",
@@ -150,11 +163,12 @@ const ListaHelados = () => {
                         onInfo={() => handleInfo(params.data.id)}
                         onEdit={() => handleEdit(params.data.id)}
                         onDelete={() => handleDelete(params.data.id)}
+                        onRecarga={() => handleRecarga(params.data.id)} // Agregar el botón de recarga
                     />
                 </div>
             ),
         }
-    ], [handleInfo, handleEdit, handleDelete]);
+    ], [handleInfo, handleEdit, handleDelete, handleRecarga]);
 
     return (
         <>
@@ -221,7 +235,16 @@ const ListaHelados = () => {
                         helado={selectedHelado}
                     />
                 )}
+                {openRecargaModal && (
+                    <RecargaHelado
+                        open={openRecargaModal}
+                        onClose={() => setOpenRecargaModal(false)}
+                        helado={selectedHelado}
+                        obtenerHelados={obtenerHelados}
+                    />
+                )}
             </Suspense>
+
         </>
     );
 };

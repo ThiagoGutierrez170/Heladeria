@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import './Navbar.css';
-import './Navbar.css';
 
 const Navbar = () => {
     const location = useLocation();
@@ -17,9 +16,12 @@ const Navbar = () => {
         setAnchorEl(null);
     };
 
+    // Obtener el rol del usuario y el token desde localStorage
+    const rolUsuario = localStorage.getItem('rol');
+    const token = localStorage.getItem('token');
+
     return (
         <>
-            <AppBar position="fixed">
             <AppBar position="fixed">
                 <Toolbar>
                     <Typography
@@ -37,31 +39,23 @@ const Navbar = () => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Button
-                        color="inherit"
-                        component={Link}
-                        to="/vendedores"
-                        sx={{
-                            borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none',
-                            display: { xs: 'none', md: 'block' }, // Hide on small screens
-                        }}
-                    >
-                        Lista de Vendedores
-                    </Button>
 
-                    <Button
-                        color="inherit"
-                        component={Link}
-                        to="/helados"
-                        sx={{
-                            borderBottom: location.pathname === "/helados" ? '2px solid white' : 'none',
-                            display: { xs: 'none', md: 'block' }, 
-                        }}
-                    >
-                        Lista de Helados
-                    </Button>
+                    {/* Mostrar Lista de Vendedores solo si es administrador */}
+                    {(rolUsuario === 'administrador' || rolUsuario === 'supervisor') && (
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/vendedores"
+                            sx={{
+                                borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none',
+                                display: { xs: 'none', md: 'block' },
+                            }}
+                        >
+                            Lista de Vendedores
+                        </Button>
+                    )}
 
-
+                    {/* Mostrar Lista de Helados a todos los roles */}
                     <Button
                         color="inherit"
                         component={Link}
@@ -74,30 +68,36 @@ const Navbar = () => {
                         Lista de Helados
                     </Button>
 
-                    <Button
-                        color="inherit"
-                        component={Link}
-                        to="/usuarios"  // Ruta para la lista de usuarios
-                        sx={{
-                            borderBottom: location.pathname === "/usuarios" ? '2px solid white' : 'none',
-                            display: { xs: 'none', md: 'block' },  // Mostrar en pantallas grandes
-                        }}
-                    >
-                        Lista de Usuarios
-                    </Button>
+                    {/* Mostrar Lista de Usuarios solo si es administrador */}
+                    {rolUsuario === 'administrador' && (
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/usuarios"
+                            sx={{
+                                borderBottom: location.pathname === "/usuarios" ? '2px solid white' : 'none',
+                                display: { xs: 'none', md: 'block' },
+                            }}
+                        >
+                            Lista de Usuarios
+                        </Button>
+                    )}
 
-                    <Button
-                        color="inherit"
-                        component={Link}
-                        to="/login"
-                        sx={{
-                            borderBottom: location.pathname === "/login" ? '2px solid white' : 'none',
-                            display: { xs: 'none', md: 'block' },
-                        }}
-                    >
-                        Login
-                    </Button>
-                    
+                    {/* Mostrar Login solo si no está autenticado */}
+                    {!token && (
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/login"
+                            sx={{
+                                borderBottom: location.pathname === "/login" ? '2px solid white' : 'none',
+                                display: { xs: 'none', md: 'block' },
+                            }}
+                        >
+                            Login
+                        </Button>
+                    )}
+
                 </Toolbar>
             </AppBar>
             <Menu
@@ -106,55 +106,41 @@ const Navbar = () => {
                 onClose={handleMenuClose}
                 sx={{ display: { xs: 'block', md: 'none' } }} // Show only on small screens
             >
-                <MenuItem
-                    component={Link}
-                    to="/vendedores"
-                    onClick={handleMenuClose}
-                >
-                    Lista de Vendedores
-                </MenuItem>
-                <MenuItem
-                    component={Link}
-                    to="/agregar-vendedor"
-                    onClick={handleMenuClose}
-                >
-                    Agregar Vendedor
-                </MenuItem>
+                {/* Menu items */}
+                {(rolUsuario === 'administrador' || rolUsuario === 'supervisor') && (
+                    <MenuItem
+                        component={Link}
+                        to="/vendedores"
+                        onClick={handleMenuClose}
+                    >
+                        Lista de Vendedores
+                    </MenuItem>
+                )}
                 <MenuItem
                     component={Link}
                     to="/helados"
                     onClick={handleMenuClose}
                 >
-                    Lista de helados
+                    Lista de Helados
                 </MenuItem>
-                <MenuItem
-                    component={Link}
-                    to="/agregar-helado"
-                    onClick={handleMenuClose}
-                >
-                    Agregar helado
-                </MenuItem>
-                <MenuItem
-                    component={Link}
-                    to="/helados"
-                    onClick={handleMenuClose}
-                >
-                    Lista de helados
-                </MenuItem>
-                <MenuItem
-                    component={Link}
-                    to="/agregar-helado"
-                    onClick={handleMenuClose}
-                >
-                    Agregar helado
-                </MenuItem>
-                <MenuItem
-                    component={Link}
-                    to="/usuarios"  // Opción para la lista de usuarios en el menú
-                    onClick={handleMenuClose}
-                >
-                    Lista de Usuarios
-                </MenuItem>
+                {rolUsuario === 'administrador' && (
+                    <MenuItem
+                        component={Link}
+                        to="/usuarios"
+                        onClick={handleMenuClose}
+                    >
+                        Lista de Usuarios
+                    </MenuItem>
+                )}
+                {!token && (
+                    <MenuItem
+                        component={Link}
+                        to="/login"
+                        onClick={handleMenuClose}
+                    >
+                        Login
+                    </MenuItem>
+                )}
             </Menu>
         </>
     );

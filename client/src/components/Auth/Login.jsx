@@ -20,8 +20,10 @@ const Login = () => {
             const { token, rol } = response.data; // Suponiendo que el servidor devuelve el token y el rol del usuario
 
             // Guarda el token y el rol en localStorage
-            localStorage.setItem('token', token);
-            localStorage.setItem('rol', rol);
+            // Ejemplo después de obtener el token y rol en el frontend
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('rol', response.data.usuario.rol);
+
 
             // Redirige al usuario a la página principal
             Swal.fire('Inicio de sesion !', 'Has iniciado correctamente.', 'success');

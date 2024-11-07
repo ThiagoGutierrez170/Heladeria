@@ -13,4 +13,8 @@ Heladorouter.put('/:id', heladoController.actualizarHelado);
 
 Heladorouter.delete('/:id', heladoController.eliminarHelado);
 
+// Cambiar la ruta en el backend
+Heladorouter.put('/recargar/:id', heladoController.recargarHelados);
+
+
 export default Heladorouter;

@@ -17,7 +17,7 @@ const Navbar = () => {
 
     return (
         <>
-            <AppBar position="fixed" sx={{ backgroundColor: 'purple' }}>
+            <AppBar position="fixed" sx={{ backgroundColor: '#1976D2' }}>
                 <Toolbar>
                     <Typography
                         variant="h6"
@@ -34,11 +34,28 @@ const Navbar = () => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    
+
                     {/* Navegación Principal en Pantallas Grandes */}
                     <Button color="inherit" component={Link} to="/vendedores"
                         sx={{ borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
                         Lista de Vendedores
+                    </Button>
+
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/helados"
+                        sx={{
+                            borderBottom: location.pathname === "/helados" ? '2px solid white' : 'none',
+                            display: { xs: 'none', md: 'block' },
+                        }}
+                    >
+                        Lista de Helados
+                    </Button>
+
+                    <Button color="inherit" component={Link} to="/agregar-nota"
+                        sx={{ borderBottom: location.pathname === "/agregar-nota" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
+                        Crear Nota
                     </Button>
                     <Button color="inherit" component={Link} to="/notas-activas"
                         sx={{ borderBottom: location.pathname === "/notas-activas" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
@@ -49,9 +66,33 @@ const Navbar = () => {
                         Notas Finalizadas
                     </Button>
 
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/login"
+                        sx={{
+                            borderBottom: location.pathname === "/login" ? '2px solid white' : 'none',
+                            display: { xs: 'none', md: 'block' },
+                        }}
+                    >
+                        Login
+                    </Button>
+
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/usuarios"  // Ruta para la lista de usuarios
+                        sx={{
+                            borderBottom: location.pathname === "/usuarios" ? '2px solid white' : 'none',
+                            display: { xs: 'none', md: 'block' },  // Mostrar en pantallas grandes
+                        }}
+                    >
+                        Lista de Usuarios
+                    </Button>
+
                 </Toolbar>
             </AppBar>
-            
+
             {/* Menú Lateral para Pantallas Pequeñas */}
             <Menu
                 anchorEl={anchorEl}

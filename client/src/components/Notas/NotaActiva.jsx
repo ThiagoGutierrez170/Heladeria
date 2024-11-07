@@ -64,26 +64,36 @@ const NotaActiva = () => {
 
     return (
         <Container>
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" gutterBottom sx={{ color: 'black' }}>
                 Detalle de Nota Activa
             </Typography>
-            <Typography variant="h6">Playa: {nota.playa}</Typography>
-            <Typography variant="body1">Clima: {nota.clima}</Typography>
-            <Typography variant="body1">Estado: {nota.estado}</Typography>
-            <Typography variant="body1">
+            <Typography variant="h6" sx={{ color: 'black' }}>
+                Playa: {nota.playa}
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'black' }}>
+                Clima: {nota.clima}
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'black' }}>
+                Estado: {nota.estado}
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'black' }}>
                 Vendedor: {nota.vendedor_id ? nota.vendedor_id.nombre : 'No asignado'}
             </Typography>
-            <Typography variant="h6" sx={{ mt: 3 }}>Catálogo</Typography>
+            <Typography variant="h6" sx={{ mt: 3, color: 'black' }}>
+                Catálogo
+            </Typography>
             {Array.isArray(nota.catalogo) && nota.catalogo.length > 0 ? (
                 nota.catalogo.map((item) => (
                     <div key={item.helado_id._id}>
-                        <Typography variant="body2">
+                        <Typography variant="body2" sx={{ color: 'black' }}>
                             Helado: {item.helado_id.nombre} - Cantidad inicial: {item.cantidad_inicial}
                         </Typography>
                     </div>
                 ))
             ) : (
-                <Typography variant="body2">No hay artículos en el catálogo.</Typography>
+                <Typography variant="body2" sx={{ color: 'black' }}>
+                    No hay artículos en el catálogo.
+                </Typography>
             )}
             <Button variant="contained" color="primary" onClick={handleEditar} sx={{ mt: 3, mr: 2 }}>
                 Editar
@@ -100,6 +110,7 @@ const NotaActiva = () => {
             </Button>
         </Container>
     );
+    
 };
 
 export default NotaActiva;

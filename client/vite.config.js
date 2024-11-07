@@ -12,7 +12,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         selfHandleResponse: false,
-        /*configure: (proxy, _options) => {
+        configure: (proxy, _options) => {
           proxy.on('proxyRes', (proxyRes, req, res) => {
             if (proxyRes.statusCode === 401) {
               // Si el servidor responde con un 401, redirigimos al usuario a la página de login
@@ -25,7 +25,7 @@ export default defineConfig({
             }
             proxyRes.pipe(res);
           });
-        }*/
+        }
       },
     },
   },

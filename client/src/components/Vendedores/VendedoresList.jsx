@@ -44,7 +44,7 @@ const VendedoresList = () => {
     const fetchVendedores = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/vendedor/`);
+            const response = await axios.get(`/api/vendedor/`);
             setVendedores(response.data);
             if (!Array.isArray(response.data)) {
                 console.error('Expected an array but got:', response.data);
@@ -211,5 +211,4 @@ const VendedoresList = () => {
 };
 
 export default VendedoresList;
-
 

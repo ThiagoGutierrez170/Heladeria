@@ -23,8 +23,8 @@ import usuario from './src/routes/usuario.routes.js'
 app.use('/api/vendedor', vendedorRouter);
 app.use('/api/helado', heladoRouter);
 app.use('/api/nota', notaRouter);
-app.use('/api/sesion',sesion);
-app.use('/api/usuario',usuario);
+app.use('/api/sesion', sesion);
+app.use('/api/usuario', usuario);
 
 
 conectDB();
@@ -34,4 +34,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el http://localhost:${PORT}`);
 });
-

@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 
 const EditarHelado = () => {
     const [helado, setHelado] = useState({
+
         nombre: '',
         imagen: '',
         costo: '',

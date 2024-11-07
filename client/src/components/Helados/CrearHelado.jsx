@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+
 const CrearHelado = () => {
     const [datosFormulario, setDatosFormulario] = useState({
         nombre: '',
@@ -67,6 +68,7 @@ const CrearHelado = () => {
             } catch (error) {
                 Swal.fire('Error!', 'Hubo un problema al registrar el helado.', 'error');
             }
+
         }
     };
 

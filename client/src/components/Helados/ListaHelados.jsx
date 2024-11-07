@@ -56,6 +56,7 @@ const ListaHelados = () => {
     }, []);
 
     useEffect(() => {
+
         const filtrarHelados = () => {
             const filtrados = helados.filter((helado) =>
                 helado.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase())
@@ -225,6 +226,7 @@ const ListaHelados = () => {
             </Suspense>
 
         </>
+
     );
 };
 

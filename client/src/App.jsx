@@ -11,6 +11,7 @@ import EditarHelado from './components/Helados/EditarHelado';
 import Titulo from './Titulo';
 
 
+
 const App = () => {
   return (
     <>
@@ -25,6 +26,7 @@ const App = () => {
           <Route path="/agregar-helado" element={<CrearHelado/>}/>
           <Route path="/helados" element={<ListaHelados/>}/>
           <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
+
         </Routes>
       </Router>
     </>

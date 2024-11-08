@@ -40,6 +40,17 @@ const Navbar = () => {
                         sx={{ borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
                         Lista de Vendedores
                     </Button>
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/helados"
+                        sx={{
+                            borderBottom: location.pathname === "/helados" ? '2px solid white' : 'none',
+                            display: { xs: 'none', md: 'block' }, 
+                        }}
+                    >
+                        Lista de Helados
+                    </Button>
                     <Button color="inherit" component={Link} to="/notas-activas"
                         sx={{ borderBottom: location.pathname === "/notas-activas" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
                         Notas Activas
@@ -64,6 +75,13 @@ const Navbar = () => {
                 </MenuItem>
                 <MenuItem component={Link} to="/agregar-vendedor" onClick={handleMenuClose}>
                     Agregar Vendedor
+                </MenuItem>
+                <MenuItem
+                    component={Link}
+                    to="/helados"
+                    onClick={handleMenuClose}
+                >
+                    Lista de helados
                 </MenuItem>
                 <MenuItem component={Link} to="/notas-activas" onClick={handleMenuClose}>
                     Notas Activas

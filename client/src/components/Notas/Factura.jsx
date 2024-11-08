@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -12,13 +12,15 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Button from '@mui/material/Button';  // Asegúrate de importar Button
 
 const Factura = () => {
     const { id } = useParams();
     const [catalogo, setCatalogo] = useState([]);
     const [gananciaTotal, setGananciaTotal] = useState(0);
     const [notaInfo, setNotaInfo] = useState(null);
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
         const fetchNota = async () => {
             try {
@@ -47,6 +49,27 @@ const Factura = () => {
             <Typography variant="h4" align="center" gutterBottom>
                 Factura de Nota
             </Typography>
+            
+            {/* Botón Volver */}
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/notas-activas')}
+                sx={{
+                    mb: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '12px 24px',
+                    fontSize: '16px',
+                    backgroundColor: '#1976d2',
+                    '&:hover': {
+                        backgroundColor: '#155a8a',
+                    },
+                }}
+            >
+                Volver
+            </Button>
 
             {/* Información de la nota */}
             {notaInfo && (

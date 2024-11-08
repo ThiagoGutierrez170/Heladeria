@@ -34,6 +34,25 @@ const ListaNotasActivas = () => {
             <Typography variant="h4" align="center" gutterBottom>
                 Notas Activas
             </Typography>
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/agregar-nota')}
+                sx={{
+                    mb: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '12px 24px',
+                    fontSize: '16px',
+                    backgroundColor: '#1976d2',
+                    '&:hover': {
+                        backgroundColor: '#155a8a',
+                    },
+                }}
+            >
+                +
+            </Button>
             <Grid container spacing={3}>
                 {notas.map((nota) => (
                     <Grid item xs={12} sm={6} md={4} key={nota._id}>

@@ -24,7 +24,7 @@ const EditarHelado = () => {
     useEffect(() => {
         const obtenerHelado = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/helado/${id}`);
+                const response = await axios.get(`/api/helado/${id}`);
                 setHelado(response.data);
             } catch (error) {
                 console.error('Error al obtener el helado:', error);
@@ -45,7 +45,7 @@ const EditarHelado = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5000/api/helado/${id}`, helado);
+            await axios.put(`/api/helado/${id}`, helado);
             Swal.fire('Éxito', 'El helado ha sido actualizado.', 'success');
             navigate('/helados'); // Redirigir a la lista de helados después de la actualización
         } catch (error) {

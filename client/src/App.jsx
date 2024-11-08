@@ -12,6 +12,10 @@ import Factura from './components/Notas/Factura';
 import RegistroFinalizados from './components/Notas/RegistroFinalizados';
 import DetalleNota from './components/Notas/DetalleNota';
 import Navbar from './components/utils/Navbar';
+import Titulo from './Titulo'
+import CrearHelado from './components/Helados/CrearHelado';
+import ListaHelados from './components/Helados/ListaHelados';
+import EditarHelado from './components/Helados/EditarHelado';
 
 
 const App = () => {
@@ -42,6 +46,10 @@ const App = () => {
 
           {/* Ruta para Crear Nota */}
           <Route path="/agregar-nota" element={<CrearNota />} />
+
+          <Route path="/agregar-helado" element={<CrearHelado/>}/>
+          <Route path="/helados" element={<ListaHelados/>}/>
+          <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
 
         </Routes>
       </Router>

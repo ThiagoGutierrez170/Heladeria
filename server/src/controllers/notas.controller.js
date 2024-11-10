@@ -191,7 +191,6 @@ const TraerFactura = async (req, res) => {
             const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
             const cantidadVendida = item.cantidad_vendida;
             return {
-                ...notaActiva.toObject(),
                 nombre: item.helado_id.nombre,
                 cantidadTotal,
                 cantidadVendida,

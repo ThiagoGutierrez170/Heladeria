@@ -49,11 +49,10 @@ const DetalleNota = () => {
                 Detalle de la Nota
             </Typography>
 
-            {/* Botón Volver */}
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate('/notas-activas')}  // Redirige a la página de notas activas
+                onClick={() => navigate('/registro-finalizados')}  // Redirige a la página de notas activas
                 sx={{
                     mb: 2,
                     display: 'flex',

@@ -65,6 +65,7 @@ const CrearHelado = () => {
                     stock: '',
                     estado: true,
                 });
+                navigate('/helados');
             } catch (error) {
                 Swal.fire('Error!', 'Hubo un problema al registrar el helado.', 'error');
             }

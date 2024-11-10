@@ -16,6 +16,7 @@ import Titulo from './Titulo'
 import CrearHelado from './components/Helados/CrearHelado';
 import ListaHelados from './components/Helados/ListaHelados';
 import EditarHelado from './components/Helados/EditarHelado';
+import RouteError from './components/utils/RouteError';
 
 
 const App = () => {
@@ -50,6 +51,8 @@ const App = () => {
           <Route path="/agregar-helado" element={<CrearHelado/>}/>
           <Route path="/helados" element={<ListaHelados/>}/>
           <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
+          
+          <Route path="*" element={<RouteError/>}/>
 
         </Routes>
       </Router>

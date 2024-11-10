@@ -12,7 +12,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Button from '@mui/material/Button';  // Asegúrate de importar Button
+import Button from '@mui/material/Button';
 
 const Factura = () => {
     const { id } = useParams();
@@ -54,7 +54,7 @@ const Factura = () => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate('/notas-activas')}
+                onClick={() => navigate('/registro-finalizados')}
                 sx={{
                     mb: 2,
                     display: 'flex',

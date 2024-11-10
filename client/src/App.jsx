@@ -23,6 +23,7 @@ import CrearHelado from './components/Helados/CrearHelado';
 import ListaHelados from './components/Helados/ListaHelados';
 import EditarHelado from './components/Helados/EditarHelado';
 import RouteError from './components/utils/RouteError';
+import ListaUsuario from './components/Usuarios/ListaUsuario';
 
 const App = () => {
   const [estaAutenticado, setEstaAutenticado] = useState(false);
@@ -63,7 +64,7 @@ const App = () => {
       <Titulo />
       
       {/* Renderiza el Navbar solo si el usuario está autenticado */}
-      {estaAutenticado ? <Navbar /> : null}
+      <Navbar />
       
       <Routes>
         {/* Ruta pública para Login */}
@@ -88,11 +89,16 @@ const App = () => {
         <Route path="/agregar-nota" element={<RutaPrivada element={<CrearNota />} />} />
 
 
-          <Route path="/agregar-helado" element={<CrearHelado/>}/>
-          <Route path="/helados" element={<ListaHelados/>}/>
-          <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
-          
-          <Route path="*" element={<RouteError/>}/>
+        <Route path="/agregar-helado" element={<CrearHelado/>}/>
+        <Route path="/helados" element={<ListaHelados/>}/>
+        <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
+
+        <Route path="/usuarios" element={<ListaUsuario/>}/>
+        <Route path="/usuario-editar/id:" element={<ListaUsuario/>}/>
+        <Route path="/usuario/id:" element={<ListaUsuario/>}/>
+        <Route path="/Crear-usuario" element={<ListaUsuario/>}/>
+
+        <Route path="*" element={<RouteError/>}/>
       </Routes>
     </>
   );

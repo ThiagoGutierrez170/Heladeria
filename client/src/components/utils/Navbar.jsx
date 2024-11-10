@@ -36,6 +36,10 @@ const Navbar = () => {
                     </IconButton>
                     
                     {/* Navegación Principal en Pantallas Grandes */}
+                    <Button color="inherit" component={Link} to="/usuarios"
+                        sx={{ borderBottom: location.pathname === "/usuarios" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
+                        Notas Activas
+                    </Button>
                     <Button color="inherit" component={Link} to="/vendedores"
                         sx={{ borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
                         Lista de Vendedores

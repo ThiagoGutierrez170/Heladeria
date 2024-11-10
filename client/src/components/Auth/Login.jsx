@@ -16,12 +16,13 @@ const Login = () => {
         e.preventDefault();
         try {
             // Enviar las credenciales al servidor
-            const response = await axios.post('/api/sesiones/login', { correo: email, contraseña: password });
+            const response = await axios.post('/api/sesion/login', { correo: email, contraseña: password });
             const { token, rol } = response.data; // Suponiendo que el servidor devuelve el token y el rol del usuario
 
             // Guarda el token y el rol en localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('rol', rol);
+            console.log(rol);
 
             // Redirige al usuario a la página principal
             navigate('/');  // Puedes cambiar esta ruta si tienes una ruta específica para vendedores

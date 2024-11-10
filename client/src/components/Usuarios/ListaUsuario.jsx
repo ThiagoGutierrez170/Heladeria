@@ -8,9 +8,10 @@ const ListaUsuario = () => {
 
     useEffect(() => {
         const rolUsuario = localStorage.getItem('rol');
+        console.log("rol del usuario", rolUsuario);
         if (rolUsuario !== 'administrador') {
             alert('Acceso no autorizado');
-            navigate('/');
+            navigate('/notas-activas');
             return;
         }
 

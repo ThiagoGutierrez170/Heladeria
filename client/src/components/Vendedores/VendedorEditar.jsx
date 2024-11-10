@@ -86,6 +86,7 @@ const EditarVendedor = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     p: 4,
+                    mt: 10,
                     maxWidth: 'sm',
                     boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.1)',
                     borderRadius: 3,
@@ -139,7 +140,7 @@ const EditarVendedor = () => {
                     <FormControlLabel
                         control={
                             <Checkbox
-                                checked={vendedor.estado}
+                                checked={vendedor.estado?.checked || true}  // Aquí aseguramos que el valor esté marcado por defecto
                                 onChange={handleEstadoChange}
                                 sx={{
                                     '&.Mui-checked': {
@@ -161,6 +162,7 @@ const EditarVendedor = () => {
                             color: '#333',
                         }}
                     />
+
                     <Stack direction="row" spacing={2} justifyContent="center">
                         <Button
                             variant="contained"

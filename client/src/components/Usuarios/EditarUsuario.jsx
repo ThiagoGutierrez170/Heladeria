@@ -11,15 +11,17 @@ import {
     Select,
     InputLabel,
     FormControl,
-    CssBaseline
+    CssBaseline,Stack
 } from '@mui/material';
 import { Save as SaveIcon } from '@mui/icons-material';
 import Swal from 'sweetalert2';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const EditarUsuario = () => {
     const [usuario, setUsuario] = useState({
         nombreUsuario: '',
         correo: '',
+        password: '',
         rol: 'usuario'
     });
     const { id } = useParams();
@@ -49,11 +51,18 @@ const EditarUsuario = () => {
         try {
             await axios.put(`/api/usuario/${id}`, usuario);
             Swal.fire('Usuario actualizado', 'El usuario ha sido actualizado.', 'success');
-            navigate(`/usuarios/${id}`);
+            navigate(`/usuario/${id}`);
         } catch (error) {
             Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
         }
     };
+
+    const handleCancel = () => {
+        navigate('/usuarios');
+    };
+
+
+
 
     return (
         <Container component="main" maxWidth="xs">
@@ -82,6 +91,16 @@ const EditarUsuario = () => {
                         fullWidth
                         margin="normal"
                     />
+                    <TextField
+                        label="Contraseña"
+                        name="password"
+                        value={usuario.password}
+                        type="password"
+                        onChange={handleChange}
+                        required
+                        fullWidth
+                        margin="normal"
+                    />
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Rol</InputLabel>
                         <Select
@@ -95,16 +114,24 @@ const EditarUsuario = () => {
                             <MenuItem value="administrador">Administrador</MenuItem>
                         </Select>
                     </FormControl>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{ mt: 3 }}
-                        startIcon={<SaveIcon />}
-                    >
-                        Guardar Cambios
-                    </Button>
+                    <Stack direction="row" spacing={2} justifyContent="center">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            type="submit"
+                            startIcon={<SaveIcon />}
+                        >
+                            Actualizar
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={handleCancel}
+                            startIcon={<CancelIcon />}
+                        >
+                            Cancelar
+                        </Button>
+                    </Stack>
                 </Box>
             </Box>
         </Container>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -10,10 +10,11 @@ import {
     ListItemText,
     IconButton,
     Avatar,
-    Divider,
-    Paper, Button
+    Paper,
+    Button
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import EditIcon from '@mui/icons-material/Edit';
 import Swal from 'sweetalert2';
 
 const ListaUsuario = () => {
@@ -23,9 +24,6 @@ const ListaUsuario = () => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         const rolUsuario = localStorage.getItem('rol');
-
-
-//Ejemplo de ruta para editar http://localhost:3000/editar/usuario/672ccfdcdc88b235ea0c630d
 
         if (rolUsuario !== 'administrador' || !token) {
             Swal.fire('Error', `Acceso no autorizado porque no tienes permiso.`, 'error');
@@ -48,11 +46,17 @@ const ListaUsuario = () => {
         fetchUsuarios();
     }, [navigate]);
 
-
     const handleCrearUsuario = () => {
-        navigate('/registro');  // Cambia a la ruta correspondiente
+        navigate('/registro');
     };
 
+    const handleEdit = useCallback((usuarioId) => {
+        if (!usuarioId) {
+            Swal.fire('Error', 'ID de usuario no válido', 'error');
+            return;
+        }
+        navigate(`/editar/usuario/${usuarioId}`);
+    }, [navigate]);
 
     return (
         <Container component="main" maxWidth="md" sx={{ py: 4 }}>
@@ -70,7 +74,6 @@ const ListaUsuario = () => {
                     Lista de Usuarios
                 </Typography>
 
-
                 <Box display="flex" justifyContent="flex-end" mb={2}>
                     <Button
                         variant="contained"
@@ -84,58 +87,89 @@ const ListaUsuario = () => {
                 <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
                     {usuarios.map((usuario) => (
                         <ListItem
-                            key={usuario.id}  
+                            key={usuario._id} // Cambiado de id a _id
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 py: 2,
                                 px: 2,
+                                mb: 2, // Añadido margen entre items
                                 bgcolor: '#ffffff',
                                 borderRadius: 1,
                                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                                transition: 'transform 0.3s ease',
+                                transition: 'all 0.3s ease',
                                 '&:hover': {
                                     transform: 'scale(1.02)',
+                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.15)',
                                 }
                             }}
                         >
-                            <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+                            <Avatar sx={{
+                                bgcolor: 'primary.main',
+                                mr: 2,
+                                width: 45,
+                                height: 45
+                            }}>
                                 <PersonIcon />
                             </Avatar>
                             <ListItemText
                                 primary={
                                     <Typography
                                         variant="subtitle1"
-                                        sx={{ fontWeight: 'bold', color: 'text.primary' }}
+                                        sx={{
+                                            fontWeight: 'bold',
+                                            color: 'text.primary',
+                                            fontSize: '1.1rem'
+                                        }}
                                     >
                                         {usuario.nombreUsuario}
                                     </Typography>
                                 }
                                 secondary={
-                                    <>
+                                    <Box sx={{ mt: 0.5 }}>
                                         <Typography
                                             variant="body2"
                                             color="textSecondary"
+                                            sx={{ mb: 0.5 }}
                                         >
                                             Correo: {usuario.correo}
                                         </Typography>
                                         <Typography
                                             variant="body2"
                                             color="textSecondary"
+                                            sx={{
+                                                display: 'inline-block',
+                                                bgcolor: usuario.rol === 'administrador' ? 'primary.light' : 'secondary.light',
+                                                color: '#fff',
+                                                px: 1,
+                                                py: 0.5,
+                                                borderRadius: 1,
+                                                fontSize: '0.75rem'
+                                            }}
                                         >
-                                            Rol: {usuario.rol}
+                                            {usuario.rol.toUpperCase()}
                                         </Typography>
-                                    </>
+                                    </Box>
                                 }
                             />
-
-                            <IconButton edge="end" color="primary">
-                                {/* Aquí podrías agregar un icono de acción, si es necesario */}
+                            <IconButton
+                                edge="end"
+                                color="primary"
+                                onClick={() => handleEdit(usuario._id)} // Cambiado de id a _id
+                                sx={{
+                                    '&:hover': {
+                                        bgcolor: 'primary.light',
+                                        '& .MuiSvgIcon-root': {
+                                            color: '#fff'
+                                        }
+                                    }
+                                }}
+                            >
+                                <EditIcon />
                             </IconButton>
                         </ListItem>
                     ))}
                 </List>
-
             </Box>
         </Container>
     );

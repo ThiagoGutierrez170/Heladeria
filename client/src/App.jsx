@@ -66,7 +66,7 @@ const App = () => (
         // Rutas de Usuarios
       <Route path="/usuarios" element={<ListaUsuario />} />
       <Route path="/crear-usuario" element={<CrearUsuario />} />
-      <Route path='/editar/usuario/:id' element={<EditarUsuario />} />
+      <Route path="/editar/usuario/:id" element={<EditarUsuario />} />
       <Route path="/detalle-usuario/:id" element={<DetalleUsuario />} />
 
         // Rutas de Vendedores

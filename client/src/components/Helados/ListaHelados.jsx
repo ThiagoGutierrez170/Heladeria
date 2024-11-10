@@ -286,8 +286,8 @@ const ListaHelados = () => {
                         }))}
                         columnDefs={isMobile ? mobileColumns : desktopColumns}
                         pagination={true}
-                        paginationPageSize={isMobile ? 8 : 10}
-                        paginationPageSizeSelector={isMobile ? [8, 16, 24] : [10, 30, 50, 100]}
+                        paginationPageSize={isMobile ? 20 : 10}  // Página por defecto 20 en móvil y 10 en desktop
+                        paginationPageSizeSelector={isMobile ? [20] : [10, 30, 50, 100]}  // Selector de tamaño de página solo en desktop
                         domLayout={isMobile ? 'autoHeight' : 'normal'}
                         defaultColDef={{
                             sortable: true,
@@ -296,7 +296,14 @@ const ListaHelados = () => {
                         }}
                         suppressMovableColumns={isMobile}
                         headerHeight={isMobile ? 40 : 48}
-                        rowHeight={isMobile ? 60 : 52}
+                        rowHeight={isMobile ? 100 : 52}
+                        paginationPanelStyle={{
+                            fontSize: isMobile ? '36px' : '24px', // Aumenta el tamaño de la fuente de los botones de paginación
+                        }}
+                        gridOptions={{
+                            paginationPageSize: isMobile ? 20 : 10, // Página por defecto en móvil (20) y en escritorio (10)
+                            paginationPageSizeSelector: isMobile ? [] : [10, 30, 50, 100], // No mostrar selector en móvil
+                        }}
                     />
                 </Paper>
             )}

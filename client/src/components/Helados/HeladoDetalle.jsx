@@ -51,25 +51,25 @@ const HeladoDetalle = ({ open, onClose, helado }) => {
                 </Button>
             </DialogTitle>
             <DialogContent sx={{ padding: { xs: 4, sm: 4 } }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 5, pt: 4, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     <strong>Nombre:</strong> {helado?.nombre}
                 </Typography>
-                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 5, pt: 4, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     <strong>Imagen url:</strong> {helado?.imagen}
                 </Typography>
-                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 5, pt: 4, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     <strong>Costo:</strong> {helado?.costo}
                 </Typography>
-                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 5, pt: 4, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     <strong>Precio base:</strong> {helado?.precioBase}
                 </Typography>
-                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 5, pt: 4, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     <strong>Precio venta:</strong> {helado?.precioVenta}
                 </Typography>
-                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 5, pt: 4, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     <strong>Cantidad:</strong> {helado?.cantidadCaja}
                 </Typography>
-                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'black', pb: 5, pt: 4, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     <strong>Estado:</strong> {helado?.estado ? 'Activo' : 'Inactivo'}
                 </Typography>
             </DialogContent>

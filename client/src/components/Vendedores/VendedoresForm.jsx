@@ -81,6 +81,7 @@ const VendedoresForm = () => {
                     p: 4,
                     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
                     borderRadius: 2,
+                    mt: 10,
                     backgroundColor: '#f5f5f5',
                     textAlign: 'center',
                 }}

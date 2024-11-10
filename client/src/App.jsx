@@ -24,6 +24,8 @@ import ListaHelados from './components/Helados/ListaHelados';
 import EditarHelado from './components/Helados/EditarHelado';
 import RouteError from './components/utils/RouteError';
 import ListaUsuario from './components/Usuarios/ListaUsuario';
+import RegistroFinalizadosS from './components/Notas/Supervisores/RegistroNotas';
+import DetalleNotaS from './components/Notas/Supervisores/DetalleNota';
 
 const App = () => {
   const [estaAutenticado, setEstaAutenticado] = useState(false);
@@ -98,7 +100,12 @@ const App = () => {
         <Route path="/usuario/id:" element={<ListaUsuario/>}/>
         <Route path="/Crear-usuario" element={<ListaUsuario/>}/>
 
+        {/* Rutas para los supervisores */}
+        <Route path="/S-registro-finalizados" element={<RegistroFinalizadosS/>}/>
+        <Route path="/S-detalle-nota/:id" element={<DetalleNotaS/>}/>
+
         <Route path="*" element={<RouteError/>}/>
+
       </Routes>
     </>
   );

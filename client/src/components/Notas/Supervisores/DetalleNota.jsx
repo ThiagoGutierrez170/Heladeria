@@ -14,7 +14,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';  // Asegúrate de importar Button
 
-const DetalleNota = () => {
+const DetalleNotaS = () => {
     const { id } = useParams();
     const [detallesGanancias, setDetallesGanancias] = useState([]);
     const [gananciaMinima, setGananciaMinima] = useState(0);
@@ -150,4 +150,4 @@ const DetalleNota = () => {
     );
 };
 
-export default DetalleNota;
+export default DetalleNotaS;

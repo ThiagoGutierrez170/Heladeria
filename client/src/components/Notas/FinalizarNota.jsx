@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
+import { Container, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Swal from 'sweetalert2';
 
 const FinalizarNota = () => {
@@ -26,7 +22,7 @@ const FinalizarNota = () => {
 
                     // Inicializa devoluciones con los helados del catálogo
                     const initialDevoluciones = response.data.catalogo.reduce((acc, item) => {
-                        acc[item.helado_id._id] = 0; // Asegúrate de que 'helado_id' tenga '_id'
+                        acc[item.helado_id._id] = 0; // Asegura que 'helado_id' tenga '_id'
                         return acc;
                     }, {});
                     setDevoluciones(initialDevoluciones);
@@ -44,10 +40,19 @@ const FinalizarNota = () => {
 
     // Actualiza el valor de las devoluciones cuando el usuario cambia la cantidad
     const handleDevolucionChange = (heladoId, value) => {
-        setDevoluciones({
-            ...devoluciones,
-            [heladoId]: parseInt(value, 10) || 0
-        });
+        const cantidadTotal = catalogo.find(item => item.helado_id._id === heladoId)?.cantidadTotal;
+
+        const cantidadDevuelta = parseInt(value, 10) || 0;
+
+        if (cantidadDevuelta > cantidadTotal) {
+            // Si la cantidad devuelta es mayor que la cantidad total, muestra un error
+            Swal.fire('Error', 'La cantidad devuelta no puede ser mayor a la cantidad total.', 'error');
+        } else {
+            setDevoluciones({
+                ...devoluciones,
+                [heladoId]: cantidadDevuelta
+            });
+        }
     };
 
     // Maneja el envío del formulario para finalizar la nota
@@ -55,7 +60,6 @@ const FinalizarNota = () => {
         e.preventDefault();
 
         try {
-            // Envía las devoluciones al backend para finalizar la nota
             const response = await axios.put(`/api/nota/activas/${id}/finalizar`, { devoluciones });
             
             if (response.status === 200) {
@@ -63,14 +67,13 @@ const FinalizarNota = () => {
                 navigate(`/factura/${id}`);
             }
         } catch (error) {
-            // Mostrar el error que se recibe desde el backend si existe
             const errorMessage = error.response?.data?.error || 'Hubo un problema al finalizar la nota';
             Swal.fire('Error', errorMessage, 'error');
         }
     };
 
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <Typography variant="h4" align="center" gutterBottom>
                 Finalizar Nota
             </Typography>
@@ -78,32 +81,43 @@ const FinalizarNota = () => {
                 Ingrese la cantidad de helados devueltos para cada tipo.
             </Typography>
             <form onSubmit={handleSubmit}>
-                {catalogo.length > 0 ? (
-                    catalogo.map((item) => (
-                        <Grid container spacing={2} key={item.helado_id._id} alignItems="center">
-                            <Grid item xs={8}>
-                                <Typography variant="body1">{item.helado_id.nombre}</Typography> {/* Nombre del helado */}
-                                <Typography variant="body2" color="textSecondary">
-                                    Cantidad inicial: {item.cantidad_inicial} | Vendido: {item.cantidad_vendida}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    label="Cantidad devuelta"
-                                    type="number"
-                                    variant="outlined"
-                                    fullWidth
-                                    value={devoluciones[item.helado_id._id] || 0}
-                                    onChange={(e) => handleDevolucionChange(item.helado_id._id, e.target.value)}
-                                />
-                            </Grid>
-                        </Grid>
-                    ))
-                ) : (
-                    <Typography variant="body2" color="textSecondary" align="center">
-                        No hay helados disponibles en el catálogo.
-                    </Typography>
-                )}
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="center"><strong>Helado</strong></TableCell>
+                                <TableCell align="center"><strong>Cantidad Total</strong></TableCell>
+                                <TableCell align="center"><strong>Cantidad Devuelta</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {catalogo.length > 0 ? (
+                                catalogo.map((item) => (
+                                    <TableRow key={item.helado_id._id}>
+                                        <TableCell align="center">{item.helado_id.nombre}</TableCell>
+                                        <TableCell align="center">{item.cantidadTotal}</TableCell>
+                                        <TableCell align="center">
+                                            <TextField
+                                                label="Devueltos"
+                                                type="number"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={devoluciones[item.helado_id._id] || 0}
+                                                onChange={(e) => handleDevolucionChange(item.helado_id._id, e.target.value)}
+                                            />
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} align="center">
+                                        No hay helados disponibles en el catálogo.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
                 <Button
                     type="submit"

@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';  // Asegúrate de importar useNavigate
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Button from '@mui/material/Button';  // Asegúrate de importar Button
+import Swal from 'sweetalert2'; // Importación de SweetAlert2
+import { 
+    Container, Typography, Grid, Paper, Divider, Table, TableBody, 
+    TableCell, TableContainer, TableHead, TableRow, Button 
+} from '@mui/material';
 
 const DetalleNota = () => {
     const { id } = useParams();
@@ -21,15 +14,13 @@ const DetalleNota = () => {
     const [gananciaBase, setGananciaBase] = useState(0);
     const [gananciaTotal, setGananciaTotal] = useState(0);
     const [notaInfo, setNotaInfo] = useState(null);
-    const navigate = useNavigate();  // Para navegar
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
                 const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima } = response.data;
-                console.log(response.data);
-
                 setDetallesGanancias(detallesGanancias);
                 setGananciaMinima(gananciaMinima);
                 setGananciaBase(gananciaBase);
@@ -39,9 +30,31 @@ const DetalleNota = () => {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
         };
-
         fetchNota();
     }, [id]);
+
+    const handleEliminar = async () => {
+        const confirm = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará la nota de forma permanente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar',
+        });
+
+        if (confirm.isConfirmed) {
+            try {
+                await axios.delete(`/api/nota/${id}`);
+                Swal.fire('Eliminado!', 'La nota ha sido eliminada.', 'success');
+                navigate('/registro-finalizados');
+            } catch (error) {
+                Swal.fire('Error!', 'Hubo un problema al eliminar la nota.', 'error');
+            }
+        }
+    };
 
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -52,7 +65,7 @@ const DetalleNota = () => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate('/registro-finalizados')}  // Redirige a la página de notas activas
+                onClick={() => navigate('/registro-finalizados')}
                 sx={{
                     mb: 2,
                     display: 'flex',
@@ -69,7 +82,6 @@ const DetalleNota = () => {
                 Volver
             </Button>
 
-            {/* Información de la nota */}
             {notaInfo && (
                 <Paper sx={{ p: 2, mb: 3 }}>
                     <Grid container spacing={2}>
@@ -96,7 +108,6 @@ const DetalleNota = () => {
             </Typography>
             <Divider sx={{ my: 3 }} />
 
-            {/* Tabla de detalles de helados y ganancias */}
             <TableContainer component={Paper} sx={{ mb: 3 }}>
                 <Table>
                     <TableHead>
@@ -122,7 +133,6 @@ const DetalleNota = () => {
                 </Table>
             </TableContainer>
 
-            {/* Tabla con las ganancias totales */}
             <Divider sx={{ my: 3 }} />
             <Typography variant="h6" align="center" gutterBottom>
                 Ganancias Totales de la Nota
@@ -145,6 +155,9 @@ const DetalleNota = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Button variant="contained" color="error" onClick={handleEliminar}>
+                Eliminar
+            </Button>
         </Container>
     );
 };

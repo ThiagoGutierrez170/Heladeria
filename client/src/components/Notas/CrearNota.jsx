@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Grid, TextField, Typography, Button, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { Container, Grid, TextField, Typography, Button, MenuItem, Select, InputLabel, FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import 'sweetalert2/src/sweetalert2.scss';
 import axios from 'axios';
@@ -10,18 +10,23 @@ const CrearNota = () => {
     const [playa, setPlaya] = useState('');
     const [clima, setClima] = useState('');
     const [catalogo, setCatalogo] = useState([]);
-    const [helados, setHelados] = useState([]);
     const [vendedores, setVendedores] = useState([]);
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Obtener helados y vendedores para los menús desplegables
+        // Obtener helados activos y vendedores para los menús desplegables
         const fetchData = async () => {
             try {
-                const heladoResponse = await axios.get('/api/helado');
+                const heladoResponse = await axios.get('/api/helado?estado=activo'); // Filtrar helados por estado activo
                 const vendedorResponse = await axios.get('/api/vendedor');
-                setHelados(heladoResponse.data);
+                const heladosActivos = heladoResponse.data.map((helado) => ({
+                    helado_id: helado._id,
+                    nombre: helado.nombre,
+                    imagen_url: helado.imagen_url,
+                    cantidad_inicial: 0,
+                }));
+                setCatalogo(heladosActivos);
                 setVendedores(vendedorResponse.data);
             } catch (error) {
                 console.error("Error al cargar helados o vendedores:", error);
@@ -30,14 +35,17 @@ const CrearNota = () => {
         fetchData();
     }, []);
 
-    const handleAddHelado = (heladoId) => {
-        const newCatalogo = [...catalogo, { helado_id: heladoId, cantidad_inicial: 0, recargas: [] }];
-        setCatalogo(newCatalogo);
-    };
-
     const handleChangeCantidad = (index, cantidad) => {
+        const cantidadNumerica = parseInt(cantidad, 10);
+
+        if (cantidadNumerica < 0) {
+            // Si se ingresa un valor negativo, mostrar un alerta
+            Swal.fire('Error', 'La cantidad no puede ser negativa.', 'error');
+            return;  // No actualizamos el estado si el número es negativo
+        }
+
         const newCatalogo = [...catalogo];
-        newCatalogo[index].cantidad_inicial = parseInt(cantidad);
+        newCatalogo[index].cantidad_inicial = isNaN(cantidadNumerica) ? 0 : cantidadNumerica;
         setCatalogo(newCatalogo);
     };
 
@@ -48,7 +56,9 @@ const CrearNota = () => {
         if (!vendedor) newErrors.vendedor = 'Seleccione un vendedor';
         if (!playa) newErrors.playa = 'Seleccione una playa';
         if (!clima) newErrors.clima = 'Seleccione el clima';
-        if (catalogo.length === 0) newErrors.catalogo = 'Agregue al menos un helado al catálogo';
+        if (catalogo.every(item => item.cantidad_inicial === 0)) {
+            newErrors.catalogo = 'Agregue cantidades para al menos un helado';
+        }
 
         setErrors(newErrors);
 
@@ -68,7 +78,7 @@ const CrearNota = () => {
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 });
-                navigate('/notas-activas'); // Navegar a la lista de notas después de crearla
+                navigate('/notas-activas');
             } catch (error) {
                 Swal.fire({
                     title: 'Error!',
@@ -129,30 +139,38 @@ const CrearNota = () => {
                 </FormControl>
 
                 <Typography variant="h6" sx={{ mt: 3 }}>
-                    Agregar Helados al Catálogo
+                    Catálogo de Helados
                 </Typography>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                    {helados.map((helado) => (
-                        <Grid item xs={12} sm={6} key={helado._id}>
-                            <Button variant="outlined" onClick={() => handleAddHelado(helado._id)}>
-                                {helado.nombre}
-                            </Button>
-                        </Grid>
-                    ))}
-                </Grid>
-
-                {catalogo.map((item, index) => (
-                    <TextField
-                        key={index}
-                        label={`Cantidad inicial para ${helados.find(h => h._id === item.helado_id)?.nombre || 'helado'}`}
-                        variant="outlined"
-                        fullWidth
-                        type="number"
-                        value={item.cantidad_inicial}
-                        onChange={(e) => handleChangeCantidad(index, e.target.value)}
-                        margin="normal"
-                    />
-                ))}
+                <TableContainer component={Paper} sx={{ mt: 3 }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Imagen</TableCell>
+                                <TableCell>Nombre del Helado</TableCell>
+                                <TableCell>Cantidad Inicial</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {catalogo.map((item, index) => (
+                                <TableRow key={item.helado_id}>
+                                    <TableCell>
+                                        <img src={item.imagen_url} alt={item.nombre} style={{ width: 50, height: 50 }} />
+                                    </TableCell>
+                                    <TableCell>{item.nombre}</TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            variant="outlined"
+                                            type="number"
+                                            value={item.cantidad_inicial}
+                                            onChange={(e) => handleChangeCantidad(index, e.target.value)}
+                                            fullWidth
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
                 {errors.catalogo && (
                     <Typography color="error" sx={{ mt: 1 }}>

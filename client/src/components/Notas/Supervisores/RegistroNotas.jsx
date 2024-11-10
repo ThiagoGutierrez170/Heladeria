@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 
-const RegistroFinalizados = () => {
+const RegistroFinalizadosS = () => {
     const [notasFinalizadas, setNotasFinalizadas] = useState([]);
     const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ const RegistroFinalizados = () => {
 
     // Función para ver el detalle de la nota
     const handleVerDetalle = (id) => {
-        navigate(`/nota-detalle/${id}`);
+        navigate(`/S-detalle-nota/${id}`);
     };
 
     // Función para ver la factura de la nota
@@ -73,16 +73,6 @@ const RegistroFinalizados = () => {
                                     Ver Detalle
                                 </Button>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    onClick={() => handleVerFactura(nota._id)}
-                                    sx={{ mt: 2 }}
-                                >
-                                    Ver Factura
-                                </Button>
-                            </Grid>
                         </Grid>
                     </Paper>
                 );
@@ -91,4 +81,4 @@ const RegistroFinalizados = () => {
     );
 };
 
-export default RegistroFinalizados;
+export default RegistroFinalizadosS;

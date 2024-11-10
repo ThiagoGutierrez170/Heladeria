@@ -40,6 +40,10 @@ const Navbar = () => {
                         sx={{ borderBottom: location.pathname === "/usuarios" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
                         Notas Activas
                     </Button>
+                    <Button color="inherit" component={Link} to="/S-registro-finalizados"
+                        sx={{ borderBottom: location.pathname === "/S-registro-finalizados" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
+                        Vista de Supervisor
+                    </Button>
                     <Button color="inherit" component={Link} to="/vendedores"
                         sx={{ borderBottom: location.pathname === "/vendedores" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
                         Lista de Vendedores

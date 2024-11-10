@@ -11,15 +11,17 @@ const Crear = async (req, res) => {
         const catalogoConStock = [];
         for (let item of catalogo) {
             const { helado_id, cantidad_inicial } = item;
-            const helado = await Helado.findById(helado_id);
-            if (!helado) return res.status(404).json({ error: `Helado con id ${helado_id} no encontrado` });
+            if (cantidad_inicial > 0) {
+                const helado = await Helado.findById(helado_id);
+                if (!helado) return res.status(404).json({ error: `Helado con id ${helado_id} no encontrado` });
 
-            // Ajustar stock para que no sea menor que 0
-            const nuevoStock = Math.max(helado.stock - cantidad_inicial, 0);
-            helado.stock = nuevoStock;
-            await helado.save();
+                // Ajustar stock para que no sea menor que 0
+                const nuevoStock = Math.max(helado.stock - cantidad_inicial, 0);
+                helado.stock = nuevoStock;
+                await helado.save();
 
-            catalogoConStock.push({ helado_id, cantidad_inicial });
+                catalogoConStock.push({ helado_id, cantidad_inicial });
+            };
         }
 
         const nuevaNota = await Nota.create({

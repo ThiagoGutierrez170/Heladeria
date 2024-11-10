@@ -42,17 +42,24 @@ const FinalizarNota = () => {
     const handleDevolucionChange = (heladoId, value) => {
         const cantidadTotal = catalogo.find(item => item.helado_id._id === heladoId)?.cantidadTotal;
 
-        const cantidadDevuelta = parseInt(value, 10) || 0;
+        let cantidadDevuelta = parseInt(value, 10) || 0;
 
-        if (cantidadDevuelta > cantidadTotal) {
-            // Si la cantidad devuelta es mayor que la cantidad total, muestra un error
-            Swal.fire('Error', 'La cantidad devuelta no puede ser mayor a la cantidad total.', 'error');
-        } else {
-            setDevoluciones({
-                ...devoluciones,
-                [heladoId]: cantidadDevuelta
-            });
+        // Validación para evitar valores negativos
+        if (cantidadDevuelta < 0) {
+            Swal.fire('Error', 'La cantidad devuelta no puede ser menor a 0.', 'error');
+            cantidadDevuelta = 0; // Establecer el valor en 0 si el usuario ingresa un número negativo
         }
+
+        // Validación para evitar que la cantidad devuelta sea mayor que la cantidad total
+        if (cantidadDevuelta > cantidadTotal) {
+            Swal.fire('Error', 'La cantidad devuelta no puede ser mayor a la cantidad total.', 'error');
+            cantidadDevuelta = cantidadTotal; // Establecer el valor en la cantidad total si es mayor
+        }
+
+        setDevoluciones({
+            ...devoluciones,
+            [heladoId]: cantidadDevuelta
+        });
     };
 
     // Maneja el envío del formulario para finalizar la nota

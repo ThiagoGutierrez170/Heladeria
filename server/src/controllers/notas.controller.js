@@ -104,20 +104,22 @@ const RecargarCatalogo = async (req, res) => {
 
         for (let recarga of recargasArray) {
             const { helado_id, cantidad } = recarga;
-            const helado = await Helado.findById(helado_id);
-            if (!helado) return res.status(404).json({ error: `Helado con id ${helado_id} no encontrado` });
+            if (cantidad > 0) {
+                const helado = await Helado.findById(helado_id);
+                if (!helado) return res.status(404).json({ error: `Helado con id ${helado_id} no encontrado` });
 
-            // Ajustar stock para que no sea menor que 0
-            const nuevoStock = Math.max(helado.stock - cantidad, 0);
-            helado.stock = nuevoStock;
-            await helado.save();
+                // Ajustar stock para que no sea menor que 0
+                const nuevoStock = Math.max(helado.stock - cantidad, 0);
+                helado.stock = nuevoStock;
+                await helado.save();
 
-            const itemCatalogo = nota.catalogo.find(item => item.helado_id.equals(helado_id));
-            if (itemCatalogo) {
-                itemCatalogo.recargas.push(cantidad);
-            } else {
-                nota.catalogo.push({ helado_id, cantidad_inicial: cantidad, recargas: [cantidad] });
-            }
+                const itemCatalogo = nota.catalogo.find(item => item.helado_id.equals(helado_id));
+                if (itemCatalogo) {
+                    itemCatalogo.recargas.push(cantidad);
+                } else {
+                    nota.catalogo.push({ helado_id, cantidad_inicial: cantidad });
+                }
+            };
         }
 
         await nota.save();

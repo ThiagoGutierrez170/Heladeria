@@ -53,7 +53,7 @@ const CrearHelado = () => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                await axios.post('http://localhost:5000/api/helados', datosFormulario);
+                await axios.post('/api/helado', datosFormulario);
                 Swal.fire('Helado agregado!', 'Has agregado correctamente el helado.', 'success');
                 setDatosFormulario({
                     nombre: '',
@@ -65,6 +65,7 @@ const CrearHelado = () => {
                     stock: '',
                     estado: true,
                 });
+                navigate('/helados');
             } catch (error) {
                 Swal.fire('Error!', 'Hubo un problema al registrar el helado.', 'error');
             }

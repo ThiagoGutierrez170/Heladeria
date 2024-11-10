@@ -78,7 +78,7 @@ const NotaActiva = () => {
                 nota.catalogo.map((item) => (
                     <div key={item.helado_id._id}>
                         <Typography variant="body2">
-                            Helado: {item.helado_id.nombre} - Cantidad inicial: {item.cantidad_inicial}
+                            Helado: {item.helado_id.nombre} - Cantidad: {item.cantidadTotal}
                         </Typography>
                     </div>
                 ))

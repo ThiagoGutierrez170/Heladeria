@@ -40,7 +40,7 @@ const ListaHelados = () => {
     const obtenerHelados = async (page = 1, pageSize = 10) => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/helado?page=${page}&pageSize=${pageSize}`);
+            const response = await axios.get(`/api/helado?page=${page}&pageSize=${pageSize}`);
             setHelados(response.data);
             setHeladosFiltrados(response.data);
         } catch (error) {

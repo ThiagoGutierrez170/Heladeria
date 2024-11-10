@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';  // Asegúrate de importar useNavigate
 import axios from 'axios';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -12,6 +12,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Button from '@mui/material/Button';  // Asegúrate de importar Button
 
 const DetalleNota = () => {
     const { id } = useParams();
@@ -20,25 +21,20 @@ const DetalleNota = () => {
     const [gananciaBase, setGananciaBase] = useState(0);
     const [gananciaTotal, setGananciaTotal] = useState(0);
     const [notaInfo, setNotaInfo] = useState(null);
+    const navigate = useNavigate();  // Para navegar
 
     useEffect(() => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
-                const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal } = response.data;
+                const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima } = response.data;
                 console.log(response.data);
 
                 setDetallesGanancias(detallesGanancias);
                 setGananciaMinima(gananciaMinima);
                 setGananciaBase(gananciaBase);
                 setGananciaTotal(gananciaTotal);
-
-                // Asumiendo que la información de la nota también viene en la respuesta
-                setNotaInfo({ 
-                    vendedor: response.data.vendedor, 
-                    playa: response.data.playa, 
-                    clima: response.data.clima 
-                });
+                setNotaInfo({ vendedor: vendedor_id, playa, clima });
             } catch (error) {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
@@ -53,13 +49,33 @@ const DetalleNota = () => {
                 Detalle de la Nota
             </Typography>
 
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/registro-finalizados')}  // Redirige a la página de notas activas
+                sx={{
+                    mb: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '12px 24px',
+                    fontSize: '16px',
+                    backgroundColor: '#1976d2',
+                    '&:hover': {
+                        backgroundColor: '#155a8a',
+                    },
+                }}
+            >
+                Volver
+            </Button>
+
             {/* Información de la nota */}
             {notaInfo && (
                 <Paper sx={{ p: 2, mb: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant="body1">
-                                <strong>Vendedor:</strong>
+                                <strong>Vendedor: </strong>
                                 {notaInfo.vendedor?.nombre ? 
                                     `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}` 
                                     : "Información de vendedor no disponible"}

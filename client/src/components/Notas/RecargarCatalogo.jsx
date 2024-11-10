@@ -19,9 +19,15 @@ const RecargarCatalogo = () => {
         const fetchCatalogo = async () => {
             try {
                 const response = await axios.get(`/api/nota/activas/${id}`);
-                setCatalogo(response.data.catalogo);
+                console.log(response.data.catalogo);
+                const catalogoData = response.data.catalogo.map(item => ({
+                    ...item,
+                    cantidadTotal: item.cantidadTotal || 0 // Asegura que cantidadTotal siempre esté definido
+                }));
+                setCatalogo(catalogoData);
+
                 // Inicializa el estado de recargas para cada helado en 0
-                const initialRecargas = response.data.catalogo.reduce((acc, item) => {
+                const initialRecargas = catalogoData.reduce((acc, item) => {
                     acc[item.helado_id._id] = 0;
                     return acc;
                 }, {});
@@ -43,17 +49,18 @@ const RecargarCatalogo = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         try {
             // Envía las recargas al backend para actualizar la nota
             await axios.put(`/api/nota/recargar/${id}`, { recargas });
-            console.log(recargas);
             Swal.fire('Recarga Exitosa', 'Las cantidades han sido recargadas en el catálogo.', 'success');
-            navigate(`/notas-activas/${id}`);
+            navigate(`/notas-activas/`);
         } catch (error) {
+            console.error('Error en la solicitud de recarga:', error.response || error);
             Swal.fire('Error', 'Hubo un problema al recargar el catálogo', 'error');
         }
     };
+    
 
     return (
         <Container maxWidth="sm">
@@ -66,7 +73,7 @@ const RecargarCatalogo = () => {
                         <Grid item xs={6}>
                             <Typography variant="body1">{item.helado_id.nombre}</Typography>
                             <Typography variant="body2" color="textSecondary">
-                                Cantidad inicial: {item.cantidad_inicial}
+                                Cantidad total: {item.cantidadTotal} {/* Mostrar la cantidad total aquí */}
                             </Typography>
                         </Grid>
                         <Grid item xs={6}>
@@ -94,7 +101,7 @@ const RecargarCatalogo = () => {
                 <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={() => navigate(`/notas-activas/${id}`)}
+                    onClick={() => navigate(`/notas-activas`)}
                     fullWidth
                     sx={{ mt: 2 }}
                 >

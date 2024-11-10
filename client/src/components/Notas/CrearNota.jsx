@@ -68,7 +68,7 @@ const CrearNota = () => {
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 });
-                navigate('/notas'); // Navegar a la lista de notas después de crearla
+                navigate('/notas-activas'); // Navegar a la lista de notas después de crearla
             } catch (error) {
                 Swal.fire({
                     title: 'Error!',
@@ -167,7 +167,7 @@ const CrearNota = () => {
                         </Button>
                     </Grid>
                     <Grid item>
-                        <Button variant="outlined" color="secondary" onClick={() => navigate('/notas')}>
+                        <Button variant="outlined" color="secondary" onClick={() => navigate('/notas-activas')}>
                             Cancelar
                         </Button>
                     </Grid>

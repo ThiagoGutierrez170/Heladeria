@@ -117,7 +117,7 @@ const FinalizarNota = () => {
                 <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={() => navigate(`/notas-activas/${id}`)}
+                    onClick={() => navigate(`/notas-activas`)}
                     fullWidth
                     sx={{ mt: 2 }}
                 >

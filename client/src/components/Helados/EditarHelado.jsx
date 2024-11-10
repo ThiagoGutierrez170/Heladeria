@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const EditarHelado = () => {
-    const { id } = useParams(); 
+    const { id } = useParams();
     const navigate = useNavigate();
     const [helado, setHelado] = useState({
         nombre: '',
@@ -46,7 +46,7 @@ const EditarHelado = () => {
         try {
             await axios.put(`/api/helado/${id}`, helado);
             Swal.fire('Éxito', 'El helado ha sido actualizado.', 'success');
-            navigate('/helados'); // Redirigir a la lista de helados después de la actualización
+            navigate('/helados');
         } catch (error) {
             Swal.fire('Error', 'Hubo un problema al actualizar el helado.', 'error');
         }
@@ -67,10 +67,10 @@ const EditarHelado = () => {
                 maxWidth: 'sm',
                 boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.1)',
                 borderRadius: 3,
-                backgroundColor: '#ffffff',
+                backgroundColor: '#f5f5f5', // Fondo suave
             }}
         >
-            <Typography variant="h4" align="center" gutterBottom color="primary" sx={{ mb: 3 }}>
+            <Typography variant="h4" align="center" gutterBottom sx={{ mb: 3, color: 'black' }}>
                 Editar Helado
             </Typography>
             <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -81,8 +81,17 @@ const EditarHelado = () => {
                     value={helado.nombre}
                     onChange={handleChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        '& .MuiInputBase-root': {
+                            backgroundColor: '#ffffff', // Fondo blanco
+                            borderRadius: '5px', // Bordes redondeados
+                        },
+                    }}
                     required
+                    InputProps={{
+                        style: { color: 'black' },
+                    }}
                 />
                 <TextField
                     fullWidth
@@ -91,8 +100,17 @@ const EditarHelado = () => {
                     value={helado.imagen}
                     onChange={handleChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        '& .MuiInputBase-root': {
+                            backgroundColor: '#ffffff', // Fondo blanco
+                            borderRadius: '5px', // Bordes redondeados
+                        },
+                    }}
                     required
+                    InputProps={{
+                        style: { color: 'black' },
+                    }}
                 />
                 <TextField
                     fullWidth
@@ -101,8 +119,17 @@ const EditarHelado = () => {
                     value={helado.costo}
                     onChange={handleChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        '& .MuiInputBase-root': {
+                            backgroundColor: '#ffffff',
+                            borderRadius: '5px',
+                        },
+                    }}
                     required
+                    InputProps={{
+                        style: { color: 'black' },
+                    }}
                 />
                 <TextField
                     fullWidth
@@ -111,8 +138,17 @@ const EditarHelado = () => {
                     value={helado.precioBase}
                     onChange={handleChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        '& .MuiInputBase-root': {
+                            backgroundColor: '#ffffff',
+                            borderRadius: '5px',
+                        },
+                    }}
                     required
+                    InputProps={{
+                        style: { color: 'black' },
+                    }}
                 />
                 <TextField
                     fullWidth
@@ -121,8 +157,17 @@ const EditarHelado = () => {
                     value={helado.precioVenta}
                     onChange={handleChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        '& .MuiInputBase-root': {
+                            backgroundColor: '#ffffff',
+                            borderRadius: '5px',
+                        },
+                    }}
                     required
+                    InputProps={{
+                        style: { color: 'black' },
+                    }}
                 />
                 <TextField
                     fullWidth
@@ -131,8 +176,17 @@ const EditarHelado = () => {
                     value={helado.cantidadCaja}
                     onChange={handleChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        '& .MuiInputBase-root': {
+                            backgroundColor: '#ffffff',
+                            borderRadius: '5px',
+                        },
+                    }}
                     required
+                    InputProps={{
+                        style: { color: 'black' },
+                    }}
                 />
                 <TextField
                     fullWidth
@@ -141,8 +195,17 @@ const EditarHelado = () => {
                     value={helado.stock}
                     onChange={handleChange}
                     variant="outlined"
-                    sx={{ mb: 3 }}
+                    sx={{
+                        mb: 3,
+                        '& .MuiInputBase-root': {
+                            backgroundColor: '#ffffff',
+                            borderRadius: '5px',
+                        },
+                    }}
                     required
+                    InputProps={{
+                        style: { color: 'black' },
+                    }}
                 />
                 <FormControlLabel
                     control={
@@ -162,11 +225,9 @@ const EditarHelado = () => {
                             }}
                         />
                     }
-                    label="Estado"
+                    label={<span style={{ color: 'black', fontSize: '16px' }}>Estado</span>}
                     sx={{
                         marginBottom: 3,
-                        fontSize: '16px',
-                        color: '#333',
                     }}
                 />
                 <Stack direction="row" spacing={2} justifyContent="center">
@@ -175,6 +236,12 @@ const EditarHelado = () => {
                         color="primary"
                         type="submit"
                         startIcon={<SaveIcon />}
+                        sx={{
+                            backgroundColor: '#1976d2',
+                            '&:hover': {
+                                backgroundColor: '#1565c0',
+                            },
+                        }}
                     >
                         Actualizar
                     </Button>
@@ -183,6 +250,14 @@ const EditarHelado = () => {
                         color="secondary"
                         onClick={handleCancel}
                         startIcon={<CancelIcon />}
+                        sx={{
+                            borderColor: '#f44336',
+                            color: '#f44336',
+                            '&:hover': {
+                                borderColor: '#d32f2f',
+                                color: '#d32f2f',
+                            },
+                        }}
                     >
                         Cancelar
                     </Button>

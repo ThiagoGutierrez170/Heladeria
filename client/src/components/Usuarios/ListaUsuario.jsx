@@ -25,6 +25,8 @@ const ListaUsuario = () => {
         const rolUsuario = localStorage.getItem('rol');
 
 
+//Ejemplo de ruta para editar http://localhost:3000/editar/usuario/672ccfdcdc88b235ea0c630d
+
         if (rolUsuario !== 'administrador' || !token) {
             Swal.fire('Error', `Acceso no autorizado porque no tienes permiso.`, 'error');
             navigate('/');
@@ -39,7 +41,7 @@ const ListaUsuario = () => {
                 setUsuarios(res.data);
             } catch (error) {
                 console.error("Error al obtener los usuarios", error);
-                alert('No se pudo cargar la lista de usuarios');
+                Swal.fire('Error', 'No se pudo cargar la lista de usuarios', 'error');
             }
         };
 
@@ -82,7 +84,7 @@ const ListaUsuario = () => {
                 <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
                     {usuarios.map((usuario) => (
                         <ListItem
-                            key={usuario.id}  // Mover la key aquí
+                            key={usuario.id}  
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',

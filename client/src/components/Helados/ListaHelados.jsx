@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Typography, Paper, CircularProgress, IconButton, Button, TextField } from '@mui/material';
+import { Typography, Paper, CircularProgress, IconButton, Button, TextField, useTheme, useMediaQuery } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -7,31 +7,33 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import InfoIcon from '@mui/icons-material/Info';
 import AddIcon from '@mui/icons-material/Add';
-import Swal from 'sweetalert2';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import Swal from 'sweetalert2';
 const HeladoDetalles = lazy(() => import('./HeladoDetalle'));
 import RecargaHelado from './RecargaHelado';
-import './helado.modules.css/ListaHelados.css';
 
-const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga }) => (
-    <div style={{ display: 'flex' }}>
-        <IconButton color="default" onClick={onInfo} sx={{ marginRight: '8px' }}>
+const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobile }) => (
+    <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+        <IconButton size={isMobile ? "small" : "medium"} color="default" onClick={onInfo} sx={{ m: 0.5 }}>
             <InfoIcon />
         </IconButton>
-        <IconButton color="primary" onClick={onEdit} sx={{ marginRight: '8px' }}>
+        <IconButton size={isMobile ? "small" : "medium"} color="primary" onClick={onEdit} sx={{ m: 0.5 }}>
             <EditIcon />
         </IconButton>
-        <IconButton color="error" onClick={onDelete}>
+        <IconButton size={isMobile ? "small" : "medium"} color="error" onClick={onDelete} sx={{ m: 0.5 }}>
             <DeleteIcon />
         </IconButton>
-        <IconButton color="secondary" onClick={onRecarga} sx={{ marginLeft: '8px' }}>
+        <IconButton size={isMobile ? "small" : "medium"} color="secondary" onClick={onRecarga} sx={{ m: 0.5 }}>
             <AddIcon />
         </IconButton>
     </div>
 ));
 
 const ListaHelados = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [helados, setHelados] = useState([]);
     const [loading, setLoading] = useState(true);
     const [terminoBusqueda, setTerminoBusqueda] = useState('');
@@ -106,107 +108,171 @@ const ListaHelados = () => {
         setOpenRecargaModal(true);
     }, [helados]);
 
-    const columns = useMemo(() => [
+    const mobileColumns = useMemo(() => [
+        {
+            headerName: "Helados",
+            field: "nombre",
+            flex: 1,
+            minWidth: 150,
+            cellRenderer: (params) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <img
+                        src={params.data.imagen}
+                        alt={params.value}
+                        style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '4px',
+                            objectFit: 'cover'
+                        }}
+                    />
+                    <div>
+                        <div style={{ fontWeight: 'bold' }}>{params.value}</div>
+                        <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                            Stock: {params.data.stock}
+                        </div>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            headerName: "Acciones",
+            field: "acciones",
+            width: 160,
+            cellRenderer: (params) => (
+                <ActionButtons
+                    onInfo={() => handleInfo(params.data.id)}
+                    onEdit={() => handleEdit(params.data.id)}
+                    onDelete={() => handleDelete(params.data.id)}
+                    onRecarga={() => handleRecarga(params.data.id)}
+                    isMobile={true}
+                />
+            ),
+        }
+    ], [handleInfo, handleEdit, handleDelete, handleRecarga]);
+
+    const desktopColumns = useMemo(() => [
         {
             headerName: "Nombre",
             field: "nombre",
             flex: 1,
             minWidth: 300,
-
         },
-            
         {
             headerName: "Imagen",
             field: "imagen",
             flex: 1,
-            minWidth: 200,
+            width: 100,
             cellRenderer: (params) => (
-                <img src={params.value} alt={`${params.data.nombre} imagen`} style={{ width: '50px', height: '50px' }} />
+                <img
+                    src={params.value}
+                    alt={`${params.data.nombre} imagen`}
+                    style={{
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '4px',
+                        objectFit: 'cover'
+                    }}
+                />
             ),
         },
         {
             headerName: "Costo",
             field: "costo",
-            flex: 0.5,
-            minWidth: 50,
+            flex: 1,
+            width: 100,
         },
         {
             headerName: "Precio Base",
             field: "precioBase",
             flex: 1,
-            minWidth: 50,
+            width: 120,
         },
         {
             headerName: "Precio Venta",
             field: "precioVenta",
             flex: 1,
-            minWidth: 50,
+            width: 120,
         },
         {
-            headerName: "Cantidad en Caja",
-            field: "cantidadCaja",
-            flex: 1,
-            minWidth: 100,
-        },
-        {
-            headerName: "Stock Disponible",
+            headerName: "Stock",
             field: "stock",
             flex: 1,
-            minWidth: 100,
+            width: 100,
         },
         {
             headerName: "Acciones",
             field: "acciones",
+            width: 200,
             cellRenderer: (params) => (
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <ActionButtons
-                        onInfo={() => handleInfo(params.data.id)}
-                        onEdit={() => handleEdit(params.data.id)}
-                        onDelete={() => handleDelete(params.data.id)}
-                        onRecarga={() => handleRecarga(params.data.id)} // Agregar el botón de recarga
-                    />
-                </div>
+                <ActionButtons
+                    onInfo={() => handleInfo(params.data.id)}
+                    onEdit={() => handleEdit(params.data.id)}
+                    onDelete={() => handleDelete(params.data.id)}
+                    onRecarga={() => handleRecarga(params.data.id)}
+                    isMobile={false}
+                />
             ),
         }
     ], [handleInfo, handleEdit, handleDelete, handleRecarga]);
 
     return (
-        <>
-            <Typography variant="h5" align="center" gutterBottom color="primary">
+        <div style={{ padding: isMobile ? '16px' : '24px' }}>
+            <Typography
+                variant={isMobile ? "h6" : "h5"}
+                align="center"
+                gutterBottom
+                color="primary"
+                sx={{ mb: 3 }}
+            >
                 Lista de Helados
             </Typography>
-            <div className="search-container">
+
+            <div style={{
+                display: 'flex',
+                gap: '16px',
+                flexDirection: isMobile ? 'column' : 'row',
+                marginBottom: '16px'
+            }}>
                 <TextField
-                    className="search-input"
+                    fullWidth
+                    size={isMobile ? "small" : "medium"}
                     variant="outlined"
                     value={terminoBusqueda}
                     onChange={(e) => setTerminoBusqueda(e.target.value)}
-                    placeholder='Buscar helados'
+                    placeholder="Buscar helados"
+                    InputProps={{
+                        startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} />,
+                    }}
                 />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate('/agregar-helado')}
+                    sx={{
+                        minWidth: isMobile ? '100%' : 'auto',
+                        height: isMobile ? '40px' : '56px'
+                    }}
+                >
+                    <AddIcon sx={{ mr: 1 }} />
+                    {!isMobile}
+                </Button>
             </div>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => navigate('/agregar-helado')}
-                sx={{
-                    mb: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '12px 24px',
-                    fontSize: '16px',
-                    backgroundColor: '#1976d2',
-                    '&:hover': {
-                        backgroundColor: '#155a8a',
-                    },
-                }}
-            >
-                <AddIcon sx={{ mr: 0 }} />
-            </Button>
+
             {loading ? (
-                <CircularProgress color="primary" />
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                    <CircularProgress color="primary" />
+                </div>
             ) : (
-                <Paper sx={{ height: 590, width: '100%', mt: 3 }} className="ag-theme-alpine">
+                <Paper
+                    sx={{
+                        height: isMobile ? '70vh' : '590px',
+                        width: '100%',
+                        overflow: 'hidden',
+                        borderRadius: '8px'
+                    }}
+                    className="ag-theme-alpine"
+                >
                     <AgGridReact
                         ref={gridRef}
                         rowData={heladosFiltrados.map((helado) => ({
@@ -216,17 +282,25 @@ const ListaHelados = () => {
                             costo: helado.costo,
                             precioBase: helado.precioBase,
                             precioVenta: helado.precioVenta,
-                            cantidadCaja: helado.cantidadCaja,
                             stock: helado.stock,
-                            estado: helado.estado ? 'Activo' : 'Inactivo',
                         }))}
-                        columnDefs={columns}
+                        columnDefs={isMobile ? mobileColumns : desktopColumns}
                         pagination={true}
-                        paginationPageSize={10}
-                        paginationPageSizeSelector={[10, 20, 50, 100]}
+                        paginationPageSize={isMobile ? 8 : 10}
+                        paginationPageSizeSelector={isMobile ? [8, 16, 24] : [10, 30, 50, 100]}
+                        domLayout={isMobile ? 'autoHeight' : 'normal'}
+                        defaultColDef={{
+                            sortable: true,
+                            filter: true,
+                            resizable: !isMobile,
+                        }}
+                        suppressMovableColumns={isMobile}
+                        headerHeight={isMobile ? 40 : 48}
+                        rowHeight={isMobile ? 60 : 52}
                     />
                 </Paper>
             )}
+
             <Suspense fallback={<CircularProgress />}>
                 {openInfoModal && (
                     <HeladoDetalles
@@ -244,8 +318,7 @@ const ListaHelados = () => {
                     />
                 )}
             </Suspense>
-
-        </>
+        </div>
     );
 };
 

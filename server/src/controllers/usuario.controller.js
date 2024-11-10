@@ -60,7 +60,7 @@ export const editarUsuario = async (req, res) => {
     }
 };
 
-const traerUsuario = async (req, res) => {
+export const traerUsuario = async (req, res) => {
     try {
         const { id } = req.params; // Obtener el ID desde los parámetros de la ruta
         const usuario = await Usuario.findById(id); // Buscar el usuario por ID

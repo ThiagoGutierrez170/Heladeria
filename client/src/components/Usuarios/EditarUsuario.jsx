@@ -14,6 +14,7 @@ import {
     CssBaseline
 } from '@mui/material';
 import { Save as SaveIcon } from '@mui/icons-material';
+import Swal from 'sweetalert2';
 
 const EditarUsuario = () => {
     const [usuario, setUsuario] = useState({
@@ -46,11 +47,11 @@ const EditarUsuario = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`/api/usuario/editar/${id}`, usuario);
-            alert('Usuario actualizado con éxito');
+            await axios.put(`/api/usuario/${id}`, usuario);
+            Swal.fire('Usuario actualizado', 'El usuario ha sido actualizado.', 'success');
             navigate(`/usuarios/${id}`);
         } catch (error) {
-            alert('Error al actualizar usuario');
+            Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
         }
     };
 

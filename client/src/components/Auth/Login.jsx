@@ -39,6 +39,9 @@ const Login = () => {
         navigate('/registro');  // Redirige a la página de crear usuario
     };
 
+
+
+    
     return (
         <Container maxWidth="xs" sx={{ mt: 8 }}>
             <Box
@@ -83,7 +86,7 @@ const Login = () => {
                             sx={{
                                 py: 1.5,
                                 fontSize: '1rem',
-                                backgroundColor: '#7E57C2',
+                                backgroundColor: '#1976D2',
                                 '&:hover': { backgroundColor: '#673AB7' },
                             }}
                         >

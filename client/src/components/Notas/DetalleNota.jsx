@@ -49,7 +49,7 @@ const DetalleNota = () => {
 
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color='black' gutterBottom>
                 Detalle de la Nota
             </Typography>
 
@@ -58,7 +58,7 @@ const DetalleNota = () => {
                 <Paper sx={{ p: 2, mb: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <Typography variant="body1">
+                            <Typography variant="body1" color='black'>
                                 <strong>Vendedor:</strong>
                                 {notaInfo.vendedor?.nombre ? 
                                     `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}` 
@@ -66,16 +66,16 @@ const DetalleNota = () => {
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Playa:</strong> {notaInfo.playa}</Typography>
+                            <Typography variant="body1" color='black'><strong>Playa:</strong> {notaInfo.playa}</Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
+                            <Typography variant="body1" color='black'><strong>Clima:</strong> {notaInfo.clima}</Typography>
                         </Grid>
                     </Grid>
                 </Paper>
             )}
 
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" color='black' gutterBottom>
                 Detalle de Ganancias de la Nota
             </Typography>
             <Divider sx={{ my: 3 }} />
@@ -85,7 +85,7 @@ const DetalleNota = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Nombre del helado</strong></TableCell>
+                            <TableCell><strong color='black'>Nombre del helado</strong></TableCell>
                             <TableCell align="center"><strong>Cantidad Vendida</strong></TableCell>
                             <TableCell align="center"><strong>Ganancia Mínima (Gs)</strong></TableCell>
                             <TableCell align="center"><strong>Ganancia Base (Gs)</strong></TableCell>
@@ -94,7 +94,7 @@ const DetalleNota = () => {
                     </TableHead>
                     <TableBody>
                         {detallesGanancias.map((item, index) => (
-                            <TableRow key={index}>
+                            <TableRow key={index} color='black'>
                                 <TableCell>{item.nombre}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
                                 <TableCell align="center">{item.gananciaMinima.toFixed(0)} Gs</TableCell>
@@ -108,7 +108,7 @@ const DetalleNota = () => {
 
             {/* Tabla con las ganancias totales */}
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" color='black' gutterBottom>
                 Ganancias Totales de la Nota
             </Typography>
             <TableContainer component={Paper} sx={{ mb: 3 }}>

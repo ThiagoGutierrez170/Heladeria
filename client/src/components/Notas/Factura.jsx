@@ -25,7 +25,7 @@ const Factura = () => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/factura`);
-                const { detallesFactura, gananciaTotalBase, vendedor_id, playa, clima, createdAt } = response.data;
+                const { detallesFactura, gananciaTotalBase, vendedor, playa, clima, createdAt } = response.data;
                 
                 const catalogoCalculado = detallesFactura.map((item) => ({
                     nombre: item.nombre,
@@ -36,7 +36,7 @@ const Factura = () => {
                 setCatalogo(catalogoCalculado);
                 setGananciaTotal(gananciaTotalBase);
                 setNotaInfo({ 
-                    vendedor: vendedor_id, 
+                    vendedor, 
                     playa, 
                     clima, 
                     fecha: new Date(createdAt).toLocaleDateString() // Formatear y asignar fecha aquí
@@ -80,8 +80,8 @@ const Factura = () => {
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant="body1">
-                                <strong>Vendedor:</strong> 
-                                {notaInfo.vendedor?.nombre ? 
+                                <strong>Vendedor: </strong> 
+                                {notaInfo.vendedor ? 
                                     `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}` 
                                     : "Información de vendedor no disponible"}
                             </Typography>

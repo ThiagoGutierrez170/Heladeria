@@ -176,7 +176,6 @@ const ListaNotasFinalizada = async (req, res) => {
     }
 };
 
-// Obtener la factura de una nota finalizada
 const TraerFactura = async (req, res) => {
     try {
         const { id } = req.params;
@@ -212,7 +211,7 @@ const TraerFactura = async (req, res) => {
             vendedor: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
             playa: nota.playa,
             clima: nota.clima,
-            createdAt: nota.createdAt // Agregar el campo createdAt aquí
+            createdAt: nota.createdAt 
         });
     } catch (error) {
         console.error('Error al generar la factura:', error);
@@ -221,18 +220,21 @@ const TraerFactura = async (req, res) => {
 };
 
 
-// Obtener el detalle de una nota finalizada (con cálculo de todas las ganancias)
-// Obtener el detalle de una nota finalizada (con cálculo de todas las ganancias)
+
+// Controlador corregido: DetalleNota
 const DetalleNota = async (req, res) => {
     try {
         const { id } = req.params;
-        const nota = await Nota.findById(id).populate('catalogo.helado_id')
-            .populate('vendedor_id', 'nombre apellido');
-        
+        const nota = await Nota.findById(id)
+            .populate('catalogo.helado_id') // Popula la información del helado en el catálogo
+            .populate('vendedor_id', 'nombre apellido'); // Popula solo nombre y apellido del vendedor
+
+        // Verificar que la nota exista y que su estado sea 'finalizado'
         if (!nota || nota.estado !== 'finalizado') {
             return res.status(404).json({ error: 'Nota finalizada no encontrada' });
         }
 
+        // Calcular detalles de ganancias para cada helado en el catálogo
         const detallesGanancias = nota.catalogo.map(item => {
             const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
             const cantidadVendida = cantidadTotal - (item.cantidad_devuelta || 0);
@@ -247,26 +249,26 @@ const DetalleNota = async (req, res) => {
             };
         });
 
+        // Calcular ganancias totales
         const gananciaMinima = detallesGanancias.reduce((acc, item) => acc + item.gananciaMinima, 0);
         const gananciaBase = detallesGanancias.reduce((acc, item) => acc + item.gananciaBase, 0);
         const gananciaTotal = detallesGanancias.reduce((acc, item) => acc + item.gananciaTotal, 0);
 
-        // Asegúrate de incluir la fecha en la respuesta
+        // Enviar la respuesta con la estructura esperada
         res.status(200).json({ 
             detallesGanancias, 
             gananciaMinima, 
             gananciaBase, 
             gananciaTotal,
-            vendedor: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
+            vendedor_id: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
             playa: nota.playa,
             clima: nota.clima,
-            fecha: nota.createdAt 
-         });
+            fecha: nota.createdAt
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener el detalle de la nota', detalle: error.message });
     }
 };
-
 
 
 // Eliminar una nota (solo visible para el administrador)

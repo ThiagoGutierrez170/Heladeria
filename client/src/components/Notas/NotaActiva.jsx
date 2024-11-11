@@ -95,7 +95,7 @@ const NotaActiva = () => {
                     </Grid>
                     <Grid item xs={6} sm={3}>
                         <Typography variant="subtitle1">
-                            <strong>Vendedor:</strong> {nota.vendedor_id ? nota.vendedor_id.nombre : 'No asignado'}
+                            <strong>Vendedor: </strong> {nota.vendedor_id ? nota.vendedor_id.nombre +" "+ nota.vendedor_id.apellido : 'No asignado'}
                         </Typography>
                     </Grid>
                 </Grid>

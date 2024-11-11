@@ -22,12 +22,13 @@ const DetalleNota = () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
                 const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima, fecha } = response.data;
+                
                 setDetallesGanancias(detallesGanancias);
                 setGananciaMinima(gananciaMinima);
                 setGananciaBase(gananciaBase);
                 setGananciaTotal(gananciaTotal);
                 setNotaInfo({ vendedor: vendedor_id, playa, clima });
-                setFechaNota(fecha);
+                setFechaNota(fecha); // Utiliza createdAt como la fecha de la nota
             } catch (error) {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
@@ -101,7 +102,6 @@ const DetalleNota = () => {
                         <Grid item xs={12}>
                             <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
                         </Grid>
-                        {/* Agregar la fecha de la nota */}
                         <Grid item xs={12}>
                             <Typography variant="body1"><strong>Fecha:</strong> {new Date(fechaNota).toLocaleDateString()}</Typography>
                         </Grid>
@@ -148,21 +148,22 @@ const DetalleNota = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell><strong>Ganancia Mínima Total</strong></TableCell>
-                            <TableCell align="center"><strong>Ganancia Base Total</strong></TableCell>
-                            <TableCell align="center"><strong>Ganancia Total</strong></TableCell>
+                            <TableCell><strong>Ganancia Base Total</strong></TableCell>
+                            <TableCell><strong>Ganancia Total</strong></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell align="center">{gananciaMinima.toFixed(0)} Gs</TableCell>
-                            <TableCell align="center">{gananciaBase.toFixed(0)} Gs</TableCell>
-                            <TableCell align="center">{gananciaTotal.toFixed(0)} Gs</TableCell>
+                            <TableCell>{gananciaMinima.toFixed(0)} Gs</TableCell>
+                            <TableCell>{gananciaBase.toFixed(0)} Gs</TableCell>
+                            <TableCell>{gananciaTotal.toFixed(0)} Gs</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Button variant="contained" color="error" onClick={handleEliminar}>
-                Eliminar
+
+            <Button variant="contained" color="error" onClick={handleEliminar} fullWidth>
+                Eliminar Nota
             </Button>
         </Container>
     );

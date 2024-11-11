@@ -30,11 +30,6 @@ const RegistroFinalizadosS = () => {
         navigate(`/S-detalle-nota/${id}`);
     };
 
-    // Función para ver la factura de la nota
-    const handleVerFactura = (id) => {
-        navigate(`/factura/${id}`);
-    };
-
     return (
         <Container maxWidth="lg" sx={{ mt: 5 }}>
             <Typography variant="h4" align="center" gutterBottom>
@@ -61,7 +56,9 @@ const RegistroFinalizadosS = () => {
                             <Grid item xs={12} sm={6} md={3}>
                                 <Typography variant="body1"><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
                             </Grid>
-
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography variant="body1"><strong>Fecha:</strong> {new Date(nota.createdAt).toLocaleDateString()}</Typography>
+                            </Grid>
                             {/* Botones para ver detalle y factura */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <Button

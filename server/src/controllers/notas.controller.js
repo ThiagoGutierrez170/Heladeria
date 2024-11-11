@@ -205,13 +205,14 @@ const TraerFactura = async (req, res) => {
         // Calcula la ganancia total base sumando las ganancias de cada helado
         const gananciaTotalBase = detallesFactura.reduce((acc, detalle) => acc + detalle.gananciaBase, 0);
 
-        // Incluye en la respuesta la información completa de la nota
+        // Incluye en la respuesta la información completa de la nota, incluyendo createdAt
         res.status(200).json({
             detallesFactura,
             gananciaTotalBase,
             vendedor: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
             playa: nota.playa,
-            clima: nota.clima
+            clima: nota.clima,
+            createdAt: nota.createdAt // Agregar el campo createdAt aquí
         });
     } catch (error) {
         console.error('Error al generar la factura:', error);
@@ -219,12 +220,15 @@ const TraerFactura = async (req, res) => {
     }
 };
 
+
+// Obtener el detalle de una nota finalizada (con cálculo de todas las ganancias)
 // Obtener el detalle de una nota finalizada (con cálculo de todas las ganancias)
 const DetalleNota = async (req, res) => {
     try {
         const { id } = req.params;
         const nota = await Nota.findById(id).populate('catalogo.helado_id')
-            .populate('vendedor_id', 'nombre apellido') ;
+            .populate('vendedor_id', 'nombre apellido');
+        
         if (!nota || nota.estado !== 'finalizado') {
             return res.status(404).json({ error: 'Nota finalizada no encontrada' });
         }
@@ -247,19 +251,22 @@ const DetalleNota = async (req, res) => {
         const gananciaBase = detallesGanancias.reduce((acc, item) => acc + item.gananciaBase, 0);
         const gananciaTotal = detallesGanancias.reduce((acc, item) => acc + item.gananciaTotal, 0);
 
+        // Asegúrate de incluir la fecha en la respuesta
         res.status(200).json({ 
-                detallesGanancias, 
-                gananciaMinima, 
-                gananciaBase, 
-                gananciaTotal,
-                vendedor: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
-                playa: nota.playa,
-                clima: nota.clima
-             });
+            detallesGanancias, 
+            gananciaMinima, 
+            gananciaBase, 
+            gananciaTotal,
+            vendedor: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
+            playa: nota.playa,
+            clima: nota.clima,
+            fecha: nota.createdAt 
+         });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener el detalle de la nota', detalle: error.message });
     }
 };
+
 
 
 // Eliminar una nota (solo visible para el administrador)

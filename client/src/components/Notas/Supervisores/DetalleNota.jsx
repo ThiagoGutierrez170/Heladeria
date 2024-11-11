@@ -27,14 +27,14 @@ const DetalleNotaS = () => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
-                const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima } = response.data;
+                const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima, fecha } = response.data;
                 console.log(response.data);
 
                 setDetallesGanancias(detallesGanancias);
                 setGananciaMinima(gananciaMinima);
                 setGananciaBase(gananciaBase);
                 setGananciaTotal(gananciaTotal);
-                setNotaInfo({ vendedor: vendedor_id, playa, clima });
+                setNotaInfo({ vendedor: vendedor_id, playa, clima, fecha });
             } catch (error) {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
@@ -53,7 +53,7 @@ const DetalleNotaS = () => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate('/notas-activas')}  // Redirige a la página de notas activas
+                onClick={() => navigate('/S-registro-finalizados')}  // Redirige a la página de notas activas
                 sx={{
                     mb: 2,
                     display: 'flex',
@@ -87,6 +87,9 @@ const DetalleNotaS = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="body1"><strong>Fecha:</strong> {new Date(notaInfo.fecha).toLocaleDateString()}</Typography>
                         </Grid>
                     </Grid>
                 </Paper>

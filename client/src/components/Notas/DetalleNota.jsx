@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2'; // Importación de SweetAlert2
+import Swal from 'sweetalert2'; 
 import { 
     Container, Typography, Grid, Paper, Divider, Table, TableBody, 
     TableCell, TableContainer, TableHead, TableRow, Button 
@@ -14,18 +14,20 @@ const DetalleNota = () => {
     const [gananciaBase, setGananciaBase] = useState(0);
     const [gananciaTotal, setGananciaTotal] = useState(0);
     const [notaInfo, setNotaInfo] = useState(null);
+    const [fechaNota, setFechaNota] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
-                const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima } = response.data;
+                const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima, fecha } = response.data;
                 setDetallesGanancias(detallesGanancias);
                 setGananciaMinima(gananciaMinima);
                 setGananciaBase(gananciaBase);
                 setGananciaTotal(gananciaTotal);
                 setNotaInfo({ vendedor: vendedor_id, playa, clima });
+                setFechaNota(fecha);
             } catch (error) {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
@@ -98,6 +100,10 @@ const DetalleNota = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
+                        </Grid>
+                        {/* Agregar la fecha de la nota */}
+                        <Grid item xs={12}>
+                            <Typography variant="body1"><strong>Fecha:</strong> {new Date(fechaNota).toLocaleDateString()}</Typography>
                         </Grid>
                     </Grid>
                 </Paper>

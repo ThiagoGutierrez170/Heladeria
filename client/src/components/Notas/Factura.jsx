@@ -25,8 +25,8 @@ const Factura = () => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/factura`);
-                const { detallesFactura, gananciaTotalBase, vendedor_id, playa, clima } = response.data;
-                console.log(response.data);
+                const { detallesFactura, gananciaTotalBase, vendedor, playa, clima, createdAt } = response.data;
+                
                 const catalogoCalculado = detallesFactura.map((item) => ({
                     nombre: item.nombre,
                     cantidadVendida: item.cantidadVendida,
@@ -35,7 +35,12 @@ const Factura = () => {
 
                 setCatalogo(catalogoCalculado);
                 setGananciaTotal(gananciaTotalBase);
-                setNotaInfo({ vendedor: vendedor_id, playa, clima });
+                setNotaInfo({ 
+                    vendedor, 
+                    playa, 
+                    clima, 
+                    fecha: new Date(createdAt).toLocaleDateString() // Formatear y asignar fecha aquí
+                });
             } catch (error) {
                 console.error('Error al cargar la nota:', error);
             }
@@ -50,7 +55,6 @@ const Factura = () => {
                 Factura de Nota
             </Typography>
             
-            {/* Botón Volver */}
             <Button
                 variant="contained"
                 color="primary"
@@ -71,14 +75,13 @@ const Factura = () => {
                 Volver
             </Button>
 
-            {/* Información de la nota */}
             {notaInfo && (
                 <Paper sx={{ p: 2, mb: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant="body1">
-                                <strong>Vendedor:</strong> 
-                                {notaInfo.vendedor?.nombre ? 
+                                <strong>Vendedor: </strong> 
+                                {notaInfo.vendedor ? 
                                     `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}` 
                                     : "Información de vendedor no disponible"}
                             </Typography>
@@ -89,6 +92,9 @@ const Factura = () => {
                         <Grid item xs={12}>
                             <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
                         </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="body1"><strong>Fecha:</strong> {notaInfo.fecha}</Typography>
+                        </Grid>
                     </Grid>
                 </Paper>
             )}
@@ -98,7 +104,6 @@ const Factura = () => {
             </Typography>
             <Divider sx={{ my: 3 }} />
 
-            {/* Tabla de detalles de helados y ganancias */}
             <TableContainer component={Paper} sx={{ mb: 3 }}>
                 <Table>
                     <TableHead>

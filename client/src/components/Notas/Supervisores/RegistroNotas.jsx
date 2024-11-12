@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 
-const RegistroFinalizados = () => {
+const RegistroFinalizadosS = () => {
     const [notasFinalizadas, setNotasFinalizadas] = useState([]);
     const navigate = useNavigate();
 
@@ -27,12 +27,7 @@ const RegistroFinalizados = () => {
 
     // Función para ver el detalle de la nota
     const handleVerDetalle = (id) => {
-        navigate(`/nota-detalle/${id}`);
-    };
-
-    // Función para ver la factura de la nota
-    const handleVerFactura = (id) => {
-        navigate(`/factura/${id}`);
+        navigate(`/S-detalle-nota/${id}`);
     };
 
     return (
@@ -61,7 +56,9 @@ const RegistroFinalizados = () => {
                             <Grid item xs={12} sm={6} md={3}>
                                 <Typography variant="body1"><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
                             </Grid>
-
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography variant="body1"><strong>Fecha:</strong> {new Date(nota.createdAt).toLocaleDateString()}</Typography>
+                            </Grid>
                             {/* Botones para ver detalle y factura */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <Button
@@ -73,16 +70,6 @@ const RegistroFinalizados = () => {
                                     Ver Detalle
                                 </Button>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    onClick={() => handleVerFactura(nota._id)}
-                                    sx={{ mt: 2 }}
-                                >
-                                    Ver Factura
-                                </Button>
-                            </Grid>
                         </Grid>
                     </Paper>
                 );
@@ -91,4 +78,4 @@ const RegistroFinalizados = () => {
     );
 };
 
-export default RegistroFinalizados;
+export default RegistroFinalizadosS;

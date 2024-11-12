@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
+import { Container, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Swal from 'sweetalert2';
 
 const RecargarCatalogo = () => {
@@ -18,9 +14,9 @@ const RecargarCatalogo = () => {
     useEffect(() => {
         const fetchCatalogo = async () => {
             try {
-                const response = await axios.get(`/api/nota/activas/${id}`);
-                console.log(response.data.catalogo);
-                const catalogoData = response.data.catalogo.map(item => ({
+                // Obtener todos los helados activos
+                const response = await axios.get('/api/helado?estado=activo');
+                const catalogoData = response.data.map(item => ({
                     ...item,
                     cantidadTotal: item.cantidadTotal || 0 // Asegura que cantidadTotal siempre esté definido
                 }));
@@ -28,7 +24,7 @@ const RecargarCatalogo = () => {
 
                 // Inicializa el estado de recargas para cada helado en 0
                 const initialRecargas = catalogoData.reduce((acc, item) => {
-                    acc[item.helado_id._id] = 0;
+                    acc[item._id] = 0;  // Usamos el _id del helado
                     return acc;
                 }, {});
                 setRecargas(initialRecargas);
@@ -38,7 +34,7 @@ const RecargarCatalogo = () => {
         };
 
         fetchCatalogo();
-    }, [id]);
+    }, []);
 
     const handleRecargaChange = (heladoId, value) => {
         setRecargas({
@@ -49,9 +45,9 @@ const RecargarCatalogo = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         try {
-            // Envía las recargas al backend para actualizar la nota
+            // Enviar recargas a la API para actualizar los helados
             await axios.put(`/api/nota/recargar/${id}`, { recargas });
             Swal.fire('Recarga Exitosa', 'Las cantidades han sido recargadas en el catálogo.', 'success');
             navigate(`/notas-activas/`);
@@ -60,34 +56,44 @@ const RecargarCatalogo = () => {
             Swal.fire('Error', 'Hubo un problema al recargar el catálogo', 'error');
         }
     };
-    
 
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <Typography variant="h4" align="center" gutterBottom>
                 Recargar Catálogo
             </Typography>
             <form onSubmit={handleSubmit}>
-                {catalogo.map((item) => (
-                    <Grid container spacing={2} key={item.helado_id._id} alignItems="center">
-                        <Grid item xs={6}>
-                            <Typography variant="body1">{item.helado_id.nombre}</Typography>
-                            <Typography variant="body2" color="textSecondary">
-                                Cantidad total: {item.cantidadTotal} {/* Mostrar la cantidad total aquí */}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                label="Cantidad a Recargar"
-                                type="number"
-                                variant="outlined"
-                                fullWidth
-                                value={recargas[item.helado_id._id] || 0}
-                                onChange={(e) => handleRecargaChange(item.helado_id._id, e.target.value)}
-                            />
-                        </Grid>
-                    </Grid>
-                ))}
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="center"><strong>Helado</strong></TableCell>
+                                <TableCell align="center"><strong>Cantidad Total</strong></TableCell>
+                                <TableCell align="center"><strong>Cantidad a Recargar</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {catalogo.map((item) => (
+                                <TableRow key={item._id}>
+                                    <TableCell align="center">
+                                        <Typography variant="body1">{item.nombre}</Typography>
+                                    </TableCell>
+                                    <TableCell align="center">{item.cantidadTotal}</TableCell>
+                                    <TableCell align="center">
+                                        <TextField
+                                            label="Recargar"
+                                            type="number"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={recargas[item._id] || 0}
+                                            onChange={(e) => handleRecargaChange(item._id, e.target.value)}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
                 <Button
                     type="submit"

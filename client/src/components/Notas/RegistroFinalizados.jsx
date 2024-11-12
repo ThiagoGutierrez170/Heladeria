@@ -25,12 +25,10 @@ const RegistroFinalizados = () => {
         fetchNotasFinalizadas();
     }, []);
 
-    // Función para ver el detalle de la nota
     const handleVerDetalle = (id) => {
         navigate(`/nota-detalle/${id}`);
     };
 
-    // Función para ver la factura de la nota
     const handleVerFactura = (id) => {
         navigate(`/factura/${id}`);
     };
@@ -43,8 +41,10 @@ const RegistroFinalizados = () => {
             <Divider sx={{ my: 3 }} />
 
             {notasFinalizadas.map((nota) => {
-                // Calcular la ganancia base total sumando cada gananciaBase en detallesGanancias
                 const gananciaBaseTotal = nota.detallesGanancias.reduce((total, detalle) => total + detalle.gananciaBase, 0);
+
+                // Formatear la fecha de la nota
+                const fechaNota = new Date(nota.createdAt).toLocaleDateString();
 
                 return (
                     <Paper key={nota._id} sx={{ p: 3, mb: 3 }}>
@@ -61,8 +61,9 @@ const RegistroFinalizados = () => {
                             <Grid item xs={12} sm={6} md={3}>
                                 <Typography variant="body1"><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
                             </Grid>
-
-                            {/* Botones para ver detalle y factura */}
+                            <Grid item xs={12} sm={6} md={3}>
+                                <Typography variant="body1"><strong>Fecha:</strong> {fechaNota}</Typography>
+                            </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <Button
                                     variant="contained"

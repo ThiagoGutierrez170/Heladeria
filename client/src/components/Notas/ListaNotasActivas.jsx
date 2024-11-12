@@ -31,8 +31,9 @@ const ListaNotasActivas = () => {
 
     return (
         <Container>
-            <Typography variant="h4" align="center" gutterBottom>
-                Notas Activas
+            <br />
+            <Typography variant="h4" align="center" color='black' gutterBottom>
+                Registro de Notas Finalizadas
             </Typography>
             <Button
                 variant="contained"

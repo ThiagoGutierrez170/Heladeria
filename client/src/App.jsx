@@ -98,7 +98,7 @@ const App = () => {
         <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
 
         <Route path="/usuarios" element={<ListaUsuario/>}/>
-        <Route path="/usuario-editar/id:" element={<EditarUsuario/>}/>
+        <Route path="/editar-usuario/:id" element={<EditarUsuario />} />
         <Route path="/Crear-usuario" element={<CrearUsuario/>}/>
 
         {/* Rutas para los supervisores */}

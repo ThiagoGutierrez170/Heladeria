@@ -51,7 +51,7 @@ const EditarUsuario = () => {
         try {
             await axios.put(`/api/usuario/${id}`, usuario);
             Swal.fire('Usuario actualizado', 'El usuario ha sido actualizado.', 'success');
-            navigate(`/usuario/${id}`);
+            navigate(`/usuarios`);
         } catch (error) {
             Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
         }
@@ -60,9 +60,6 @@ const EditarUsuario = () => {
     const handleCancel = () => {
         navigate('/usuarios');
     };
-
-
-
 
     return (
         <Container component="main" maxWidth="xs">
@@ -94,7 +91,7 @@ const EditarUsuario = () => {
                     <TextField
                         label="Contraseña"
                         name="password"
-                        value={usuario.password}
+                        value={usuario.contraseña}
                         type="password"
                         onChange={handleChange}
                         required

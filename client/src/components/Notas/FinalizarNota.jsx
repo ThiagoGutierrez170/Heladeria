@@ -81,11 +81,9 @@ const FinalizarNota = () => {
 
     return (
         <Container maxWidth="md">
-            <Typography variant="h4" align="center" gutterBottom>
+            <br />
+            <Typography variant="h4" align="center" color="black" gutterBottom>
                 Finalizar Nota
-            </Typography>
-            <Typography variant="body1" align="center" gutterBottom>
-                Ingrese la cantidad de helados devueltos para cada tipo.
             </Typography>
             <form onSubmit={handleSubmit}>
                 <TableContainer component={Paper} sx={{ mt: 2 }}>

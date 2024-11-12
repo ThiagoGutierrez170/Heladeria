@@ -49,6 +49,15 @@ const Factura = () => {
         fetchNota();
     }, [id]);
 
+    // Función para formatear los números en guaraníes con puntos
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
             <Typography variant="h4" align="center" color='black' gutterBottom>
@@ -118,7 +127,7 @@ const Factura = () => {
                             <TableRow key={index}>
                                 <TableCell>{item.nombre}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{item.gananciaBaseHelado.toFixed(0)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaBaseHelado)} Gs</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -127,8 +136,9 @@ const Factura = () => {
 
             <Divider sx={{ my: 3 }} />
             <Typography variant="h5" align="center"  color='black' sx={{ mt: 2 }}>
-                Ganancia base total: {gananciaTotal.toFixed(0)} Gs
+                Ganancia base total: {formatearGs(gananciaTotal)} Gs
             </Typography>
+            <br /><br />
         </Container>
     );
 };

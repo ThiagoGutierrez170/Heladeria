@@ -59,6 +59,15 @@ const DetalleNota = () => {
         }
     };
 
+    // Función para formatear los números en guaraníes con puntos
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
             <Typography variant="h4" align="center" color='black' gutterBottom>
@@ -138,9 +147,9 @@ const DetalleNota = () => {
                                 </TableCell>
                                 <TableCell>{item.nombre || "Nombre no disponible"}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{item.gananciaMinima.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaBase.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaTotal.toFixed(0)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaMinima)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaBase)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaTotal)} Gs</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -162,9 +171,9 @@ const DetalleNota = () => {
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell>{gananciaMinima.toFixed(0)} Gs</TableCell>
-                            <TableCell>{gananciaBase.toFixed(0)} Gs</TableCell>
-                            <TableCell>{gananciaTotal.toFixed(0)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaMinima)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaBase)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaTotal)} Gs</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -173,9 +182,9 @@ const DetalleNota = () => {
             <Button variant="contained" color="error" onClick={handleEliminar} fullWidth>
                 Eliminar Nota
             </Button>
+            <br /><br /><br />
         </Container>
     );
 };
 
 export default DetalleNota;
-

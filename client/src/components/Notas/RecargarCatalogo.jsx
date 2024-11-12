@@ -59,7 +59,8 @@ const RecargarCatalogo = () => {
 
     return (
         <Container maxWidth="md">
-            <Typography variant="h4" align="center" gutterBottom>
+            <br />
+            <Typography variant="h4" align="center" gutterBottom sx={{ color: 'black' }}>
                 Recargar Catálogo
             </Typography>
             <form onSubmit={handleSubmit}>
@@ -67,10 +68,10 @@ const RecargarCatalogo = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell align="center"><strong>Imagen</strong></TableCell>
-                                <TableCell align="center"><strong>Helado</strong></TableCell>
-                                <TableCell align="center"><strong>Cantidad Total</strong></TableCell>
-                                <TableCell align="center"><strong>Cantidad a Recargar</strong></TableCell>
+                                <TableCell align="center" sx={{ color: 'black' }}><strong>Imagen</strong></TableCell>
+                                <TableCell align="center" sx={{ color: 'black' }}><strong>Helado</strong></TableCell>
+                                <TableCell align="center" sx={{ color: 'black' }}><strong>Cantidad Total</strong></TableCell>
+                                <TableCell align="center" sx={{ color: 'black' }}><strong>Cantidad a Recargar</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -79,10 +80,10 @@ const RecargarCatalogo = () => {
                                     <TableCell>
                                         <img src={item.imagen} alt={item.nombre} style={{ width: 50, height: 50 }} />
                                     </TableCell>
-                                    <TableCell align="center">
-                                        <Typography variant="body1">{item.nombre}</Typography>
+                                    <TableCell align="center" sx={{ color: 'black' }}>
+                                        <Typography variant="body1" sx={{ color: 'black' }}>{item.nombre}</Typography>
                                     </TableCell>
-                                    <TableCell align="center">{item.cantidadTotal}</TableCell>
+                                    <TableCell align="center" sx={{ color: 'black' }}>{item.cantidadTotal}</TableCell>
                                     <TableCell align="center">
                                         <TextField
                                             label="Recargar"
@@ -91,6 +92,7 @@ const RecargarCatalogo = () => {
                                             fullWidth
                                             value={recargas[item._id] || 0}
                                             onChange={(e) => handleRecargaChange(item._id, e.target.value)}
+                                            sx={{ color: 'black' }}
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -117,6 +119,7 @@ const RecargarCatalogo = () => {
                 >
                     Cancelar
                 </Button>
+                <br /><br />
             </form>
         </Container>
     );

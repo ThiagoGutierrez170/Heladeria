@@ -24,7 +24,7 @@ const ListaUsuario = () => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         const rolUsuario = localStorage.getItem('rol');
-
+        console.log(rolUsuario);
         if (rolUsuario !== 'administrador' || !token) {
             Swal.fire('Error', `Acceso no autorizado porque no tienes permiso.`, 'error');
             navigate('/');
@@ -47,7 +47,7 @@ const ListaUsuario = () => {
     }, [navigate]);
 
     const handleCrearUsuario = () => {
-        navigate('/registro');
+        navigate('/Crear-usuario');
     };
 
     const handleEdit = useCallback((usuarioId) => {
@@ -55,7 +55,7 @@ const ListaUsuario = () => {
             Swal.fire('Error', 'ID de usuario no válido', 'error');
             return;
         }
-        navigate(`/editar/usuario/${usuarioId}`);
+        navigate(`/editar-usuario/${usuarioId}`);
     }, [navigate]);
 
     return (

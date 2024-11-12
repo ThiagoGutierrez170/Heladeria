@@ -60,6 +60,7 @@ const VendedoresForm = () => {
                 setCi("");
                 setContacto("");
                 setEstado(false);
+                navigate('/vendedores');
             } catch (error) {
                 Swal.fire({
                     title: 'Error!',

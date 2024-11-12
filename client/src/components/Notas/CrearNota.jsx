@@ -92,7 +92,7 @@ const CrearNota = () => {
 
     return (
         <Container maxWidth="md" sx={{ p: 4, backgroundColor: '#f5f5f5', borderRadius: 2, boxShadow: 2 }}>
-            <Typography variant="h4" gutterBottom align="center">
+           <Typography variant="h4" align="center" gutterBottom sx={{ mb: 3, color: '#333' }}>
                 Crear Nota de Venta
             </Typography>
             <form onSubmit={handleSubmit}>
@@ -138,8 +138,8 @@ const CrearNota = () => {
                     </Select>
                 </FormControl>
 
-                <Typography variant="h6" sx={{ mt: 3 }}>
-                    Catálogo de Helados
+                <Typography variant="h6"  gutterBottom sx={{ mb: 3, color: '#333' }}>
+                    Agregar Helados al Catálogo
                 </Typography>
                 <TableContainer component={Paper} sx={{ mt: 3 }}>
                     <Table>

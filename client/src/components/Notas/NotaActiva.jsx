@@ -135,7 +135,9 @@ const NotaActiva = () => {
                     </Table>
                 </TableContainer>
             ) : (
-                <Typography variant="body2">No hay artículos en el catálogo.</Typography>
+                <Typography variant="body2" sx={{ color: 'black' }}>
+                    No hay artículos en el catálogo.
+                </Typography>
             )}
 
             {/* Botones de acciones */}
@@ -155,6 +157,7 @@ const NotaActiva = () => {
             </Box>
         </Container>
     );
+    
 };
 
 export default NotaActiva;

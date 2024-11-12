@@ -35,7 +35,7 @@ const RegistroFinalizados = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color='black' gutterBottom>
                 Registro de Notas Finalizadas
             </Typography>
             <Divider sx={{ my: 3 }} />
@@ -50,16 +50,16 @@ const RegistroFinalizados = () => {
                     <Paper key={nota._id} sx={{ p: 3, mb: 3 }}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Vendedor:</strong> {nota.vendedor_id?.nombre} {nota.vendedor_id?.apellido}</Typography>
+                                <Typography variant="body1" color='black'><strong>Vendedor:</strong> {nota.vendedor_id?.nombre} {nota.vendedor_id?.apellido}</Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Playa:</strong> {nota.playa}</Typography>
+                                <Typography variant="body1" color='black'><strong>Playa:</strong> {nota.playa}</Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Clima:</strong> {nota.clima}</Typography>
+                                <Typography variant="body1" color='black'><strong>Clima:</strong> {nota.clima}</Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
+                                <Typography variant="body1" color='black'><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <Typography variant="body1"><strong>Fecha:</strong> {fechaNota}</Typography>

@@ -1,28 +1,26 @@
-/* styles.css */
-.search-container {
-    margin-bottom: 16px;
-    text-align: center;
+
+.ag-theme-alpine {
+    --ag-grid-size: 4px;
+    --ag-list-item-height: 20px;
 }
 
-.search-input {
-    width: 300px; /* Ajusta el ancho según tus necesidades */
-    padding: 10px 40px 10px 20px; /* Espaciado interno */
-    border-radius: 25px; /* Bordes redondeados */
-    border: 1px solid #ccc; /* Color del borde */
-    transition: border-color 0.3s, box-shadow 0.3s; /* Transición suave */
-    font-size: 16px; /* Tamaño de fuente */
+@media (max-width: 600px) {
+    .ag-theme-alpine {
+        --ag-grid-size: 3px;
+        --ag-list-item-height: 25px;
+        --ag-header-height: 40px;
+    }
+    
+    .ag-theme-alpine .ag-header-cell {
+        font-size: 0.875rem;
+    }
+    
+    .ag-theme-alpine .ag-cell {
+        padding: 8px;
+    }
 }
 
-.search-input:focus {
-    border-color: #007BFF; /* Color del borde al enfocar */
-    outline: none; /* Sin contorno por defecto */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra al enfocar */
-}
-
-.search-icon {
-    position: absolute;
-    left: 15px; /* Posición del icono */
-    top: 50%; /* Centrado verticalmente */
-    transform: translateY(-50%); /* Ajuste de posición */
-    color: #007BFF; /* Color del icono */
+.ag-theme-alpine .ag-root-wrapper {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }

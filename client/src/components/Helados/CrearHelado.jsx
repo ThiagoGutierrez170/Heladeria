@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Container, TextField, Typography, FormControlLabel, Checkbox, Grid } from '@mui/material';
+import { Button, Container, TextField, Typography, FormControlLabel, Checkbox, Stack } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import SaveIcon from '@mui/icons-material/Save';
 
 const CrearHelado = () => {
     const [datosFormulario, setDatosFormulario] = useState({
@@ -18,6 +18,7 @@ const CrearHelado = () => {
         stock: '',
         estado: true,
     });
+
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
@@ -41,8 +42,8 @@ const CrearHelado = () => {
 
     const manejarEnvio = async (e) => {
         e.preventDefault();
-        const newErrors = {};
 
+        const newErrors = {};
         Object.keys(datosFormulario).forEach((field) => {
             if (!datosFormulario[field] && field !== 'estado') {
                 newErrors[field] = `Por favor proporciona ${labels[field].toLowerCase()}`;
@@ -69,20 +70,33 @@ const CrearHelado = () => {
             } catch (error) {
                 Swal.fire('Error!', 'Hubo un problema al registrar el helado.', 'error');
             }
-
         }
     };
 
+    const handleCancel = () => {
+        navigate('/helados');
+    };
+
     return (
-        <Container maxWidth="sm" sx={{ p: 4, boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)', borderRadius: 2, backgroundColor: '#f5f5f5', textAlign: 'center' }}>
-            <Typography variant="h4" align="center" gutterBottom sx={{ mb: 3, color: '#333' }}>
+        <Container
+            maxWidth="sm"
+            sx={{
+                p: { xs: 2, sm: 4 },
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
+                borderRadius: 2,
+                backgroundColor: '#f5f5f5',
+                textAlign: 'center',
+                mt: { xs: 3, sm: 5 },
+            }}
+        >
+            <Typography variant="h4" align="center" gutterBottom sx={{ mb: 3, color: '#333', fontSize: { xs: '1.5rem', sm: '2rem' } }}>
                 Agregar Helado
             </Typography>
             <form onSubmit={manejarEnvio}>
                 {['nombre', 'imagen', 'costo', 'precioBase', 'precioVenta', 'cantidadCaja', 'stock'].map((field) => (
                     <TextField
                         key={field}
-                        label={labels[field]}  // Usando el label personalizado
+                        label={labels[field]}
                         variant="outlined"
                         fullWidth
                         name={field}
@@ -92,6 +106,7 @@ const CrearHelado = () => {
                         helperText={errors[field]}
                         margin="normal"
                         type={['costo', 'precioBase', 'precioVenta', 'cantidadCaja', 'stock'].includes(field) ? 'number' : 'text'}
+                        sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
                     />
                 ))}
                 <FormControlLabel
@@ -101,49 +116,47 @@ const CrearHelado = () => {
                             onChange={manejarCambio}
                             name="estado"
                             sx={{
-                                '&.Mui-checked': {
-                                    color: '#1976d2', // Color cuando está chequeado
-                                },
-                                '&.Mui-checked:hover': {
-                                    backgroundColor: 'rgba(25, 118, 210, 0.08)', // Efecto hover
-                                },
-                                '& .MuiSvgIcon-root': {
-                                    fontSize: 28, // Tamaño del icono del checkbox
-                                },
+                                '&.Mui-checked': { color: '#1976d2' },
+                                '&.Mui-checked:hover': { backgroundColor: 'rgba(25, 118, 210, 0.08)' },
+                                '& .MuiSvgIcon-root': { fontSize: 28 },
                             }}
                         />
                     }
                     label="Estado"
-                    sx={{
-                        marginRight: 300,
-                        fontSize: '16px', // Tamaño de la fuente de la etiqueta
-                        color: '#333', // Color de la etiqueta
-                    }}
+                    sx={{ color: '#333', fontSize: { xs: '0.9rem', sm: '1rem' }, display: 'block', textAlign: 'left', my: 2 }}
                 />
-                <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
-                    <Grid item>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            sx={{ padding: '12px 24px', fontSize: '16px', '&:hover': { backgroundColor: '#0056b3' } }}
-                        >
-                            Agregar
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={() => navigate('/helados')}
-                            startIcon={<CancelIcon />}
-                            sx={{ padding: '12px 24px', fontSize: '16px' }}
-                        >
-                            Cancelar
-                        </Button>
-                    </Grid>
-                </Grid>
+                <Stack direction="row" spacing={2} justifyContent="center">
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        startIcon={<SaveIcon />}
+                        sx={{
+                            backgroundColor: '#1976d2',
+                            '&:hover': {
+                                backgroundColor: '#1565c0',
+                            },
+                        }}
+                    >
+                        Agregar
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={handleCancel}
+                        startIcon={<CancelIcon />}
+                        sx={{
+                            borderColor: '#f44336',
+                            color: '#f44336',
+                            '&:hover': {
+                                borderColor: '#d32f2f',
+                                color: '#d32f2f',
+                            },
+                        }}
+                    >
+                        Cancelar
+                    </Button>
+                </Stack>
             </form>
         </Container>
     );

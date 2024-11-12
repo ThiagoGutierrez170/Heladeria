@@ -8,7 +8,8 @@ import {
     Box,
     Stack,
     Checkbox,
-    FormControlLabel
+    FormControlLabel,
+    FormHelperText,
 } from '@mui/material';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -78,112 +79,102 @@ const EditarVendedor = () => {
     }
 
     return (
-        <>
-            <Container
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    p: 4,
-                    mt: 10,
-                    maxWidth: 'sm',
-                    boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.1)',
-                    borderRadius: 3,
-                    backgroundColor: '#ffffff',
-                }}
-            >
-                <Typography variant="h4" align="center" gutterBottom color="primary" sx={{ mb: 3 }}>
-                    Editar Vendedor
-                </Typography>
-                <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-                    <TextField
-                        fullWidth
-                        label="Nombre"
-                        name="nombre"
-                        value={vendedor.nombre}
-                        onChange={handleChange}
+        <Container
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                p: 4,
+                mt: 5,
+                maxWidth: 'sm',
+                boxShadow: 3,
+                borderRadius: 2,
+                backgroundColor: '#ffffff',
+            }}
+        >
+            <Typography variant="h4" align="center" gutterBottom color="primary" sx={{ mb: 3 }}>
+                Editar Vendedor
+            </Typography>
+            <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+                <TextField
+                    fullWidth
+                    label="Nombre"
+                    name="nombre"
+                    value={vendedor.nombre}
+                    onChange={handleChange}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    required
+                    autoFocus
+                />
+                <TextField
+                    fullWidth
+                    label="Apellido"
+                    name="apellido"
+                    value={vendedor.apellido}
+                    onChange={handleChange}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    required
+                />
+                <TextField
+                    fullWidth
+                    label="C.I."
+                    name="ci"
+                    value={vendedor.ci}
+                    onChange={handleChange}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    required
+                />
+                <TextField
+                    fullWidth
+                    label="Contacto"
+                    name="contacto"
+                    value={vendedor.contacto}
+                    onChange={handleChange}
+                    variant="outlined"
+                    sx={{ mb: 3 }}
+                    required
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={vendedor.estado || false}
+                            onChange={handleEstadoChange}
+                            sx={{
+                                '&.Mui-checked': {
+                                    color: '#1976d2',
+                                },
+                            }}
+                        />
+                    }
+                    label="Estado"
+                    sx={{ mb: 3, fontSize: '16px', color: '#333' }}
+                />
+                <Stack direction="row" spacing={2} justifyContent="center">
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        startIcon={<SaveIcon />}
+                        sx={{ minWidth: '120px' }}
+                    >
+                        Actualizar
+                    </Button>
+                    <Button
                         variant="outlined"
-                        sx={{ mb: 2 }}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        label="Apellido"
-                        name="apellido"
-                        value={vendedor.apellido}
-                        onChange={handleChange}
-                        variant="outlined"
-                        sx={{ mb: 2 }}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        label="C.I."
-                        name="ci"
-                        value={vendedor.ci}
-                        onChange={handleChange}
-                        variant="outlined"
-                        sx={{ mb: 2 }}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        label="Contacto"
-                        name="contacto"
-                        value={vendedor.contacto}
-                        onChange={handleChange}
-                        variant="outlined"
-                        sx={{ mb: 3 }}
-                        required
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={vendedor.estado?.checked || true}  // Aquí aseguramos que el valor esté marcado por defecto
-                                onChange={handleEstadoChange}
-                                sx={{
-                                    '&.Mui-checked': {
-                                        color: '#1976d2',
-                                    },
-                                    '&.Mui-checked:hover': {
-                                        backgroundColor: 'rgba(25, 118, 210, 0.08)',
-                                    },
-                                    '& .MuiSvgIcon-root': {
-                                        fontSize: 28,
-                                    },
-                                }}
-                            />
-                        }
-                        label="Estado"
-                        sx={{
-                            marginBottom: 3,
-                            fontSize: '16px',
-                            color: '#333',
-                        }}
-                    />
-
-                    <Stack direction="row" spacing={2} justifyContent="center">
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            type="submit"
-                            startIcon={<SaveIcon />}
-                        >
-                            Actualizar
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={handleCancel}
-                            startIcon={<CancelIcon />}
-                        >
-                            Cancelar
-                        </Button>
-                    </Stack>
-                </form>
-            </Container>
-        </>
+                        color="secondary"
+                        onClick={handleCancel}
+                        startIcon={<CancelIcon />}
+                        sx={{ minWidth: '120px' }}
+                    >
+                        Cancelar
+                    </Button>
+                </Stack>
+            </form>
+        </Container>
     );
 };
 

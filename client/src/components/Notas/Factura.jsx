@@ -20,13 +20,13 @@ const Factura = () => {
     const [gananciaTotal, setGananciaTotal] = useState(0);
     const [notaInfo, setNotaInfo] = useState(null);
     const navigate = useNavigate();
-    
+
     useEffect(() => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/factura`);
                 const { detallesFactura, gananciaTotalBase, vendedor, playa, clima, createdAt } = response.data;
-                
+
                 const catalogoCalculado = detallesFactura.map((item) => ({
                     nombre: item.nombre,
                     cantidadVendida: item.cantidadVendida,
@@ -35,10 +35,10 @@ const Factura = () => {
 
                 setCatalogo(catalogoCalculado);
                 setGananciaTotal(gananciaTotalBase);
-                setNotaInfo({ 
-                    vendedor, 
-                    playa, 
-                    clima, 
+                setNotaInfo({
+                    vendedor,
+                    playa,
+                    clima,
                     fecha: new Date(createdAt).toLocaleDateString() // Formatear y asignar fecha aquí
                 });
             } catch (error) {
@@ -49,12 +49,21 @@ const Factura = () => {
         fetchNota();
     }, [id]);
 
+    // Función para formatear los números en guaraníes con puntos
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
             <Typography variant="h4" align="center" color='black' gutterBottom>
                 Factura de Nota
             </Typography>
-            
+
             <Button
                 variant="contained"
                 color="primary"
@@ -80,9 +89,9 @@ const Factura = () => {
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant="body1">
-                                <strong>Vendedor: </strong> 
-                                {notaInfo.vendedor ? 
-                                    `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}` 
+                                <strong>Vendedor: </strong>
+                                {notaInfo.vendedor ?
+                                    `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}`
                                     : "Información de vendedor no disponible"}
                             </Typography>
                         </Grid>
@@ -118,7 +127,7 @@ const Factura = () => {
                             <TableRow key={index}>
                                 <TableCell>{item.nombre}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{item.gananciaBaseHelado.toFixed(0)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaBaseHelado)} Gs</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -126,9 +135,10 @@ const Factura = () => {
             </TableContainer>
 
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h5" align="center"  color='black' sx={{ mt: 2 }}>
-                Ganancia base total: {gananciaTotal.toFixed(0)} Gs
+            <Typography variant="h5" align="center" color='black' sx={{ mt: 2 }}>
+                Ganancia base total: {formatearGs(gananciaTotal)} Gs
             </Typography>
+            <br /><br />
         </Container>
     );
 };

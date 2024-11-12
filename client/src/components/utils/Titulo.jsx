@@ -5,60 +5,69 @@ const Titulo = () => {
     const location = useLocation();
 
     React.useEffect(() => {
-        switch (location.pathname) {
-            case '/vendedores':
-                document.title = 'Lista de  Vendedores';
+        switch (true) {
+            case /^\/vendedores$/.test(location.pathname):
+                document.title = 'Lista de Vendedores';
                 break;
-            case '/helados':
+            case /^\/helados$/.test(location.pathname):
                 document.title = 'Lista de Helados';
                 break;
-            case '/agregar-vendedor':
-                document.title = 'Formulario de  Vendedor';
+            case /^\/agregar-vendedor$/.test(location.pathname):
+                document.title = 'Formulario de Vendedor';
                 break;
-            case '/editar-vendedor':
+            case /^\/editar-vendedor\/\d+$/.test(location.pathname):
                 document.title = 'Editar Vendedor';
                 break;
-            case '/agregar-helado':
+            case /^\/agregar-helado$/.test(location.pathname):
                 document.title = 'Formulario de Helado';
                 break;
-            case '/editar-helado':
+            case /^\/editar-helado\/\d+$/.test(location.pathname):
                 document.title = 'Editar Helado';
                 break;
-            case '/generar-vendedores':
-                document.title = 'Generar Vendedores';
-                break;
-            case 'notas-activas':
+            case /^\/notas-activas$/.test(location.pathname):
                 document.title = 'Notas Activas';
                 break;
-            case 'nota-inactiva':
-                document.title = 'Detalle de Nota Inactiva';
+            case /^\/nota-activa\/\d+$/.test(location.pathname):
+                document.title = 'Detalle de Nota Activa';
                 break;
-            case 'editar-nota':
+            case /^\/editar-nota\/\d+$/.test(location.pathname):
                 document.title = 'Editar Nota';
                 break;
-            case 'recargar-catalogo':
+            case /^\/recargar-catalogo\/\d+$/.test(location.pathname):
                 document.title = 'Recargar Catálogo';
                 break;
-            case 'finalizar-nota':
+            case /^\/finalizar-nota\/\d+$/.test(location.pathname):
                 document.title = 'Finalizar Nota';
                 break;
-            case 'factura':
+            case /^\/factura\/\d+$/.test(location.pathname):
                 document.title = 'Factura';
                 break;
-            case 'registro-finalizados':
+            case /^\/registro-finalizados$/.test(location.pathname):
                 document.title = 'Registro de Notas Finalizadas';
                 break;
-            case 'detalle-nota':
+            case /^\/nota-detalle\/\d+$/.test(location.pathname):
                 document.title = 'Detalle de la Nota';
                 break;
-            case '/ruta1':
-                document.title = 'Título Ruta 1';
+            case /^\/agregar-nota$/.test(location.pathname):
+                document.title = 'Agregar Nota';
                 break;
-            case '/ruta2':
-                document.title = 'Título Ruta 2';
+            case /^\/usuarios$/.test(location.pathname):
+                document.title = 'Lista de Usuarios';
+                break;
+            case /^\/usuario-editar\/\d+$/.test(location.pathname):
+                document.title = 'Editar Usuario';
+                break;
+            case /^\/crear-usuario$/.test(location.pathname):
+                document.title = 'Crear Usuario';
+                break;
+            case /^\/S-registro-finalizados$/.test(location.pathname):
+                document.title = 'Registros Finalizados - Supervisor';
+                break;
+            case /^\/S-detalle-nota\/\d+$/.test(location.pathname):
+                document.title = 'Detalle de Nota - Supervisor';
                 break;
             default:
-                document.title = 'Inicio de la Aplicación';
+                document.title = 'Aplicación';
         }
     }, [location]);
 

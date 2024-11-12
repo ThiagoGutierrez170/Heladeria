@@ -7,16 +7,26 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 const ListaNotasActivas = () => {
     const [notas, setNotas] = useState([]);
+    const [filteredNotas, setFilteredNotas] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchNotasActivas = async () => {
             try {
                 const response = await axios.get('/api/nota/activas');
-                setNotas(response.data);
+                const data = response.data.map((nota) => ({
+                    ...nota,
+                    title: nota.nombre || nota.playa,
+                    firstLetter: (nota.nombre || nota.playa)[0].toUpperCase()
+                }));
+                setNotas(data);
+                setFilteredNotas(data);
             } catch (error) {
                 console.error('Error al obtener las notas activas:', error);
             }
@@ -25,13 +35,22 @@ const ListaNotasActivas = () => {
         fetchNotasActivas();
     }, []);
 
+    const handleSearch = (event, value) => {
+        setSearchTerm(value.toLowerCase());
+        const filtered = notas.filter((nota) =>
+            nota.playa.toLowerCase().includes(value.toLowerCase()) ||
+            (nota.nombre && nota.nombre.toLowerCase().includes(value.toLowerCase()))
+        );
+        setFilteredNotas(filtered);
+    };
+
     const handleVerDetalle = (id) => {
         navigate(`/nota-activa/${id}`);
     };
 
     return (
         <Container>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color='black' m={4} gutterBottom>
                 Notas Activas
             </Typography>
             <Button
@@ -53,8 +72,26 @@ const ListaNotasActivas = () => {
             >
                 +
             </Button>
+
+            <Autocomplete
+                options={notas}
+                groupBy={(option) => option.firstLetter}
+                getOptionLabel={(option) => option.title}
+                onInputChange={handleSearch}
+                sx={{
+                    width: {
+                        xs: '100%',
+                        sm: '80%',
+                        md: 1300
+                    },
+                    mb: 4
+                }}
+                renderInput={(params) => (
+                    <TextField {...params} label="Buscar por playa" />
+                )}
+            />
             <Grid container spacing={3}>
-                {notas.map((nota) => (
+                {filteredNotas.map((nota) => (
                     <Grid item xs={12} sm={6} md={4} key={nota._id}>
                         <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
                             <CardContent>

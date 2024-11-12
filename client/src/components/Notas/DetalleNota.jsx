@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2'; 
-import { 
-    Container, Typography, Grid, Paper, Divider, Table, TableBody, 
-    TableCell, TableContainer, TableHead, TableRow, Button 
+import Swal from 'sweetalert2';
+import {
+    Container, Typography, Grid, Paper, Divider, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow, Button
 } from '@mui/material';
 
 const DetalleNota = () => {
@@ -22,13 +22,13 @@ const DetalleNota = () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
                 const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima, fecha } = response.data;
-                
+
                 setDetallesGanancias(detallesGanancias);
                 setGananciaMinima(gananciaMinima);
                 setGananciaBase(gananciaBase);
                 setGananciaTotal(gananciaTotal);
                 setNotaInfo({ vendedor: vendedor_id, playa, clima });
-                setFechaNota(fecha); // Utiliza createdAt como la fecha de la nota
+                setFechaNota(fecha);
             } catch (error) {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
@@ -59,6 +59,15 @@ const DetalleNota = () => {
         }
     };
 
+    // Función para formatear los números en guaraníes con puntos
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
             <Typography variant="h4" align="center" color='black' gutterBottom>
@@ -84,30 +93,33 @@ const DetalleNota = () => {
             >
                 Volver
             </Button>
-
             {notaInfo && (
                 <Paper sx={{ p: 2, mb: 3 }}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <Typography variant="body1">
-                                <strong>Vendedor: </strong>
-                                {notaInfo.vendedor?.nombre ? 
-                                    `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}` 
-                                    : "Información de vendedor no disponible"}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Playa:</strong> {notaInfo.playa}</Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Fecha:</strong> {new Date(fechaNota).toLocaleDateString()}</Typography>
-                        </Grid>
-                    </Grid>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell><strong>Vendedor</strong></TableCell>
+                                <TableCell><strong>Playa</strong></TableCell>
+                                <TableCell><strong>Clima</strong></TableCell>
+                                <TableCell><strong>Fecha</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>
+                                    {notaInfo.vendedor?.nombre
+                                        ? `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}`
+                                        : "Información de vendedor no disponible"}
+                                </TableCell>
+                                <TableCell>{notaInfo.playa}</TableCell>
+                                <TableCell>{notaInfo.clima}</TableCell>
+                                <TableCell>{new Date(fechaNota).toLocaleDateString()}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
                 </Paper>
             )}
+
 
             <Typography variant="h6" align="center" color='black' gutterBottom>
                 Detalle de Ganancias de la Nota
@@ -118,7 +130,8 @@ const DetalleNota = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong color='black'>Nombre del helado</strong></TableCell>
+                            <TableCell><strong>Imagen</strong></TableCell>
+                            <TableCell><strong>Nombre del helado</strong></TableCell>
                             <TableCell align="center"><strong>Cantidad Vendida</strong></TableCell>
                             <TableCell align="center"><strong>Ganancia Mínima (Gs)</strong></TableCell>
                             <TableCell align="center"><strong>Ganancia Base (Gs)</strong></TableCell>
@@ -127,12 +140,19 @@ const DetalleNota = () => {
                     </TableHead>
                     <TableBody>
                         {detallesGanancias.map((item, index) => (
-                            <TableRow key={index} color='black'>
-                                <TableCell>{item.nombre}</TableCell>
+                            <TableRow key={index}>
+                                <TableCell>
+                                    <img
+                                        src={item.imagen} // Imagen por defecto si falta la URL
+                                        alt={item.nombre}
+                                        style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '5px' }}
+                                    />
+                                </TableCell>
+                                <TableCell>{item.nombre || "Nombre no disponible"}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{item.gananciaMinima.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaBase.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaTotal.toFixed(0)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaMinima)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaBase)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaTotal)} Gs</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -154,9 +174,9 @@ const DetalleNota = () => {
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell>{gananciaMinima.toFixed(0)} Gs</TableCell>
-                            <TableCell>{gananciaBase.toFixed(0)} Gs</TableCell>
-                            <TableCell>{gananciaTotal.toFixed(0)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaMinima)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaBase)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaTotal)} Gs</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -165,6 +185,7 @@ const DetalleNota = () => {
             <Button variant="contained" color="error" onClick={handleEliminar} fullWidth>
                 Eliminar Nota
             </Button>
+            <br /><br /><br />
         </Container>
     );
 };

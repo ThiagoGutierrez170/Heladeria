@@ -15,46 +15,66 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            // Enviar las credenciales al servidor
-            const response = await axios.post('/api/sesion/login', { correo: email, contraseña: password });
-            const { token, rol } = response.data; // Suponiendo que el servidor devuelve el token y el rol del usuario
+            const response = await axios.post('/api/sesiones/login/', { correo: email, contraseña: password });
+            const { token, usuario } = response.data;
 
-            // Guarda el token y el rol en localStorage
-            // Ejemplo después de obtener el token y rol en el frontend
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('rol', response.data.usuario.rol);
+            localStorage.setItem('token', token);
+            localStorage.setItem('rol', usuario.rol);
 
-
-            // Redirige al usuario a la página principal
-            Swal.fire('Inicio de sesion !', 'Has iniciado correctamente.', 'success');
+            Swal.fire('Inicio de sesión!', 'Has iniciado sesión correctamente.', 'success');
             navigate('/');
         } catch (error) {
             setLoading(false);
             setError('Correo o contraseña incorrectos');
-            Swal.fire('Error!', 'Hubo un problema al iniciar sesion.', 'error');
+            Swal.fire('Error!', 'Hubo un problema al iniciar sesión.', 'error');
         }
     };
 
-    const handleRedirectToCreateUser = () => {
-        navigate('/registro');  // Redirige a la página de crear usuario
-    };
 
-
-
-    
     return (
-        <Container maxWidth="xs" sx={{ mt: 8 }}>
+        <Container 
+            maxWidth={false} 
+            sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                minHeight: '100vh',
+                padding: 0,
+                backgroundImage: 'linear-gradient(to right, #80d0ff, #72c2ff, #64b5ff, #56a8ff)',
+            }}
+        >
             <Box
                 sx={{
-                    boxShadow: 3,
-                    p: 4,
-                    borderRadius: 2,
-                    backgroundColor: 'white',
+                    width: { xs: '90%', sm: '70%', md: '50%', lg: '40%' },
+                    boxShadow: 6,
+                    p: 5,
+                    borderRadius: 4,
+                    backgroundColor: '#e0f7fa',
                     textAlign: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
                 }}
             >
-                <Typography variant="h4" component="h1" gutterBottom>
+                {/* Helado decorativo en la esquina */}
+                <Box
+                    component="img"
+                    src="https://cdn-icons-png.flaticon.com/512/1159/1159215.png"
+                    alt="Icono de helado"
+                    sx={{
+                        position: 'absolute',
+                        width: 100,
+                        height: 100,
+                        top: -30,
+                        right: -30,
+                        opacity: 0.4,
+                        transform: 'rotate(-20deg)',
+                    }}
+                />
+                <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#039be5', fontWeight: 'bold' }}>
                     Iniciar Sesión
+                </Typography>
+                <Typography variant="body2" mb={3} sx={{ color: '#0277bd' }}>
+                    ¡Bienvenido! Ingresa tus datos para disfrutar de nuestros helados virtuales.
                 </Typography>
                 <form onSubmit={handleLogin}>
                     <Stack spacing={3}>
@@ -67,6 +87,7 @@ const Login = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             error={Boolean(error)}
                             helperText={error}
+                            sx={{ backgroundColor: '#ffffff', borderRadius: 1 }}
                         />
                         <TextField
                             label="Contraseña"
@@ -77,6 +98,7 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             error={Boolean(error)}
                             helperText={error}
+                            sx={{ backgroundColor: '#ffffff', borderRadius: 1 }}
                         />
                         <Button
                             type="submit"
@@ -86,26 +108,16 @@ const Login = () => {
                             sx={{
                                 py: 1.5,
                                 fontSize: '1rem',
-                                backgroundColor: '#1976D2',
-                                '&:hover': { backgroundColor: '#673AB7' },
+                                backgroundColor: '#0288d1',
+                                color: '#fff',
+                                '&:hover': { backgroundColor: '#0277bd' },
+                                borderRadius: 2,
                             }}
                         >
-                            {loading ? <CircularProgress size={24} /> : 'Ingresar'}
+                            {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Ingresar'}
                         </Button>
                     </Stack>
                 </form>
-                <Button
-                    variant="text"
-                    fullWidth
-                    sx={{
-                        mt: 2,
-                        color: '#7E57C2',
-                        '&:hover': { backgroundColor: 'transparent' },
-                    }}
-                    onClick={handleRedirectToCreateUser}
-                >
-                    ¿No tienes cuenta? Crear cuenta
-                </Button>
             </Box>
         </Container>
     );

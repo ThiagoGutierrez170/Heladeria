@@ -8,8 +8,10 @@ const RecargaHelado = ({ open, onClose, helado, obtenerHelados }) => {
     const [loading, setLoading] = useState(false); // Estado para controlar la animación de carga
 
     // Maneja los cambios en el input de cajas para el helado
-    const handleCajasChange = (e) => {
-        setCajas(e.target.value);
+    const handleCajasChange = (event) => {
+        // Obtener el valor del campo y asegurarse de que sea un número positivo
+        const value = Math.max(0, event.target.value); // Esto asegura que no sea negativo
+        setCajas(value);
     };
 
     const handleRecargarStock = async () => {

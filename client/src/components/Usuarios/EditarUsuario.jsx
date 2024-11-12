@@ -11,19 +11,22 @@ import {
     Select,
     InputLabel,
     FormControl,
-    CssBaseline,Stack
+    CssBaseline, Stack
 } from '@mui/material';
 import { Save as SaveIcon } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import CancelIcon from '@mui/icons-material/Cancel';
 
+
 const EditarUsuario = () => {
     const [usuario, setUsuario] = useState({
         nombreUsuario: '',
         correo: '',
-        password: '',
+        contraseña: '',
         rol: 'usuario'
     });
+
+    //console.log(usuario.contraseña);
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -36,8 +39,18 @@ const EditarUsuario = () => {
         }
 
         const fetchUsuario = async () => {
-            const res = await axios.get(`/api/usuario/${id}`);
-            setUsuario(res.data);
+            try {
+                const res = await axios.get(`/api/usuario/${id}`);
+                const { nombreUsuario, correo, rol } = res.data;
+                setUsuario({
+                    nombreUsuario,
+                    correo,
+                    contraseña: '',  // Mostrar vacío o valor predeterminado en el formulario
+                    rol
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
         };
         fetchUsuario();
     }, [id, navigate]);
@@ -51,16 +64,16 @@ const EditarUsuario = () => {
         try {
             await axios.put(`/api/usuario/${id}`, usuario);
             Swal.fire('Usuario actualizado', 'El usuario ha sido actualizado.', 'success');
-            navigate(`/usuario/${id}`);
+            navigate('/usuarios');  // Redirige a la lista de usuarios
         } catch (error) {
             Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
         }
     };
 
+
     const handleCancel = () => {
         navigate('/usuarios');
     };
-
 
 
 
@@ -93,8 +106,8 @@ const EditarUsuario = () => {
                     />
                     <TextField
                         label="Contraseña"
-                        name="password"
-                        value={usuario.password}
+                        name="contraseña"
+                        value={usuario.contraseña}
                         type="password"
                         onChange={handleChange}
                         required

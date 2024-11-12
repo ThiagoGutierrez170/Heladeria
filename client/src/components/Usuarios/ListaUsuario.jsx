@@ -47,7 +47,7 @@ const ListaUsuario = () => {
     }, [navigate]);
 
     const handleCrearUsuario = () => {
-        navigate('/registro');
+        navigate('/crear-usuario');
     };
 
     const handleEdit = useCallback((usuarioId) => {
@@ -55,7 +55,7 @@ const ListaUsuario = () => {
             Swal.fire('Error', 'ID de usuario no válido', 'error');
             return;
         }
-        navigate(`/editar/usuario/${usuarioId}`);
+        navigate(`/usuario-editar/${usuarioId}`);
     }, [navigate]);
 
     return (
@@ -155,7 +155,7 @@ const ListaUsuario = () => {
                             <IconButton
                                 edge="end"
                                 color="primary"
-                                onClick={() => handleEdit(usuario._id)} // Cambiado de id a _id
+                                onClick={() => handleEdit(usuario._id)} // Aquí es donde usas el id del usuario para navegar a la vista de edición
                                 sx={{
                                     '&:hover': {
                                         bgcolor: 'primary.light',

@@ -26,7 +26,7 @@ export const crearUsuario = async (req, res) => {
             contraseña: hashedPassword,
             rol
         });
-        
+
         await nuevoUsuario.save();
         return res.status(201).json({ message: 'Usuario creado exitosamente', nuevoUsuario });
     } catch (error) {
@@ -37,24 +37,35 @@ export const crearUsuario = async (req, res) => {
 export const editarUsuario = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombreUsuario, correo, rol } = req.body;
+        const { nombreUsuario, correo, rol, contraseña } = req.body;
 
         // Verificar campos requeridos
         if (!nombreUsuario || !correo || !rol) {
             return res.status(400).json({ error: 'Faltan datos' });
         }
 
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(
-            id,
-            { nombreUsuario, correo, rol },
-            { new: true }
-        );
+        // Si se proporciona una nueva contraseña, encriptarla
+        let usuarioActualizado = {
+            nombreUsuario,
+            correo,
+            rol
+        };
 
-        if (!usuarioActualizado) {
+        if (contraseña) {
+            // Encriptar la nueva contraseña si se proporciona
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(contraseña, salt);
+            usuarioActualizado = { ...usuarioActualizado, contraseña: hashedPassword };
+        }
+
+        // Actualizar el usuario en la base de datos
+        const usuario = await Usuario.findByIdAndUpdate(id, usuarioActualizado, { new: true });
+
+        if (!usuario) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }
 
-        return res.status(200).json({ message: 'Usuario actualizado exitosamente', usuarioActualizado });
+        return res.status(200).json({ message: 'Usuario actualizado exitosamente', usuario });
     } catch (error) {
         return res.status(500).json({ error: 'Error al actualizar el usuario', detalles: error.message });
     }

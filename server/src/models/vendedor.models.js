@@ -8,7 +8,11 @@ const vendedorSchema = new mongoose.Schema({
 
     edad: { type: Number, required: true },
 
-    ci: { type: String, required: true, unique: true },
+    ci: { 
+        type: String, 
+        required: [true, "El campo CI es obligatorio"], 
+        unique: [true, "El numero de cedula debe ser unico"] 
+    },
 
     contacto: { type: String, required: false },
 

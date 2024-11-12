@@ -8,19 +8,25 @@ const NotaActiva = () => {
     const { id } = useParams();
     const [nota, setNota] = useState(null);
     const navigate = useNavigate();
+ 
 
     useEffect(() => {
         const fetchNotaDetalle = async () => {
             try {
                 const response = await axios.get(`/api/nota/activas/${id}`);
+                
+                console.log(response.data);
                 setNota(response.data);
+
             } catch (error) {
-                console.error('Error al obtener el detalle de la nota:', error);
+                Swal.fire('Error', 'Hubo un problema al cargar la nota.', 'error');
             }
         };
 
         fetchNotaDetalle();
     }, [id]);
+
+
 
     const handleEditar = () => {
         navigate(`/editar-nota/${id}`);
@@ -67,6 +73,7 @@ const NotaActiva = () => {
                 onClick={() => navigate('/notas-activas')}
                 sx={{
                     mb: 2,
+                    mt: 3,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -80,29 +87,32 @@ const NotaActiva = () => {
             >
                 Volver
             </Button>
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" gutterBottom color='black'>
                 Detalle de Nota Activa
             </Typography>
 
             {/* Información de la nota en formato horizontal */}
-            <Box sx={{ my: 3 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={6} sm={3}>
-                        <Typography variant="subtitle1"><strong>Playa:</strong> {nota.playa}</Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                        <Typography variant="subtitle1"><strong>Clima:</strong> {nota.clima}</Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                        <Typography variant="subtitle1">
-                            <strong>Vendedor: </strong> {nota.vendedor_id ? nota.vendedor_id.nombre +" "+ nota.vendedor_id.apellido : 'No asignado'}
-                        </Typography>
-                    </Grid>
-                </Grid>
-            </Box>
+            <TableContainer component={Paper} sx={{ mt: 3 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Playa</strong></TableCell>
+                            <TableCell><strong>Clima</strong></TableCell>
+                            <TableCell><strong>Vendedor</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>{nota.playa}</TableCell>
+                            <TableCell>{nota.clima}</TableCell>
+                            <TableCell>{nota.vendedor_id ? `${nota.vendedor_id.nombre} ${nota.vendedor_id.apellido}` : 'No asignado'}</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
             {/* Tabla de catálogo de helados */}
-            <Typography variant="h6" sx={{ mt: 3 }}>
+            <Typography variant="h6" sx={{ mt: 3 }} color='black'>
                 Catálogo de Helados
             </Typography>
             {Array.isArray(nota.catalogo) && nota.catalogo.length > 0 ? (
@@ -120,7 +130,7 @@ const NotaActiva = () => {
                                 <TableRow key={item.helado_id._id}>
                                     <TableCell align="center">
                                         <img
-                                            src={item.helado_id.imagenUrl} // Asegúrate de que el objeto helado tenga la propiedad imagenUrl
+                                            src={item.helado_id.imagen}
                                             alt={item.helado_id.nombre}
                                             width={60}
                                             height={60}
@@ -130,6 +140,7 @@ const NotaActiva = () => {
                                     <TableCell align="center">{item.helado_id.nombre}</TableCell>
                                     <TableCell align="center">{item.cantidadTotal}</TableCell>
                                 </TableRow>
+
                             ))}
                         </TableBody>
                     </Table>
@@ -157,7 +168,7 @@ const NotaActiva = () => {
             </Box>
         </Container>
     );
-    
+
 };
 
 export default NotaActiva;

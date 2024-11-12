@@ -1,4 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; // Asegúrate de importar SweetAlert
+
+// Importación de componentes
 import VendedoresList from './components/Vendedores/VendedoresList';
 import VendedoresForm from './components/Vendedores/VendedoresForm';
 import EditarVendedor from './components/Vendedores/VendedorEditar';
@@ -12,48 +17,47 @@ import Factura from './components/Notas/Factura';
 import RegistroFinalizados from './components/Notas/RegistroFinalizados';
 import DetalleNota from './components/Notas/DetalleNota';
 import Navbar from './components/utils/Navbar';
-
-import Titulo from './Titulo';
+import Titulo from './components/utils/Titulo';
 import Login from './components/Auth/Login';
 import RutaPrivada from './components/utils/RutaPrivada';
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-
+import RouteError from './components/utils/RouteError';
+import ListaUsuario from './components/Usuarios/ListaUsuario';
+import EditarUsuario from './components/Usuarios/EditarUsuario';
+import CrearUsuario from './components/Usuarios/CrearUsuario';
+import RegistroFinalizadosS from './components/Notas/Supervisores/RegistroNotas';
+import DetalleNotaS from './components/Notas/Supervisores/DetalleNota';
 import CrearHelado from './components/Helados/CrearHelado';
 import ListaHelados from './components/Helados/ListaHelados';
 import EditarHelado from './components/Helados/EditarHelado';
-import RouteError from './components/utils/RouteError';
-import ListaUsuario from './components/Usuarios/ListaUsuario';
-import RegistroFinalizadosS from './components/Notas/Supervisores/RegistroNotas';
-import DetalleNotaS from './components/Notas/Supervisores/DetalleNota';
+import ListaVendedores from './components/Vendedores/VendedoresList';
+import Home from './components/Home/Home.jsx';
 
 const App = () => {
   const [estaAutenticado, setEstaAutenticado] = useState(false);
   const ubicacion = useLocation();
   const navegar = useNavigate();
+  const usuarioRol = localStorage.getItem('rol');
 
-  // VERIFICA SI EXISTE UN TOKEN
   const verificarAutenticacion = () => {
     const token = localStorage.getItem('token');
     setEstaAutenticado(!!token);
     if (!token) {
       navegar('/login'); // Si no hay token, redirige al login
     }
-    console.log(token ? 'Hay token' : 'No hay token');
   };
 
-  // SE VERIFICA AUTENTICACIÓN AL MONTARSE EL COMPONENTE
+  // SE VERIFICA AUTENTICACIÓN AL MONTARSE EL COMPONENTE Y AL CAMBIAR LA RUTA
   useEffect(() => {
     verificarAutenticacion();
-  }, []);
+  }, [ubicacion.pathname]);
 
   // CIERRA SESIÓN AL IR A /LOGOUT
   useEffect(() => {
-    if (ubicacion.pathname === '/logout' && estaAutenticado === true) {
+    if (ubicacion.pathname === '/logout' && estaAutenticado) {
       manejarCerrarSesion();
       navegar('/login'); // REDIRIGE AL LOGIN
     }
-  }, [ubicacion.pathname, navegar]);
+  }, [ubicacion.pathname, navegar, usuarioRol]);
 
   // MANEJO DEL CIERRE DE SESIÓN
   const manejarCerrarSesion = () => {
@@ -61,51 +65,82 @@ const App = () => {
     setEstaAutenticado(false);
   };
 
+  // Función para mostrar alerta si el supervisor intenta acceder a rutas no permitidas
+  const urlAlert = (usuarioRol, ubicacion, navegar) => {
+    const rutasPermitidasSupervisor = [
+      '/S-registro-finalizados',
+      '/S-detalle-nota/:id', // Aquí puedes ajustar si las rutas tienen parámetros
+      '/registro-finalizados'
+    ];
+
+    // Verifica si el usuario es supervisor y si está en una ruta no permitida
+    if (usuarioRol === 'supervisor' && !rutasPermitidasSupervisor.some(ruta => ubicacion.pathname.includes(ruta))) {
+      Swal.fire({
+        title: '¡Atención!',
+        text: 'Estás intentando acceder a una ruta que no está permitida para tu rol. ¡Por favor, revisa tu ruta!',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+      });
+      navegar('/registro-finalizados'); // Redirige a la página de login o una ruta predeterminada
+    }
+  };
+
+  // Llamada a la función urlAlert cada vez que cambie la ruta
+  useEffect(() => {
+    if (usuarioRol === 'supervisor') {
+      urlAlert(usuarioRol, ubicacion, navegar);
+    }
+  }, [ubicacion.pathname, usuarioRol, navegar]);
+
   return (
     <>
       <Titulo />
-      
+
       {/* Renderiza el Navbar solo si el usuario está autenticado */}
-      <Navbar />
-      
+      {estaAutenticado && <Navbar />}
+
       <Routes>
         {/* Ruta pública para Login */}
         <Route path="/login" element={<Login />} />
 
-        {/* Ruta protegida para la página principal '/' */}
-        <Route path="/" element={<RutaPrivada element={<VendedoresList />} />} />
-
-
         {/* Rutas protegidas */}
-        <Route path="/vendedores" element={<RutaPrivada element={<VendedoresList />} />} />
-        <Route path="/agregar-vendedor" element={<RutaPrivada element={<VendedoresForm />} />} />
-        <Route path="/editar-vendedor/:id" element={<RutaPrivada element={<EditarVendedor />} />} />
-        <Route path="/notas-activas" element={<RutaPrivada element={<ListaNotasActivas />} />} />
-        <Route path="/nota-activa/:id" element={<RutaPrivada element={<NotaActiva />} />} />
-        <Route path="/editar-nota/:id" element={<RutaPrivada element={<EditarNota />} />} />
-        <Route path="/recargar-catalogo/:id" element={<RutaPrivada element={<RecargarCatalogo />} />} />
-        <Route path="/finalizar-nota/:id" element={<RutaPrivada element={<FinalizarNota />} />} />
-        <Route path="/factura/:id" element={<RutaPrivada element={<Factura />} />} />
-        <Route path="/registro-finalizados" element={<RutaPrivada element={<RegistroFinalizados />} />} />
-        <Route path="/nota-detalle/:id" element={<RutaPrivada element={<DetalleNota />} />} />
-        <Route path="/agregar-nota" element={<RutaPrivada element={<CrearNota />} />} />
+        {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
+          <>
+            <Route path="/" element={<RutaPrivada element={<Home />} />} />
+            <Route path="/vendedores" element={<RutaPrivada element={<ListaVendedores />} />} />
+            <Route path="/vendedores" element={<RutaPrivada element={<VendedoresList />} />} />
+            <Route path="/agregar-vendedor" element={<RutaPrivada element={<VendedoresForm />} />} />
+            <Route path="/editar-vendedor/:id" element={<RutaPrivada element={<EditarVendedor />} />} />
+            <Route path="/notas-activas" element={<RutaPrivada element={<ListaNotasActivas />} />} />
+            <Route path="/nota-activa/:id" element={<RutaPrivada element={<NotaActiva />} />} />
+            <Route path="/editar-nota/:id" element={<RutaPrivada element={<EditarNota />} />} />
+            <Route path="/recargar-catalogo/:id" element={<RutaPrivada element={<RecargarCatalogo />} />} />
+            <Route path="/finalizar-nota/:id" element={<RutaPrivada element={<FinalizarNota />} />} />
+            <Route path="/factura/:id" element={<RutaPrivada element={<Factura />} />} />
+            <Route path="/registro-finalizados" element={<RutaPrivada element={<RegistroFinalizados />} />} />
+            <Route path="/nota-detalle/:id" element={<RutaPrivada element={<DetalleNota />} />} />
+            <Route path="/agregar-nota" element={<RutaPrivada element={<CrearNota />} />} />
 
+            <Route path="/agregar-helado" element={<RutaPrivada element={<CrearHelado />} />} />
+            <Route path="/helados" element={<RutaPrivada element={<ListaHelados />} />} />
+            <Route path="/editar-helado/:id" element={<RutaPrivada element={<EditarHelado />} />} />
 
-        <Route path="/agregar-helado" element={<CrearHelado/>}/>
-        <Route path="/helados" element={<ListaHelados/>}/>
-        <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
-
-        <Route path="/usuarios" element={<ListaUsuario/>}/>
-        <Route path="/usuario-editar/id:" element={<ListaUsuario/>}/>
-        <Route path="/usuario/id:" element={<ListaUsuario/>}/>
-        <Route path="/Crear-usuario" element={<ListaUsuario/>}/>
+            <Route path="/usuarios" element={<RutaPrivada element={<ListaUsuario />} />} />
+            <Route path="/usuario-editar/:id" element={<RutaPrivada element={<EditarUsuario />} />} />
+            <Route path="/crear-usuario" element={<RutaPrivada element={<CrearUsuario />} />} />
+          </>
+        )}
 
         {/* Rutas para los supervisores */}
-        <Route path="/S-registro-finalizados" element={<RegistroFinalizadosS/>}/>
-        <Route path="/S-detalle-nota/:id" element={<DetalleNotaS/>}/>
+        {(usuarioRol === 'supervisor') && (
+          <>
+            <Route path="/S-registro-finalizados" element={<RutaPrivada element={<RegistroFinalizadosS />} />} />
+            <Route path="/S-detalle-nota/:id" element={<RutaPrivada element={<DetalleNotaS />} />} />
+            <Route path="/registro-finalizados" element={<RutaPrivada element={<RegistroFinalizados />} />} />
+          </>
+        )}
 
-        <Route path="*" element={<RouteError/>}/>
-
+        <Route path="*" element={<RouteError />} />
       </Routes>
     </>
   );

@@ -13,6 +13,7 @@ const NotaActiva = () => {
         const fetchNotaDetalle = async () => {
             try {
                 const response = await axios.get(`/api/nota/activas/${id}`);
+                //console.log("Datos de la nota:", response.data); // Verifica la estructura de los datos
                 setNota(response.data);
             } catch (error) {
                 console.error('Error al obtener el detalle de la nota:', error);
@@ -61,7 +62,6 @@ const NotaActiva = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 5 }}>
-            {/* Botón de regreso */}
             <Button
                 variant="contained"
                 color="primary"
@@ -87,7 +87,6 @@ const NotaActiva = () => {
                     Detalle de Nota Activa
                 </Typography>
 
-                {/* Información de la nota en formato horizontal */}
                 <Box sx={{ my: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={4}>
@@ -98,13 +97,12 @@ const NotaActiva = () => {
                         </Grid>
                         <Grid item xs={12} sm={4}>
                             <Typography variant="subtitle1">
-                                <strong>Vendedor: </strong> {nota.vendedor_id ? nota.vendedor_id.nombre + " " + nota.vendedor_id.apellido : 'No asignado'}
+                                <strong>Vendedor: </strong> {nota.vendedor_id ? `${nota.vendedor_id.nombre} ${nota.vendedor_id.apellido}` : 'No asignado'}
                             </Typography>
                         </Grid>
                     </Grid>
                 </Box>
 
-                {/* Catálogo de helados */}
                 <Typography variant="h6" align="center" sx={{ mt: 3 }} color="black">
                     Catálogo de Helados
                 </Typography>
@@ -123,7 +121,7 @@ const NotaActiva = () => {
                                     <TableRow key={item.helado_id._id}>
                                         <TableCell align="center">
                                             <img
-                                                src={item.helado_id.imagenUrl} // Asegúrate de que el objeto helado tenga la propiedad imagenUrl
+                                                src={item.helado_id.imagen} 
                                                 alt={item.helado_id.nombre}
                                                 width={60}
                                                 height={60}
@@ -143,7 +141,6 @@ const NotaActiva = () => {
                     </Typography>
                 )}
 
-                {/* Botones de acciones */}
                 <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
                     <Button variant="contained" color="primary" onClick={handleEditar}>
                         Editar

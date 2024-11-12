@@ -38,7 +38,7 @@ const Navbar = () => {
                     {/* Navegación Principal en Pantallas Grandes */}
                     <Button color="inherit" component={Link} to="/usuarios"
                         sx={{ borderBottom: location.pathname === "/usuarios" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>
-                        Notas Activas
+                        Usuarios
                     </Button>
                     <Button color="inherit" component={Link} to="/S-registro-finalizados"
                         sx={{ borderBottom: location.pathname === "/S-registro-finalizados" ? '2px solid white' : 'none', display: { xs: 'none', md: 'block' } }}>

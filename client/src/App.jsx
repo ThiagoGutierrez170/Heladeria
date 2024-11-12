@@ -1,6 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/utils/Navbar';
-import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import VendedoresList from './components/Vendedores/VendedoresList';
 import VendedoresForm from './components/Vendedores/VendedoresForm';
 import EditarVendedor from './components/Vendedores/VendedorEditar';
@@ -13,70 +11,104 @@ import FinalizarNota from './components/Notas/FinalizarNota';
 import Factura from './components/Notas/Factura';
 import RegistroFinalizados from './components/Notas/RegistroFinalizados';
 import DetalleNota from './components/Notas/DetalleNota';
-import RecargaHelado from './components/Helados/RecargaHelado';
-import ListaHelados from './components/Helados/ListaHelados';
-import CrearHelado from './components/Helados/CrearHelado';
-import EditarHelado from './components/Helados/EditarHelado';
-import HeladoDetalles from './components/Helados/HeladoDetalle';
-import Titulo from './components/utils/Titulo';
+import Navbar from './components/utils/Navbar';
+
+import Titulo from './Titulo';
 import Login from './components/Auth/Login';
-import CrearUsuario from './components/Usuarios/CrearUsuario';
-import Registro from './components/Usuarios/CrearUsuario';
+import RutaPrivada from './components/utils/RutaPrivada';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import CrearHelado from './components/Helados/CrearHelado';
+import ListaHelados from './components/Helados/ListaHelados';
+import EditarHelado from './components/Helados/EditarHelado';
+import RouteError from './components/utils/RouteError';
 import ListaUsuario from './components/Usuarios/ListaUsuario';
-import ProtectedRoute from './components/Auth/ProtectedRoute';
-import DetalleUsuario from './components/Usuarios/DetalleUsuario';
-import EditarUsuario from './components/Usuarios/EditarUsuario';
+import RegistroFinalizadosS from './components/Notas/Supervisores/RegistroNotas';
+import DetalleNotaS from './components/Notas/Supervisores/DetalleNota';
+
+const App = () => {
+  const [estaAutenticado, setEstaAutenticado] = useState(false);
+  const ubicacion = useLocation();
+  const navegar = useNavigate();
+
+  // VERIFICA SI EXISTE UN TOKEN
+  const verificarAutenticacion = () => {
+    const token = localStorage.getItem('token');
+    setEstaAutenticado(!!token);
+    if (!token) {
+      navegar('/login'); // Si no hay token, redirige al login
+    }
+    console.log(token ? 'Hay token' : 'No hay token');
+  };
+
+  // SE VERIFICA AUTENTICACIÓN AL MONTARSE EL COMPONENTE
+  useEffect(() => {
+    verificarAutenticacion();
+  }, []);
+
+  // CIERRA SESIÓN AL IR A /LOGOUT
+  useEffect(() => {
+    if (ubicacion.pathname === '/logout' && estaAutenticado === true) {
+      manejarCerrarSesion();
+      navegar('/login'); // REDIRIGE AL LOGIN
+    }
+  }, [ubicacion.pathname, navegar]);
+
+  // MANEJO DEL CIERRE DE SESIÓN
+  const manejarCerrarSesion = () => {
+    localStorage.removeItem('token'); // ELIMINA EL TOKEN AL CERRAR SESIÓN
+    setEstaAutenticado(false);
+  };
+
+  return (
+    <>
+      <Titulo />
+      
+      {/* Renderiza el Navbar solo si el usuario está autenticado */}
+      <Navbar />
+      
+      <Routes>
+        {/* Ruta pública para Login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Ruta protegida para la página principal '/' */}
+        <Route path="/" element={<RutaPrivada element={<VendedoresList />} />} />
 
 
-const App = () => (
-
-  <Router>
-    <Titulo />
-    <Navbar />
-    <Routes>
-      //Login
-      <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<CrearUsuario />} />
-
-        // Rutas de Helados
-      <Route path="/helados" element={<ListaHelados />} />
-      <Route path="/agregar-helado" element={<CrearHelado />} />
-      <Route path="/editar-helado/:id" element={<EditarHelado />} />
-      <Route path="/helado-detalle/:id" element={<HeladoDetalles />} />
-      <Route path="/recargar-helado/:id" element={<RecargaHelado />} />
-
-      {/* Rutas de Notas Activas */}
-      <Route path="/notas-activas" element={<ListaNotasActivas />} />
-      <Route path="/nota-activa/:id" element={<NotaActiva />} />
-      <Route path="/editar-nota/:id" element={<EditarNota />} />
-      <Route path="/recargar-catalogo/:id" element={<RecargarCatalogo />} />
+        {/* Rutas protegidas */}
+        <Route path="/vendedores" element={<RutaPrivada element={<VendedoresList />} />} />
+        <Route path="/agregar-vendedor" element={<RutaPrivada element={<VendedoresForm />} />} />
+        <Route path="/editar-vendedor/:id" element={<RutaPrivada element={<EditarVendedor />} />} />
+        <Route path="/notas-activas" element={<RutaPrivada element={<ListaNotasActivas />} />} />
+        <Route path="/nota-activa/:id" element={<RutaPrivada element={<NotaActiva />} />} />
+        <Route path="/editar-nota/:id" element={<RutaPrivada element={<EditarNota />} />} />
+        <Route path="/recargar-catalogo/:id" element={<RutaPrivada element={<RecargarCatalogo />} />} />
+        <Route path="/finalizar-nota/:id" element={<RutaPrivada element={<FinalizarNota />} />} />
+        <Route path="/factura/:id" element={<RutaPrivada element={<Factura />} />} />
+        <Route path="/registro-finalizados" element={<RutaPrivada element={<RegistroFinalizados />} />} />
+        <Route path="/nota-detalle/:id" element={<RutaPrivada element={<DetalleNota />} />} />
+        <Route path="/agregar-nota" element={<RutaPrivada element={<CrearNota />} />} />
 
 
-      {/* Rutas para Finalizar Nota y Factura */}
-      <Route path="/finalizar-nota/:id" element={<FinalizarNota />} />
-      <Route path="/factura/:id" element={<Factura />} />
+        <Route path="/agregar-helado" element={<CrearHelado/>}/>
+        <Route path="/helados" element={<ListaHelados/>}/>
+        <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
 
-      {/* Rutas de Notas Finalizadas */}
-      <Route path="/registro-finalizados" element={<RegistroFinalizados />} />
-      <Route path="/nota-detalle/:id" element={<DetalleNota />} />
+        <Route path="/usuarios" element={<ListaUsuario/>}/>
+        <Route path="/usuario-editar/id:" element={<ListaUsuario/>}/>
+        <Route path="/usuario/id:" element={<ListaUsuario/>}/>
+        <Route path="/Crear-usuario" element={<ListaUsuario/>}/>
 
-      {/* Ruta para Crear Nota */}
-      <Route path="/agregar-nota" element={<CrearNota />} />
+        {/* Rutas para los supervisores */}
+        <Route path="/S-registro-finalizados" element={<RegistroFinalizadosS/>}/>
+        <Route path="/S-detalle-nota/:id" element={<DetalleNotaS/>}/>
 
-        // Rutas de Usuarios
-      <Route path="/usuarios" element={<ListaUsuario />} />
-      <Route path="/crear-usuario" element={<CrearUsuario />} />
-      <Route path="/editar/usuario/:id" element={<EditarUsuario />} />
-      <Route path="/detalle-usuario/:id" element={<DetalleUsuario />} />
+        <Route path="*" element={<RouteError/>}/>
 
-        // Rutas de Vendedores
-      <Route path="/vendedores" element={<VendedoresList />} />
-      <Route path="/agregar-vendedor" element={<VendedoresForm />} />
-      <Route path="/editar-vendedor/:id" element={<EditarVendedor />} />
-
-    </Routes>
-  </Router>
-
-);
+      </Routes>
+    </>
+  );
+};
 
 export default App;

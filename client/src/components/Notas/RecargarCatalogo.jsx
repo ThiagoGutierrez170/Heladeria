@@ -67,6 +67,7 @@ const RecargarCatalogo = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell align="center"><strong>Imagen</strong></TableCell>
                                 <TableCell align="center"><strong>Helado</strong></TableCell>
                                 <TableCell align="center"><strong>Cantidad Total</strong></TableCell>
                                 <TableCell align="center"><strong>Cantidad a Recargar</strong></TableCell>
@@ -75,6 +76,9 @@ const RecargarCatalogo = () => {
                         <TableBody>
                             {catalogo.map((item) => (
                                 <TableRow key={item._id}>
+                                    <TableCell>
+                                        <img src={item.imagen} alt={item.nombre} style={{ width: 50, height: 50 }} />
+                                    </TableCell>
                                     <TableCell align="center">
                                         <Typography variant="body1">{item.nombre}</Typography>
                                     </TableCell>

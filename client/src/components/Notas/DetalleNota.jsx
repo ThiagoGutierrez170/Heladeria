@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import { 
     Container, Typography, Grid, Paper, Divider, Table, TableBody, 
     TableCell, TableContainer, TableHead, TableRow, Button 
@@ -28,7 +28,7 @@ const DetalleNota = () => {
                 setGananciaBase(gananciaBase);
                 setGananciaTotal(gananciaTotal);
                 setNotaInfo({ vendedor: vendedor_id, playa, clima });
-                setFechaNota(fecha); // Utiliza createdAt como la fecha de la nota
+                setFechaNota(fecha);
             } catch (error) {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
@@ -118,7 +118,8 @@ const DetalleNota = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong color='black'>Nombre del helado</strong></TableCell>
+                            <TableCell><strong>Imagen</strong></TableCell>
+                            <TableCell><strong>Nombre del helado</strong></TableCell>
                             <TableCell align="center"><strong>Cantidad Vendida</strong></TableCell>
                             <TableCell align="center"><strong>Ganancia Mínima (Gs)</strong></TableCell>
                             <TableCell align="center"><strong>Ganancia Base (Gs)</strong></TableCell>
@@ -127,8 +128,15 @@ const DetalleNota = () => {
                     </TableHead>
                     <TableBody>
                         {detallesGanancias.map((item, index) => (
-                            <TableRow key={index} color='black'>
-                                <TableCell>{item.nombre}</TableCell>
+                            <TableRow key={index}>
+                                <TableCell>
+                                    <img
+                                        src={item.imagen || '/images/default-icecream.png'} // Imagen por defecto si falta la URL
+                                        alt={item.nombre || 'Imagen no disponible'}
+                                        style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '5px' }}
+                                    />
+                                </TableCell>
+                                <TableCell>{item.nombre || "Nombre no disponible"}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
                                 <TableCell align="center">{item.gananciaMinima.toFixed(0)} Gs</TableCell>
                                 <TableCell align="center">{item.gananciaBase.toFixed(0)} Gs</TableCell>
@@ -170,3 +178,4 @@ const DetalleNota = () => {
 };
 
 export default DetalleNota;
+

@@ -23,7 +23,7 @@ const CrearNota = () => {
                 const heladosActivos = heladoResponse.data.map((helado) => ({
                     helado_id: helado._id,
                     nombre: helado.nombre,
-                    imagen_url: helado.imagen_url,
+                    imagen: helado.imagen,
                     cantidad_inicial: 0,
                 }));
                 setCatalogo(heladosActivos);
@@ -154,7 +154,7 @@ const CrearNota = () => {
                             {catalogo.map((item, index) => (
                                 <TableRow key={item.helado_id}>
                                     <TableCell>
-                                        <img src={item.imagen_url} alt={item.nombre} style={{ width: 50, height: 50 }} />
+                                        <img src={item.imagen} alt={item.nombre} style={{ width: 50, height: 50 }} />
                                     </TableCell>
                                     <TableCell>{item.nombre}</TableCell>
                                     <TableCell>

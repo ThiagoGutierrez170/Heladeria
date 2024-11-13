@@ -110,7 +110,6 @@ const EditarUsuario = () => {
                         value={usuario.contraseña}
                         type="password"
                         onChange={handleChange}
-                        required
                         fullWidth
                         margin="normal"
                     />

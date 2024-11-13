@@ -64,9 +64,9 @@ const RegistroFinalizados = () => {
 
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 5 }}>
+        <Container maxWidth="lg" sx={{ mt: 0 }}>
             <Typography variant="h4" align="center" color="black" gutterBottom>
-                Registro de Notas Finalizadas
+                Registro de Notas Finalizadas 
             </Typography>
             <Divider sx={{ my: 3 }} />
 

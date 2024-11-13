@@ -12,7 +12,7 @@ import InfoIcon from '@mui/icons-material/Info';
 const InfoModal = lazy(() => import('../vendedores/VendedorDetalles'));
 import AddIcon from '@mui/icons-material/Add';
 
-const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile }) => (
+const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile , usuarioRol }) => (
     <div
         style={{
             display: 'flex',
@@ -37,6 +37,8 @@ const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile }) => (
         >
             <InfoIcon />
         </IconButton>
+        {usuarioRol === 'administrador' && (
+            <>
         <IconButton
             size={isMobile ? "large" : "medium"}
             color="primary"
@@ -51,6 +53,8 @@ const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile }) => (
         >
             <EditIcon />
         </IconButton>
+        </>
+        )}
         <IconButton
             size={isMobile ? "large" : "medium"}
             color="error"
@@ -79,8 +83,17 @@ const VendedoresList = () => {
     const [openInfoModal, setOpenInfoModal] = useState(false);
     const gridRef = useRef(null);
 
-    //Falta poner por defecto mostrar solo los activos en la lista 
-    //En mobile mostrar de a 20 registros por página y agrandar el tamaño de los registros y botones 
+    const [usuarioRol, setUsuarioRol] = useState(localStorage.getItem('rol'));
+
+    // Update role when localStorage changes
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setUsuarioRol(localStorage.getItem('rol'));
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
 
     const fetchVendedores = async () => {
         setLoading(true);
@@ -162,10 +175,11 @@ const VendedoresList = () => {
                     onEdit={() => handleEdit(params.data._id)}
                     onDelete={() => handleDelete(params.data._id)}
                     isMobile={true}
+                    usuarioRol={usuarioRol}
                 />
             ),
         }
-    ], [handleInfo, handleEdit, handleDelete]);
+    ], [handleInfo, handleEdit, handleDelete, usuarioRol]);
 
     const desktopColumns = useMemo(() => [
         {
@@ -185,17 +199,18 @@ const VendedoresList = () => {
                             onEdit={() => handleEdit(params.data._id)}
                             onDelete={() => handleDelete(params.data._id)}
                             isMobile={false}
+                            usuarioRol={usuarioRol}
                         />
                     ),
                 },
             ],
         },
-    ], [handleInfo, handleEdit, handleDelete]);
+    ], [handleInfo, handleEdit, handleDelete, usuarioRol]);
 
     return (
         <>
-            <div style={{ padding: isMobile ? '16px' : '24px' }}>
-                <Typography variant={isMobile ? "h6" : "h5"} align="center" gutterBottom color="primary" sx={{ mb: 3 }}>
+            <div style={{ padding: isMobile ? '10px' : '2px' }}>
+                <Typography variant={isMobile ? "h6" : "h5"} align="center" gutterBottom color="primary" sx={{ mb: 0 }}>
                     Lista de Vendedores
                 </Typography>
 

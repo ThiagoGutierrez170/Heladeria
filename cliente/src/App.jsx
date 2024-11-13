@@ -68,9 +68,9 @@ const App = () => {
   // Función para mostrar alerta si el supervisor intenta acceder a rutas no permitidas
   const urlAlert = (usuarioRol, ubicacion, navegar) => {
     const rutasPermitidasSupervisor = [
+      '/',
       '/S-registro-finalizados',
-      '/S-detalle-nota/:id', // Aquí puedes ajustar si las rutas tienen parámetros
-      '/registro-finalizados'
+      '/S-detalle-nota', // Aquí puedes ajustar si las rutas tienen parámetros
     ];
 
     // Verifica si el usuario es supervisor y si está en una ruta no permitida
@@ -81,7 +81,7 @@ const App = () => {
         icon: 'warning',
         confirmButtonText: 'Aceptar'
       });
-      navegar('/registro-finalizados'); // Redirige a la página de login o una ruta predeterminada
+      navegar('/'); 
     }
   };
 
@@ -108,7 +108,6 @@ const App = () => {
           <>
             <Route path="/" element={<RutaPrivada element={<Home />} />} />
             <Route path="/vendedores" element={<RutaPrivada element={<ListaVendedores />} />} />
-            <Route path="/vendedores" element={<RutaPrivada element={<VendedoresList />} />} />
             <Route path="/agregar-vendedor" element={<RutaPrivada element={<VendedoresForm />} />} />
             <Route path="/editar-vendedor/:id" element={<RutaPrivada element={<EditarVendedor />} />} />
             <Route path="/notas-activas" element={<RutaPrivada element={<ListaNotasActivas />} />} />
@@ -134,9 +133,9 @@ const App = () => {
         {/* Rutas para los supervisores */}
         {(usuarioRol === 'supervisor') && (
           <>
+            <Route path="/" element={<RutaPrivada element={<Home />} />} />
             <Route path="/S-registro-finalizados" element={<RutaPrivada element={<RegistroFinalizadosS />} />} />
             <Route path="/S-detalle-nota/:id" element={<RutaPrivada element={<DetalleNotaS />} />} />
-            <Route path="/registro-finalizados" element={<RutaPrivada element={<RegistroFinalizados />} />} />
           </>
         )}
 

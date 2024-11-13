@@ -34,7 +34,8 @@ const pages = [
     { name: 'Vendedores', route: '/vendedores', icon: <PeopleIcon /> },
     { name: 'Notas', route: '/notas-activas', icon: <NoteIcon /> },
     { name: 'Usuarios', route: '/usuarios', icon: <PersonIcon /> },
-    { name: 'Notas Finalizadas', route: '/registro-finalizados', icon: <AssignmentIcon /> }
+    { name: 'Notas Finalizadas', route: '/registro-finalizados', icon: <AssignmentIcon /> },
+    { name: 'Notas Finalizadas', route: '/S-registro-finalizados', icon: <AssignmentIcon /> }
 ];
 
 const Navbar = () => {
@@ -79,7 +80,7 @@ const Navbar = () => {
                 <Toolbar>
                     <IconButton size="large" color="inherit" aria-label="menu" onClick={toggleDrawer}>
                         <MenuIcon />
-                       
+                    
                     </IconButton>
                     <IcecreamIcon />
                     <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' , marginLeft: '10px' }}>
@@ -157,8 +158,8 @@ const Navbar = () => {
                         </>
                     )}
 
-                    {/* Notas finalizadas */}
-                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario' || usuarioRol === 'supervisor') && (
+                                        {/* Notas finalizadas - Visible solo para administrador y usuario */}
+                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
                         <>
                             <ListItemButton onClick={() => toggleSubmenu('notas-finalizadas')}>
                                 <ListItemText primary="Registros Finalizados" />
@@ -166,19 +167,36 @@ const Navbar = () => {
                             </ListItemButton>
                             <Collapse in={openSubmenu['notas-finalizadas']} timeout="auto" unmountOnExit>
                                 <List component="div" disablePadding>
-                                    {pages.filter(page => page.name === "Notas Finalizadas").map(page => (
-                                        <ListItem key={page.name} disablePadding>
-                                            <ListItemButton component={Link} to={page.route}>
-                                                {page.icon}
-                                                <ListItemText primary={page.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
+                                    <ListItem disablePadding>
+                                        <ListItemButton component={Link} to="/registro-finalizados">
+                                            <AssignmentIcon />
+                                            <ListItemText primary="Notas Finalizadas" />
+                                        </ListItemButton>
+                                    </ListItem>
                                 </List>
                             </Collapse>
                         </>
                     )}
 
+                    {/* Registros Finalizados - Visible solo para supervisor */}
+                    {usuarioRol === 'supervisor' && (
+                        <>
+                            <ListItemButton onClick={() => toggleSubmenu('S-registro-finalizados')}>
+                                <ListItemText primary="Registros Finalizados" />
+                                {openSubmenu['S-registro-finalizados'] ? <ExpandLess /> : <ExpandMore />}
+                            </ListItemButton>
+                            <Collapse in={openSubmenu['S-registro-finalizados']} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    <ListItem disablePadding>
+                                        <ListItemButton component={Link} to="/S-registro-finalizados">
+                                            <AssignmentIcon />
+                                            <ListItemText primary="Notas Finalizadas" />
+                                        </ListItemButton>
+                                    </ListItem>
+                                </List>
+                            </Collapse>
+                        </>
+                    )}
 
                     {/* Notas */}
                     {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (

@@ -14,14 +14,23 @@ import Swal from 'sweetalert2';
 const HeladoDetalles = lazy(() => import('./HeladoDetalle'));
 import RecargaHelado from './RecargaHelado';
 
-const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobile }) => (
+
+
+const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobile,usuarioRol }) => (
     <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
         <IconButton size={isMobile ? "small" : "medium"} color="default" onClick={onInfo} sx={{ m: 0.5 }}>
             <InfoIcon />
         </IconButton>
-        <IconButton size={isMobile ? "small" : "medium"} color="primary" onClick={onEdit} sx={{ m: 0.5 }}>
-            <EditIcon />
-        </IconButton>
+        {usuarioRol === 'administrador' && (
+            <>
+                <IconButton size={isMobile ? "small" : "medium"} color="primary" onClick={onEdit} sx={{ m: 0.5 }}>
+                    <EditIcon />
+                </IconButton>
+                <IconButton size={isMobile ? "small" : "medium"} color="error" onClick={onDelete} sx={{ m: 0.5 }}>
+                    <DeleteIcon />
+                </IconButton>
+            </>
+        )}
         <IconButton size={isMobile ? "small" : "medium"} color="error" onClick={onDelete} sx={{ m: 0.5 }}>
             <DeleteIcon />
         </IconButton>
@@ -43,6 +52,17 @@ const ListaHelados = () => {
     const [selectedHelado, setSelectedHelado] = useState(null);
     const gridRef = useRef(null);
     const navigate = useNavigate();
+
+    const [usuarioRol, setUsuarioRol] = useState(localStorage.getItem('rol'));
+
+    // Update role when localStorage changes
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setUsuarioRol(localStorage.getItem('rol'));
+        };
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
     const obtenerHelados = async (page = 1, pageSize = 10) => {
         setLoading(true);
@@ -91,6 +111,7 @@ const ListaHelados = () => {
             }
         }
     }, []);
+
 
     const handleEdit = useCallback((heladoId) => {
         navigate(`/editar-helado/${heladoId}`);
@@ -146,10 +167,11 @@ const ListaHelados = () => {
                     onDelete={() => handleDelete(params.data.id)}
                     onRecarga={() => handleRecarga(params.data.id)}
                     isMobile={true}
+                    usuarioRol={usuarioRol}
                 />
             ),
         }
-    ], [handleInfo, handleEdit, handleDelete, handleRecarga]);
+    ], [handleInfo, handleEdit, handleDelete, handleRecarga, usuarioRol]);
 
     const desktopColumns = useMemo(() => [
         {
@@ -211,10 +233,12 @@ const ListaHelados = () => {
                     onDelete={() => handleDelete(params.data.id)}
                     onRecarga={() => handleRecarga(params.data.id)}
                     isMobile={false}
+                    usuarioRol={usuarioRol}
+                    
                 />
             ),
         }
-    ], [handleInfo, handleEdit, handleDelete, handleRecarga]);
+    ], [handleInfo, handleEdit, handleDelete, handleRecarga,usuarioRol]);
 
     return (
         <div style={{ padding: isMobile ? '16px' : '24px' }}>

@@ -57,7 +57,7 @@ export const editarUsuario = async (req, res) => {
             const hashedPassword = await bcrypt.hash(contraseña, salt);
             usuarioActualizado = { ...usuarioActualizado, contraseña: hashedPassword };
         }
-
+        
         // Actualizar el usuario en la base de datos
         const usuario = await Usuario.findByIdAndUpdate(id, usuarioActualizado, { new: true });
 

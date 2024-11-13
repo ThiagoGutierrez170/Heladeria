@@ -8,7 +8,11 @@ const vendedorSchema = new mongoose.Schema({
 
     edad: { type: Number, required: true },
 
-    ci: { type: String, required: true, unique: true },
+    ci: { 
+        type: String, 
+        required: true, 
+        unique: [true, "Este CI debe ser único"],
+    },
 
     contacto: { type: String, required: false },
 

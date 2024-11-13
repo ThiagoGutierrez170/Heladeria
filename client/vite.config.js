@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react-swc'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+
   plugins: [react()],
   server: {
     port: 5000,//Configura el puerto que queremos usar
@@ -12,7 +13,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         selfHandleResponse: false,
-        /*configure: (proxy, _options) => {
+        configure: (proxy, _options) => {
           proxy.on('proxyRes', (proxyRes, req, res) => {
             if (proxyRes.statusCode === 401) {
               // Si el servidor responde con un 401, redirigimos al usuario a la página de login
@@ -25,7 +26,7 @@ export default defineConfig({
             }
             proxyRes.pipe(res);
           });
-        }*/
+        }
       },
     },
   },

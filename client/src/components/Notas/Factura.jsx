@@ -49,9 +49,18 @@ const Factura = () => {
         fetchNota();
     }, [id]);
 
+    // Función para formatear los números en guaraníes con puntos
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color='black' gutterBottom>
                 Factura de Nota
             </Typography>
             
@@ -87,10 +96,10 @@ const Factura = () => {
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Playa:</strong> {notaInfo.playa}</Typography>
+                            <Typography variant="body1" color='black'><strong>Playa:</strong> {notaInfo.playa}</Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
+                            <Typography variant="body1" color='black'><strong>Clima:</strong> {notaInfo.clima}</Typography>
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="body1"><strong>Fecha:</strong> {notaInfo.fecha}</Typography>
@@ -99,7 +108,7 @@ const Factura = () => {
                 </Paper>
             )}
 
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" color='black' gutterBottom>
                 Ganancias Base de la Nota
             </Typography>
             <Divider sx={{ my: 3 }} />
@@ -118,7 +127,7 @@ const Factura = () => {
                             <TableRow key={index}>
                                 <TableCell>{item.nombre}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{item.gananciaBaseHelado.toFixed(0)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaBaseHelado)} Gs</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -126,9 +135,10 @@ const Factura = () => {
             </TableContainer>
 
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h5" align="center" sx={{ mt: 2 }}>
-                Ganancia base total: {gananciaTotal.toFixed(0)} Gs
+            <Typography variant="h5" align="center"  color='black' sx={{ mt: 2 }}>
+                Ganancia base total: {formatearGs(gananciaTotal)} Gs
             </Typography>
+            <br /><br />
         </Container>
     );
 };

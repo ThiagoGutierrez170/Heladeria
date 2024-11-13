@@ -49,13 +49,12 @@ const ListaNotasActivas = async (req, res) => {
 };
 
 // Obtener una nota activa específica
-// Obtener una nota activa específica
 const TraerNotaActiva = async (req, res) => {
     try {
         const { id } = req.params;
         const notaActiva = await Nota.findById(id)
             .populate('vendedor_id', 'nombre apellido')
-            .populate('catalogo.helado_id', 'nombre'); // Popula el nombre del helado en catalogo
+            .populate('catalogo.helado_id', 'nombre imagen'); // Popula el nombre del helado en catalogo
 
         if (!notaActiva) {
             return res.status(404).json({ error: 'Nota activa no encontrada' });

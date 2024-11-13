@@ -1,5 +1,6 @@
 import Helado from '../models/helado.models.js';
 import mongoose from 'mongoose';
+import Nota from '../models/nota.models.js';
 
 const heladoController = {
     crearHelado: async (req, res) => {
@@ -75,34 +76,34 @@ const heladoController = {
             return res.status(400).json({ error: 'Error al eliminar el helado', detalle: error.message });
         }
     },
+    
     recargarHelados: async (req, res) => {
         try {
-            const { recargas } = req.body; // Array de recargas [{id, cantidadCajas}, ...]
+            const { id } = req.params;  // Obtener el ID desde la URL
+            const { cantidadCajas } = req.body; // Recibir la cantidad de cajas desde el body
 
-            for (let recarga of recargas) {
-                const { id, cantidadCajas } = recarga;
-
-                if (!mongoose.Types.ObjectId.isValid(id)) {
-                    return res.status(400).json({ error: `ID inválido para el helado con id ${id}` });
-                }
-
-                const helado = await Helado.findById(id);
-                if (!helado) {
-                    return res.status(404).json({ error: `Helado con id ${id} no encontrado.` });
-                }
-
-                // Aumentar el stock usando la cantidadCaja del helado (cuántos helados por caja)
-                helado.stock += cantidadCajas * helado.cantidadCaja;
-
-                // Guardar los cambios en la base de datos
-                await helado.save();
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).json({ error: `ID inválido para el helado con id ${id}` });
             }
+
+            const helado = await Helado.findById(id);
+            if (!helado) {
+                return res.status(404).json({ error: `Helado con id ${id} no encontrado.` });
+            }
+
+            // Aumentar el stock
+            helado.stock += cantidadCajas * helado.cantidadCaja;
+
+            // Guardar los cambios
+            await helado.save();
 
             return res.status(200).json({ mensaje: 'Recarga completada exitosamente.' });
         } catch (error) {
             return res.status(500).json({ error: 'Error al recargar helados', detalle: error.message });
         }
     }
+
+
 };
 
 export default heladoController;

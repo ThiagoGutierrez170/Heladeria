@@ -24,7 +24,7 @@ const GenerarVendedoresPrueba = () => {
 
         try {
             for (const vendedor of vendedores) {
-                await axios.post('http://localhost:5000/api/vendedor', vendedor);
+                await axios.post('/api/vendedor', vendedor);
             }
             console.log('Todos los vendedores han sido creados');
         } catch (error) {

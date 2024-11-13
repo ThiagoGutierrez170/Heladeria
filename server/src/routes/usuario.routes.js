@@ -1,5 +1,5 @@
 import express from 'express';
-import { crearUsuario, editarUsuario, eliminarUsuario, listaUsuario } from '../controllers/usuario.controller.js';
+import { crearUsuario, editarUsuario, eliminarUsuario, listaUsuario, traerUsuario } from '../controllers/usuario.controller.js';
 
 const usuarioRouter = express.Router();
 
@@ -14,5 +14,7 @@ usuarioRouter.delete('/:id', eliminarUsuario);
 
 // Ruta para listar usuarios (acceso según rol)
 usuarioRouter.get('/lista', listaUsuario);
+
+usuarioRouter.get('/:id', traerUsuario);
 
 export default usuarioRouter;

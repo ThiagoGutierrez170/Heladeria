@@ -23,7 +23,7 @@ const CrearNota = () => {
                 const heladosActivos = heladoResponse.data.map((helado) => ({
                     helado_id: helado._id,
                     nombre: helado.nombre,
-                    imagen_url: helado.imagen_url,
+                    imagen: helado.imagen,
                     cantidad_inicial: 0,
                 }));
                 setCatalogo(heladosActivos);
@@ -92,7 +92,7 @@ const CrearNota = () => {
 
     return (
         <Container maxWidth="md" sx={{ p: 4, backgroundColor: '#f5f5f5', borderRadius: 2, boxShadow: 2 }}>
-            <Typography variant="h4" gutterBottom align="center">
+           <Typography variant="h4" align="center" gutterBottom sx={{ mb: 3, color: '#333' }}>
                 Crear Nota de Venta
             </Typography>
             <form onSubmit={handleSubmit}>
@@ -138,8 +138,8 @@ const CrearNota = () => {
                     </Select>
                 </FormControl>
 
-                <Typography variant="h6" sx={{ mt: 3 }}>
-                    Catálogo de Helados
+                <Typography variant="h6"  gutterBottom sx={{ mb: 3, color: '#333' }}>
+                    Agregar Helados al Catálogo
                 </Typography>
                 <TableContainer component={Paper} sx={{ mt: 3 }}>
                     <Table>
@@ -154,7 +154,7 @@ const CrearNota = () => {
                             {catalogo.map((item, index) => (
                                 <TableRow key={item.helado_id}>
                                     <TableCell>
-                                        <img src={item.imagen_url} alt={item.nombre} style={{ width: 50, height: 50 }} />
+                                        <img src={item.imagen} alt={item.nombre} style={{ width: 50, height: 50 }} />
                                     </TableCell>
                                     <TableCell>{item.nombre}</TableCell>
                                     <TableCell>

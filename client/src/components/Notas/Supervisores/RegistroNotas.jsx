@@ -8,6 +8,15 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 
+// Función para formatear los números en guaraníes con puntos
+const formatearGs = (valor) => {
+    return new Intl.NumberFormat('es-PY', {
+        style: 'decimal',
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0
+    }).format(valor);
+};
+
 const RegistroFinalizadosS = () => {
     const [notasFinalizadas, setNotasFinalizadas] = useState([]);
     const navigate = useNavigate();
@@ -32,7 +41,7 @@ const RegistroFinalizadosS = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color='black' gutterBottom>
                 Registro de Notas Finalizadas
             </Typography>
             <Divider sx={{ my: 3 }} />
@@ -54,12 +63,12 @@ const RegistroFinalizadosS = () => {
                                 <Typography variant="body1"><strong>Clima:</strong> {nota.clima}</Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
+                                <Typography variant="body1"><strong>Ganancia Base Total:</strong> {formatearGs(gananciaBaseTotal)} Gs</Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <Typography variant="body1"><strong>Fecha:</strong> {new Date(nota.createdAt).toLocaleDateString()}</Typography>
                             </Grid>
-                            {/* Botones para ver detalle y factura */}
+                            {/* Botones para ver detalle */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <Button
                                     variant="contained"

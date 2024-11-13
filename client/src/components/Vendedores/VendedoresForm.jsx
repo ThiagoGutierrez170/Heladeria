@@ -43,7 +43,7 @@ const VendedoresForm = () => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                const response = await axios.post('http://localhost:5000/api/vendedor/', {
+                const response = await axios.post('/api/vendedor/', {
                     nombre, apellido, edad, ci, contacto, estado,
                 });
 
@@ -60,6 +60,7 @@ const VendedoresForm = () => {
                 setCi("");
                 setContacto("");
                 setEstado(false);
+                navigate('/vendedores');
             } catch (error) {
                 Swal.fire({
                     title: 'Error!',
@@ -81,6 +82,7 @@ const VendedoresForm = () => {
                     p: 4,
                     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
                     borderRadius: 2,
+                    mt: 10,
                     backgroundColor: '#f5f5f5',
                     textAlign: 'center',
                 }}

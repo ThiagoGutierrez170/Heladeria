@@ -1,80 +1,70 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Typography, CircularProgress } from '@mui/material';
 
-const RecargaHelado = () => {
-    const [helados, setHelados] = useState([]);
-    const [cajas, setCajas] = useState({});
+const RecargaHelado = ({ open, onClose, helado, obtenerHelados }) => {
+    const [cajas, setCajas] = useState('');
+    const [loading, setLoading] = useState(false); // Estado para controlar la animación de carga
 
-    // Obtener la lista de helados al montar el componente
-    useEffect(() => {
-        const obtenerHelados = async () => {
-            try {
-                const response = await axios.get("/api/helados");
-                setHelados(response.data);
-            } catch (error) {
-                console.error("Error al obtener helados:", error);
-            }
-        };
-
-        obtenerHelados();
-    }, []);
-
-    // Maneja los cambios en el input de cajas para cada helado
-    const handleCajasChange = (e, heladoId) => {
-        const { value } = e.target;
-        setCajas({
-            ...cajas,
-            [heladoId]: value,
-        });
+    // Maneja los cambios en el input de cajas para el helado
+    const handleCajasChange = (e) => {
+        setCajas(e.target.value);
     };
 
-    // Actualiza el stock del helado
-    const handleRecargarStock = async (helado) => {
-        const cantidadCajas = parseInt(cajas[helado._id], 10) || 0;
+    const handleRecargarStock = async () => {
+        const cantidadCajas = parseInt(cajas, 10) || 0;
+        if (cantidadCajas <= 0) {
+            Swal.fire('Advertencia', 'Debe ingresar una cantidad válida de cajas', 'warning');
+            return;
+        }
+
         const nuevoStock = helado.stock + (cantidadCajas * helado.cantidadCaja);
 
+        setLoading(true); // Activar la animación de carga
+
         try {
-            await axios.put(`/api/helados/actualizar/${helado._id}`, { stock: nuevoStock });
-            alert(`Stock de ${helado.nombre} actualizado a ${nuevoStock}`);
-
-            // Actualizar el estado de helados con el nuevo stock
-            setHelados((prevHelados) =>
-                prevHelados.map((h) => (h._id === helado._id ? { ...h, stock: nuevoStock } : h))
-            );
-
-            // Limpiar el input de cajas para este helado
-            setCajas({ ...cajas, [helado._id]: "" });
+            await axios.put(`/api/helado/recargar/${helado._id}`, {
+                cantidadCajas: cantidadCajas,  // Enviar solo la cantidad de cajas en el cuerpo
+            });
+            obtenerHelados(); // Actualizar la lista de helados
+            Swal.fire('Éxito', `Stock de ${helado.nombre} actualizado a ${nuevoStock}`, 'success');
+            onClose(); // Cerrar el modal tras la actualización
         } catch (error) {
-            console.error("Error al actualizar el stock:", error);
+            console.error('Error al realizar la recarga:', error.response ? error.response.data : error);
+            Swal.fire('Error', error.response?.data?.error || 'Hubo un problema al recargar los helados', 'error');
+        } finally {
+            setLoading(false); // Desactivar la animación de carga
         }
     };
 
     return (
-        <div>
-            <h1>Recarga de Stock de Helados</h1>
-            <ul>
-                {helados.map((helado) => (
-                    <li key={helado._id} className="helado-recarga-item">
-                        <p><strong>Nombre:</strong> {helado.nombre}</p>
-                        <p><strong>Stock Actual:</strong> {helado.stock}</p>
-                        <p><strong>Unidades por Caja:</strong> {helado.cantidadCaja}</p>
-                        <div>
-                            <label htmlFor={`cajas-${helado._id}`}>Cantidad de Cajas:</label>
-                            <input
-                                type="number"
-                                id={`cajas-${helado._id}`}
-                                name={`cajas-${helado._id}`}
-                                value={cajas[helado._id] || ""}
-                                onChange={(e) => handleCajasChange(e, helado._id)}
-                                min="0"
-                                className="cajas-input"
-                            />
-                            <button onClick={() => handleRecargarStock(helado)}>Recargar Stock</button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <Dialog open={open} onClose={onClose}>
+            <DialogTitle>Recargar Stock de {helado.nombre}</DialogTitle>
+            <DialogContent>
+                <Typography variant="h6">Stock Actual: {helado.stock}</Typography>
+                <TextField
+                    label="Cantidad de Cajas"
+                    type="number"
+                    variant="outlined"
+                    fullWidth
+                    value={cajas}
+                    onChange={handleCajasChange}
+                    min="0"
+                    margin="normal"
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose} color="secondary" disabled={loading}>Cancelar</Button>
+                <Button
+                    onClick={handleRecargarStock}
+                    color="primary"
+                    disabled={!cajas || cajas <= 0 || loading} // Deshabilitar mientras carga
+                >
+                    {loading ? <CircularProgress size={24} color="inherit" /> : 'Recargar Stock'}
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 };
 

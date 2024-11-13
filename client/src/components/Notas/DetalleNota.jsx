@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import { 
     Container, Typography, Grid, Paper, Divider, Table, TableBody, 
     TableCell, TableContainer, TableHead, TableRow, Button 
@@ -28,7 +28,7 @@ const DetalleNota = () => {
                 setGananciaBase(gananciaBase);
                 setGananciaTotal(gananciaTotal);
                 setNotaInfo({ vendedor: vendedor_id, playa, clima });
-                setFechaNota(fecha); // Utiliza createdAt como la fecha de la nota
+                setFechaNota(fecha);
             } catch (error) {
                 console.error('Error al cargar el detalle de la nota:', error);
             }
@@ -59,9 +59,18 @@ const DetalleNota = () => {
         }
     };
 
+    // Función para formatear los números en guaraníes con puntos
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color='black' gutterBottom>
                 Detalle de la Nota
             </Typography>
 
@@ -97,10 +106,10 @@ const DetalleNota = () => {
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Playa:</strong> {notaInfo.playa}</Typography>
+                            <Typography variant="body1" color='black'><strong>Playa:</strong> {notaInfo.playa}</Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Clima:</strong> {notaInfo.clima}</Typography>
+                            <Typography variant="body1" color='black'><strong>Clima:</strong> {notaInfo.clima}</Typography>
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="body1"><strong>Fecha:</strong> {new Date(fechaNota).toLocaleDateString()}</Typography>
@@ -109,7 +118,7 @@ const DetalleNota = () => {
                 </Paper>
             )}
 
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" color='black' gutterBottom>
                 Detalle de Ganancias de la Nota
             </Typography>
             <Divider sx={{ my: 3 }} />
@@ -118,6 +127,7 @@ const DetalleNota = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
+                            <TableCell><strong>Imagen</strong></TableCell>
                             <TableCell><strong>Nombre del helado</strong></TableCell>
                             <TableCell align="center"><strong>Cantidad Vendida</strong></TableCell>
                             <TableCell align="center"><strong>Ganancia Mínima (Gs)</strong></TableCell>
@@ -128,11 +138,18 @@ const DetalleNota = () => {
                     <TableBody>
                         {detallesGanancias.map((item, index) => (
                             <TableRow key={index}>
-                                <TableCell>{item.nombre}</TableCell>
+                                <TableCell>
+                                    <img
+                                        src={item.imagen || '/images/default-icecream.png'} // Imagen por defecto si falta la URL
+                                        alt={item.nombre || 'Imagen no disponible'}
+                                        style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '5px' }}
+                                    />
+                                </TableCell>
+                                <TableCell>{item.nombre || "Nombre no disponible"}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{item.gananciaMinima.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaBase.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaTotal.toFixed(0)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaMinima)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaBase)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaTotal)} Gs</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -140,7 +157,7 @@ const DetalleNota = () => {
             </TableContainer>
 
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" color='black' gutterBottom>
                 Ganancias Totales de la Nota
             </Typography>
             <TableContainer component={Paper} sx={{ mb: 3 }}>
@@ -154,9 +171,9 @@ const DetalleNota = () => {
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell>{gananciaMinima.toFixed(0)} Gs</TableCell>
-                            <TableCell>{gananciaBase.toFixed(0)} Gs</TableCell>
-                            <TableCell>{gananciaTotal.toFixed(0)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaMinima)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaBase)} Gs</TableCell>
+                            <TableCell>{formatearGs(gananciaTotal)} Gs</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -165,6 +182,7 @@ const DetalleNota = () => {
             <Button variant="contained" color="error" onClick={handleEliminar} fullWidth>
                 Eliminar Nota
             </Button>
+            <br /><br /><br />
         </Container>
     );
 };

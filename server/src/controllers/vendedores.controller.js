@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Vendedor from '../models/vendedor.models.js';
-
+import Nota from '../models/nota.models.js';
 const vendedorController = {
     crearVendedor: async (req, res) => {
         try {
@@ -63,18 +63,36 @@ const vendedorController = {
     eliminarVendedor: async (req, res) => {
         try {
             const { id } = req.params;
+
+            // Verifica si el ID es válido
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ error: 'ID inválido' });
             }
+    
+            // Verifica si el vendedor está relacionado con alguna nota
+            const notasAsociadas = await Nota.findOne({ vendedor_id: id });
+    
+            if (notasAsociadas) {
+                return res.status(400).json({
+                    error: 'No se puede eliminar el vendedor',
+                    detalle: 'Este vendedor está asociado a una o más notas y no se puede eliminar'
+                });
+            }
+    
+            // Si no tiene dependencias, procede con la eliminación
             const vendedorEliminado = await Vendedor.findByIdAndDelete(id);
+    
             if (!vendedorEliminado) {
                 return res.status(404).json({ error: 'Vendedor no encontrado' });
             }
+    
             return res.status(200).json({ mensaje: 'Vendedor eliminado con éxito', vendedorEliminado });
         } catch (error) {
-            return res.status(400).json({ error: 'Error al eliminar el vendedor', detalle: error.message });
+            console.error("Error al eliminar el vendedor:", error.message);
+            return res.status(500).json({ error: 'Error al eliminar el vendedor', detalle: error.message });
         }
     }
+    
 };
 
 export default vendedorController;

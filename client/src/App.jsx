@@ -13,7 +13,7 @@ import RegistroFinalizados from './components/Notas/RegistroFinalizados';
 import DetalleNota from './components/Notas/DetalleNota';
 import Navbar from './components/utils/Navbar';
 
-import Titulo from './Titulo';
+import Titulo from './components/utils/Titulo';
 import Login from './components/Auth/Login';
 import RutaPrivada from './components/utils/RutaPrivada';
 import { useState, useEffect } from 'react';
@@ -24,6 +24,8 @@ import ListaHelados from './components/Helados/ListaHelados';
 import EditarHelado from './components/Helados/EditarHelado';
 import RouteError from './components/utils/RouteError';
 import ListaUsuario from './components/Usuarios/ListaUsuario';
+import EditarUsuario from './components/Usuarios/EditarUsuario';
+import CrearUsuario from './components/Usuarios/CrearUsuario';
 import RegistroFinalizadosS from './components/Notas/Supervisores/RegistroNotas';
 import DetalleNotaS from './components/Notas/Supervisores/DetalleNota';
 
@@ -96,9 +98,8 @@ const App = () => {
         <Route path="/editar-helado/:id" element={<EditarHelado/>}/>
 
         <Route path="/usuarios" element={<ListaUsuario/>}/>
-        <Route path="/usuario-editar/id:" element={<ListaUsuario/>}/>
-        <Route path="/usuario/id:" element={<ListaUsuario/>}/>
-        <Route path="/Crear-usuario" element={<ListaUsuario/>}/>
+        <Route path="/editar-usuario/:id" element={<EditarUsuario />} />
+        <Route path="/Crear-usuario" element={<CrearUsuario/>}/>
 
         {/* Rutas para los supervisores */}
         <Route path="/S-registro-finalizados" element={<RegistroFinalizadosS/>}/>

@@ -1,6 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {
+    Button,
+    TextField,
+    Typography,
+    Container,
+    Box,
+    CssBaseline,
+    MenuItem,
+    Select,
+    FormControl,
+    InputLabel,
+    Paper,
+    CircularProgress
+} from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
+import Swal from 'sweetalert2';
+
 
 const CrearUsuario = () => {
     const [usuario, setUsuario] = useState({
@@ -9,13 +26,14 @@ const CrearUsuario = () => {
         contraseña: '',
         rol: 'usuario'
     });
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const rolUsuario = localStorage.getItem('rol'); // Suponiendo que el rol se guarda en localStorage
+        const rolUsuario = localStorage.getItem('rol');
         if (rolUsuario !== 'administrador') {
             alert('Acceso no autorizado');
-            navigate('/'); // Redirigir al inicio o a una página de acceso denegado
+            navigate('/');
         }
     }, [navigate]);
 
@@ -25,31 +43,112 @@ const CrearUsuario = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
-            await axios.post('/api/usuarios/crear', usuario);
-            alert('Usuario creado con éxito');
+            await axios.post('/api/usuario/', usuario);
+            Swal.fire('Usuario agregado!', 'Has agregado correctamente al usuario.', 'success');
             navigate('/usuarios');
         } catch (error) {
-            alert('Error al crear usuario');
+            Swal.fire('Error', 'Error al crear usuario', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div>
-            <h2>Crear Usuario</h2>
-            <form onSubmit={handleSubmit}>
-                <input name="nombreUsuario" placeholder="Nombre de Usuario" onChange={handleChange} required />
-                <input name="correo" placeholder="Correo" type="email" onChange={handleChange} required />
-                <input name="contraseña" placeholder="Contraseña" type="password" onChange={handleChange} required />
-                <select name="rol" onChange={handleChange}>
-                    <option value="usuario">Usuario</option>
-                    <option value="supervisor">Supervisor</option>
-                    <option value="administrador">Administrador</option>
-                </select>
-                <button type="submit">Crear Usuario</button>
-            </form>
-        </div>
+        <Container component="main" maxWidth="sm" sx={{ mt: 8, mb: 4 }}>
+            <CssBaseline />
+            <Paper elevation={6} sx={{ p: 4, borderRadius: 2 }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Typography component="h1" variant="h5" sx={{ mb: 2, fontWeight: 'bold', color: 'primary.main' }}>
+                        Crear Usuario
+                    </Typography>
+                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="nombreUsuario"
+                            label="Nombre de Usuario"
+                            name="nombreUsuario"
+                            value={usuario.nombreUsuario}
+                            onChange={handleChange}
+                            autoFocus
+                            sx={{ backgroundColor: '#fafafa', borderRadius: 1 }}
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="correo"
+                            label="Correo"
+                            name="correo"
+                            type="email"
+                            value={usuario.correo}
+                            onChange={handleChange}
+                            sx={{ backgroundColor: '#fafafa', borderRadius: 1 }}
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="contraseña"
+                            label="Contraseña"
+                            name="contraseña"
+                            type="password"
+                            value={usuario.contraseña}
+                            onChange={handleChange}
+                            sx={{ backgroundColor: '#fafafa', borderRadius: 1 }}
+                        />
+                        <FormControl fullWidth margin="normal" sx={{ backgroundColor: '#fafafa', borderRadius: 1 }}>
+                            <InputLabel id="rol-label">Rol</InputLabel>
+                            <Select
+                                labelId="rol-label"
+                                id="rol"
+                                name="rol"
+                                value={usuario.rol}
+                                onChange={handleChange}
+                                label="Rol"
+                            >
+                                <MenuItem value="usuario">Usuario</MenuItem>
+                                <MenuItem value="supervisor">Supervisor</MenuItem>
+                                <MenuItem value="administrador">Administrador</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        <Button
+                            type="submit"
+                            
+                            variant="contained"
+                            color="primary"
+                            sx={{ mt: 3, mb: 2, p: 1.5 }}
+                            disabled={loading}
+                        >
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Crear Usuario'}
+                        </Button>
+
+                       
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={() => navigate('/usuarios')}
+                                startIcon={<CancelIcon />}
+                                sx={{ mt: 3, mb: 2, p: 1.5, ml: 2 }}
+                            >
+                                Cancelar
+                            </Button>
+                        
+                    </Box>
+                </Box>
+            </Paper>
+        </Container>
     );
-};
+}
 
 export default CrearUsuario;

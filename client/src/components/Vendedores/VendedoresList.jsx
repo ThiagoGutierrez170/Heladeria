@@ -118,7 +118,12 @@ const VendedoresList = () => {
                 setVendedores(prev => prev.filter(vendedor => vendedor._id !== vendedorId));
                 Swal.fire('Eliminado!', 'El vendedor ha sido eliminado.', 'success');
             } catch (error) {
-                Swal.fire('Error', 'Hubo un problema al eliminar el vendedor.', 'error');
+                // Verifica si el error es debido a referencias en notas
+                if (error.response && error.response.data && error.response.data.detalle) {
+                    Swal.fire('Error', error.response.data.detalle, 'error');
+                } else {
+                    Swal.fire('Error', 'Hubo un problema al eliminar el vendedor.', 'error');
+                }
             }
         }
     }, []);

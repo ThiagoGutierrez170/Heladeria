@@ -1,5 +1,6 @@
 import Helado from '../models/helado.models.js';
 import mongoose from 'mongoose';
+import Nota from '../models/nota.models.js';
 
 const heladoController = {
     crearHelado: async (req, res) => {

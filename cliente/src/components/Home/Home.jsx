@@ -24,8 +24,8 @@ const items = [
 
 function Home() {
     return (
-        <Container maxWidth="md" sx={{ marginTop: 4 }}>
-            <Box display="flex" alignItems="center" mb={4} flexDirection="column" textAlign="center">
+        <Container maxWidth="md" sx={{ marginTop: 0}}>
+            <Box display="flex" alignItems="center" mb={1} flexDirection="column" textAlign="center">
                 <IcecreamIcon sx={{ fontSize: 60, color: '#6E65C7', marginBottom: 1 }} />
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#6E65C7', marginBottom: 2 }}>
                     Bienvenidos a la Experiencia de Sabores

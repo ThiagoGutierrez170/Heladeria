@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { lazy, Suspense, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Typography, Paper, CircularProgress, IconButton, Button, useTheme, useMediaQuery } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
@@ -37,8 +38,6 @@ const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile , usuario
         >
             <InfoIcon />
         </IconButton>
-        {usuarioRol === 'administrador' && (
-            <>
         <IconButton
             size={isMobile ? "large" : "medium"}
             color="primary"
@@ -53,8 +52,8 @@ const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile , usuario
         >
             <EditIcon />
         </IconButton>
-        </>
-        )}
+        {usuarioRol === 'administrador' && (
+            <>
         <IconButton
             size={isMobile ? "large" : "medium"}
             color="error"
@@ -69,6 +68,8 @@ const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile , usuario
         >
             <DeleteIcon />
         </IconButton>
+            </>
+        )}
     </div>
 ));
 

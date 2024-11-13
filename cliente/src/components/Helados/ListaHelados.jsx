@@ -16,11 +16,12 @@ import RecargaHelado from './RecargaHelado';
 
 
 
-const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobile,usuarioRol }) => (
+const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobile, usuarioRol }) => (
     <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
         <IconButton size={isMobile ? "small" : "medium"} color="default" onClick={onInfo} sx={{ m: 0.5 }}>
             <InfoIcon />
         </IconButton>
+        
         {usuarioRol === 'administrador' && (
             <>
                 <IconButton size={isMobile ? "small" : "medium"} color="primary" onClick={onEdit} sx={{ m: 0.5 }}>
@@ -31,14 +32,13 @@ const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobil
                 </IconButton>
             </>
         )}
-        <IconButton size={isMobile ? "small" : "medium"} color="error" onClick={onDelete} sx={{ m: 0.5 }}>
-            <DeleteIcon />
-        </IconButton>
+
         <IconButton size={isMobile ? "small" : "medium"} color="secondary" onClick={onRecarga} sx={{ m: 0.5 }}>
             <AddIcon />
         </IconButton>
     </div>
 ));
+
 
 const ListaHelados = () => {
     const theme = useTheme();

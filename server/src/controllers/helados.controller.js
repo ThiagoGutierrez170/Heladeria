@@ -1,4 +1,5 @@
 import Helado from '../models/helado.models.js';
+import Nota from '../models/nota.models.js';
 import mongoose from 'mongoose';
 
 const heladoController = {
@@ -63,16 +64,26 @@ const heladoController = {
     eliminarHelado: async (req, res) => {
         try {
             const { id } = req.params;
+    
+            // Verificación de ID válido
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ error: 'ID inválido' });
             }
+    
+            // Intento de eliminación del helado
             const heladoEliminado = await Helado.findByIdAndDelete(id);
+    
+            // Verificación si el helado fue encontrado
             if (!heladoEliminado) {
                 return res.status(404).json({ error: 'Helado no encontrado' });
             }
+    
+            // Respuesta de éxito
             return res.status(200).json({ mensaje: 'Helado eliminado con éxito', heladoEliminado });
+    
         } catch (error) {
-            return res.status(400).json({ error: 'Error al eliminar el helado', detalle: error.message });
+            // Error del servidor
+            return res.status(500).json({ error: 'Error al eliminar el helado', detalle: error.message });
         }
     },
     

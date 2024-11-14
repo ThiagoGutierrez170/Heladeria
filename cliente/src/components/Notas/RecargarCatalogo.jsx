@@ -59,7 +59,7 @@ const RecargarCatalogo = () => {
 
     return (
         <Container maxWidth="md">
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" gutterBottom color='black' sx={{ mb: 2 }}>
                 Recargar Catálogo
             </Typography>
             <form onSubmit={handleSubmit}>

@@ -85,7 +85,7 @@ const EditarNota = () => {
 
     return (
         <Container maxWidth="sm">
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" gutterBottom color='black' sx={{ mb: 2 }}>
                 Editar Nota
             </Typography>
             <form onSubmit={handleSubmit}>

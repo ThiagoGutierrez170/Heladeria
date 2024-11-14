@@ -1,41 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Grid } from '@mui/material';
+import {
+    Container, Typography, Button, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Paper, Box, Grid
+} from '@mui/material';
 import Swal from 'sweetalert2';
 
 const NotaActiva = () => {
     const { id } = useParams();
     const [nota, setNota] = useState(null);
     const navigate = useNavigate();
- 
 
     useEffect(() => {
         const fetchNotaDetalle = async () => {
             try {
                 const response = await axios.get(`/api/nota/activas/${id}`);
-                
-                console.log(response.data);
                 setNota(response.data);
-
             } catch (error) {
                 Swal.fire('Error', 'Hubo un problema al cargar la nota.', 'error');
             }
         };
-
         fetchNotaDetalle();
     }, [id]);
 
-
-
-    const handleEditar = () => {
-        navigate(`/editar-nota/${id}`);
-    };
-
-    const handleRecargarCatalogo = () => {
-        navigate(`/recargar-catalogo/${id}`);
-    };
-
+    const handleEditar = () => navigate(`/editar-nota/${id}`);
+    const handleRecargarCatalogo = () => navigate(`/recargar-catalogo/${id}`);
     const handleEliminar = async () => {
         const confirm = await Swal.fire({
             title: '¿Estás seguro?',
@@ -47,7 +37,6 @@ const NotaActiva = () => {
             confirmButtonText: 'Eliminar',
             cancelButtonText: 'Cancelar',
         });
-
         if (confirm.isConfirmed) {
             try {
                 await axios.delete(`/api/nota/${id}`);
@@ -59,39 +48,31 @@ const NotaActiva = () => {
         }
     };
 
-    const handleFinalizarNota = () => {
-        navigate(`/finalizar-nota/${id}`);
-    };
+    const handleFinalizarNota = () => navigate(`/finalizar-nota/${id}`);
 
     if (!nota) return <Typography>Cargando...</Typography>;
 
     return (
-        <Container>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => navigate('/notas-activas')}
-                sx={{
-                    mb: 2,
-                    mt: 3,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '12px 24px',
-                    fontSize: '16px',
-                    backgroundColor: '#1976d2',
-                    '&:hover': {
-                        backgroundColor: '#155a8a',
-                    },
-                }}
-            >
-                Volver
-            </Button>
-            <Typography variant="h4" gutterBottom color='black'>
+        <Container maxWidth="sm" sx={{ py: 4 }}>
+            <Box display="flex" justifyContent="center" mb={3}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate('/notas-activas')}
+                    sx={{
+                        mb: 2,
+                        px: 4,
+                        fontSize: { xs: '14px', sm: '16px' },
+                    }}
+                >
+                    Volver
+                </Button>
+            </Box>
+            <Typography variant="h4" gutterBottom align="center" color='black' sx={{ mb: 2 }}>
                 Detalle de Nota Activa
             </Typography>
 
-            {/* Información de la nota en formato horizontal */}
+            {/* Información de la nota */}
             <TableContainer component={Paper} sx={{ mt: 3 }}>
                 <Table>
                     <TableHead>
@@ -105,14 +86,18 @@ const NotaActiva = () => {
                         <TableRow>
                             <TableCell>{nota.playa}</TableCell>
                             <TableCell>{nota.clima}</TableCell>
-                            <TableCell>{nota.vendedor_id ? `${nota.vendedor_id.nombre} ${nota.vendedor_id.apellido}` : 'No asignado'}</TableCell>
+                            <TableCell>
+                                {nota.vendedor_id
+                                    ? `${nota.vendedor_id.nombre} ${nota.vendedor_id.apellido}`
+                                    : 'No asignado'}
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            {/* Tabla de catálogo de helados */}
-            <Typography variant="h6" sx={{ mt: 3 }} color='black'>
+            {/* Catálogo de helados */}
+            <Typography variant="h6" sx={{ mt: 3 }} color="textPrimary" align="center">
                 Catálogo de Helados
             </Typography>
             {Array.isArray(nota.catalogo) && nota.catalogo.length > 0 ? (
@@ -140,35 +125,41 @@ const NotaActiva = () => {
                                     <TableCell align="center">{item.helado_id.nombre}</TableCell>
                                     <TableCell align="center">{item.cantidadTotal}</TableCell>
                                 </TableRow>
-
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
             ) : (
-                <Typography variant="body2" sx={{ color: 'black' }}>
+                <Typography variant="body2" sx={{ mt: 2, color: 'textSecondary' }} align="center">
                     No hay artículos en el catálogo.
                 </Typography>
             )}
 
             {/* Botones de acciones */}
-            <Box sx={{ mt: 3 }}>
-                <Button variant="contained" color="primary" onClick={handleEditar} sx={{ mr: 2 }}>
-                    Editar
-                </Button>
-                <Button variant="contained" color="secondary" onClick={handleRecargarCatalogo} sx={{ mr: 2 }}>
-                    Recargar Catálogo
-                </Button>
-                <Button variant="contained" color="error" onClick={handleEliminar}>
-                    Eliminar
-                </Button>
-                <Button variant="contained" color="success" onClick={handleFinalizarNota} sx={{ ml: 2 }}>
-                    Finalizar Nota
-                </Button>
-            </Box>
+            <Grid container spacing={2} justifyContent="center" sx={{ mt: 3 }}>
+                <Grid item xs={6} sm={3}>
+                    <Button fullWidth variant="contained" color="primary" onClick={handleEditar}>
+                        Editar
+                    </Button>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                    <Button fullWidth variant="contained" color="secondary" onClick={handleRecargarCatalogo}>
+                        Recargar
+                    </Button>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                    <Button fullWidth variant="contained" color="error" onClick={handleEliminar}>
+                        Eliminar
+                    </Button>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                    <Button fullWidth variant="contained" color="success" onClick={handleFinalizarNota}>
+                        Finalizar
+                    </Button>
+                </Grid>
+            </Grid>
         </Container>
     );
-
 };
 
 export default NotaActiva;

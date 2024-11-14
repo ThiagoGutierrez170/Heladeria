@@ -59,7 +59,6 @@ const DetalleNota = () => {
         }
     };
 
-    // Función para formatear los números en guaraníes con puntos
     const formatearGs = (valor) => {
         return new Intl.NumberFormat('es-PY', {
             style: 'decimal',
@@ -70,64 +69,56 @@ const DetalleNota = () => {
 
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" color='black' gutterBottom>
+            <Typography variant="h4" align="center" color="text.primary" gutterBottom>
                 Detalle de la Nota
             </Typography>
 
             <Button
                 variant="contained"
-                color="primary"
                 onClick={() => navigate('/registro-finalizados')}
                 sx={{
                     mb: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '12px 24px',
-                    fontSize: '16px',
-                    backgroundColor: '#1976d2',
-                    '&:hover': {
-                        backgroundColor: '#155a8a',
-                    },
+                    width: '100%',
+                    fontSize: '1rem',
+                    bgcolor: 'primary.main',
+                    '&:hover': { bgcolor: 'primary.dark' },
                 }}
             >
                 Volver
             </Button>
+
             {notaInfo && (
                 <Paper sx={{ p: 2, mb: 3 }}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell><strong>Vendedor</strong></TableCell>
-                                <TableCell><strong>Playa</strong></TableCell>
-                                <TableCell><strong>Clima</strong></TableCell>
-                                <TableCell><strong>Fecha</strong></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>
-                                    {notaInfo.vendedor?.nombre
-                                        ? `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}`
-                                        : "Información de vendedor no disponible"}
-                                </TableCell>
-                                <TableCell>{notaInfo.playa}</TableCell>
-                                <TableCell>{notaInfo.clima}</TableCell>
-                                <TableCell>{new Date(fechaNota).toLocaleDateString()}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
+                    <TableContainer>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><strong>Vendedor</strong></TableCell>
+                                    <TableCell><strong>Playa</strong></TableCell>
+                                    <TableCell><strong>Clima</strong></TableCell>
+                                    <TableCell><strong>Fecha</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>{notaInfo.vendedor?.nombre ?? 'Información no disponible'}</TableCell>
+                                    <TableCell>{notaInfo.playa}</TableCell>
+                                    <TableCell>{notaInfo.clima}</TableCell>
+                                    <TableCell>{new Date(fechaNota).toLocaleDateString()}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Paper>
             )}
 
-
-            <Typography variant="h6" align="center" color='black' gutterBottom>
+            <Typography variant="h6" align="center" color="text.primary" gutterBottom>
                 Detalle de Ganancias de la Nota
             </Typography>
             <Divider sx={{ my: 3 }} />
 
             <TableContainer component={Paper} sx={{ mb: 3 }}>
-                <Table>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell><strong>Imagen</strong></TableCell>
@@ -143,12 +134,12 @@ const DetalleNota = () => {
                             <TableRow key={index}>
                                 <TableCell>
                                     <img
-                                        src={item.imagen} // Imagen por defecto si falta la URL
+                                        src={item.imagen}
                                         alt={item.nombre}
                                         style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '5px' }}
                                     />
                                 </TableCell>
-                                <TableCell>{item.nombre || "Nombre no disponible"}</TableCell>
+                                <TableCell>{item.nombre ?? 'Nombre no disponible'}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
                                 <TableCell align="center">{formatearGs(item.gananciaMinima)} Gs</TableCell>
                                 <TableCell align="center">{formatearGs(item.gananciaBase)} Gs</TableCell>
@@ -160,11 +151,11 @@ const DetalleNota = () => {
             </TableContainer>
 
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" align="center" color='black' gutterBottom>
+            <Typography variant="h6" align="center" color="text.primary" gutterBottom>
                 Ganancias Totales de la Nota
             </Typography>
             <TableContainer component={Paper} sx={{ mb: 3 }}>
-                <Table>
+                <Table size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell><strong>Ganancia Mínima Total</strong></TableCell>
@@ -182,10 +173,19 @@ const DetalleNota = () => {
                 </Table>
             </TableContainer>
 
-            <Button variant="contained" color="error" onClick={handleEliminar} fullWidth>
+            <Button
+                variant="contained"
+                color="error"
+                onClick={handleEliminar}
+                sx={{
+                    width: '100%',
+                    fontSize: '1rem',
+                    py: 1.5,
+                    mt: 2,
+                }}
+            >
                 Eliminar Nota
             </Button>
-            <br /><br /><br />
         </Container>
     );
 };

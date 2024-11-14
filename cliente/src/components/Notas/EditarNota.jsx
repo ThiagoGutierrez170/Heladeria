@@ -17,7 +17,7 @@ const EditarNota = () => {
         clima: '',
         estado: '',
         catalogo: [],
-        vendedor: '', 
+        vendedor: '',
     });
     const [errors, setErrors] = useState({});
     const [vendedores, setVendedores] = useState([]); // Estado para almacenar la lista de vendedores
@@ -106,7 +106,7 @@ const EditarNota = () => {
                         </MenuItem>
                     ))}
                 </TextField>
-                
+
                 <TextField
                     select
                     label="Clima"
@@ -129,7 +129,7 @@ const EditarNota = () => {
                 <TextField
                     select
                     label="Vendedor"
-                    name="vendedor"
+                    name='vendedor'
                     value={nota.vendedor}
                     onChange={handleInputChange}
                     fullWidth

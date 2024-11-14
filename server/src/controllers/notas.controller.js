@@ -241,6 +241,7 @@ const DetalleNota = async (req, res) => {
 
             return {
                 nombre: item.helado_id.nombre,
+                imagen: item.helado_id.imagen,
                 cantidadTotal,
                 cantidadVendida,
                 gananciaMinima: cantidadVendida * item.helado_id.costo,

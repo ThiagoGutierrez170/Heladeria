@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Vendedor from '../models/vendedor.models.js';
 import Nota from '../models/nota.models.js';
+
 const vendedorController = {
     crearVendedor: async (req, res) => {
         try {
@@ -92,7 +93,6 @@ const vendedorController = {
             return res.status(500).json({ error: 'Error al eliminar el vendedor', detalle: error.message });
         }
     }
-    
 };
 
 export default vendedorController;

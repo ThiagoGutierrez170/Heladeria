@@ -10,8 +10,8 @@ const vendedorSchema = new mongoose.Schema({
 
     ci: { 
         type: String, 
-        required: true, 
-        unique: [true, "Este CI debe ser único"],
+        required: [true, "El campo CI es obligatorio"], 
+        unique: [true, "El numero de cedula debe ser unico"] 
     },
 
     contacto: { type: String, required: false },

@@ -54,7 +54,7 @@ const TraerNotaActiva = async (req, res) => {
         const { id } = req.params;
         const notaActiva = await Nota.findById(id)
             .populate('vendedor_id', 'nombre apellido')
-            .populate('catalogo.helado_id', 'nombre imagen'); // Popula el nombre del helado en catalogo
+            .populate('catalogo.helado_id', 'nombre imagen' ); // Popula el nombre del helado en catalogo
 
         if (!notaActiva) {
             return res.status(404).json({ error: 'Nota activa no encontrada' });
@@ -240,6 +240,7 @@ const DetalleNota = async (req, res) => {
 
             return {
                 nombre: item.helado_id.nombre,
+                imagen: item.helado_id.imagen,
                 cantidadTotal,
                 cantidadVendida,
                 gananciaMinima: cantidadVendida * item.helado_id.costo,

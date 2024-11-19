@@ -1,6 +1,6 @@
 import Helado from '../models/helado.models.js';
-import mongoose from 'mongoose';
 import Nota from '../models/nota.models.js';
+import mongoose from 'mongoose';
 
 const heladoController = {
     crearHelado: async (req, res) => {
@@ -64,18 +64,36 @@ const heladoController = {
     eliminarHelado: async (req, res) => {
         try {
             const { id } = req.params;
+    
+            // Verifica si el ID es válido
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ error: 'ID inválido' });
             }
+    
+            // Verifica si el helado está relacionado con alguna nota
+            const notasAsociadas = await Nota.findOne({ 'catalogo.helado_id': id });
+    
+            if (notasAsociadas) {
+                return res.status(400).json({
+                    error: 'No se puede eliminar el helado',
+                    detalle: 'Este helado está asociado a una o más notas y no se puede eliminar'
+                });
+            }
+    
+            // Si no tiene dependencias, procede con la eliminación
             const heladoEliminado = await Helado.findByIdAndDelete(id);
+    
             if (!heladoEliminado) {
                 return res.status(404).json({ error: 'Helado no encontrado' });
             }
+    
             return res.status(200).json({ mensaje: 'Helado eliminado con éxito', heladoEliminado });
         } catch (error) {
-            return res.status(400).json({ error: 'Error al eliminar el helado', detalle: error.message });
+            console.error("Error al eliminar el helado:", error.message);
+            return res.status(500).json({ error: 'Error al eliminar el helado', detalle: error.message });
         }
     },
+    
     
     recargarHelados: async (req, res) => {
         try {

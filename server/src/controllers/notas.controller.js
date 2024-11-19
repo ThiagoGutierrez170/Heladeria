@@ -343,7 +343,7 @@ const FinalizarNota = async (req, res) => {
 
 
 
-
+ 
 export default {
     Crear,
     ListaNotasActivas,

@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; // Asegúrate de importar SweetAlert
 
 // Importación de componentes
 import VendedoresList from './components/Vendedores/VendedoresList';
@@ -42,16 +41,16 @@ const App = () => {
     const token = localStorage.getItem('token');
     setEstaAutenticado(!!token);
     if (!token) {
-      navegar('/login'); // Si no hay token, redirige al login
+      navegar('/login'); 
     }
   };
 
-  // SE VERIFICA AUTENTICACIÓN AL MONTARSE EL COMPONENTE Y AL CAMBIAR LA RUTA
+ 
   useEffect(() => {
     verificarAutenticacion();
   }, [ubicacion.pathname]);
 
-  // CIERRA SESIÓN AL IR A /LOGOUT
+ 
   useEffect(() => {
     if (ubicacion.pathname === '/logout' && estaAutenticado) {
       manejarCerrarSesion();

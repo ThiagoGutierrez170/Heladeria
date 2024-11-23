@@ -11,10 +11,12 @@ const NotaActiva = () => {
     const { id } = useParams();
     const [nota, setNota] = useState(null);
     const navigate = useNavigate();
+    const [usuarioRol, setUsuarioRol] = useState(localStorage.getItem('rol'));
 
     useEffect(() => {
         const fetchNotaDetalle = async () => {
             try {
+                setUsuarioRol(localStorage.getItem('rol'));
                 const response = await axios.get(`/api/nota/activas/${id}`);
                 setNota(response.data);
             } catch (error) {
@@ -61,14 +63,15 @@ const NotaActiva = () => {
                     onClick={() => navigate('/notas-activas')}
                     sx={{
                         mb: 2,
-                        px: 4,
-                        fontSize: { xs: '14px', sm: '16px' },
+                        px: 6,
+                        py: 2,
+                        fontSize: '18px',
                     }}
                 >
                     Volver
                 </Button>
             </Box>
-            <Typography variant="h4" gutterBottom align="center" color='black' sx={{ mb: 2 }}>
+            <Typography variant="h4" gutterBottom align="center" color='black' sx={{ mb: 3, fontSize: '32px' }}>
                 Detalle de Nota Activa
             </Typography>
 
@@ -77,16 +80,16 @@ const NotaActiva = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Playa</strong></TableCell>
-                            <TableCell><strong>Clima</strong></TableCell>
-                            <TableCell><strong>Vendedor</strong></TableCell>
+                            <TableCell sx={{ fontSize: '18px', fontWeight: 'bold' }}>Playa</TableCell>
+                            <TableCell sx={{ fontSize: '18px', fontWeight: 'bold' }}>Clima</TableCell>
+                            <TableCell sx={{ fontSize: '18px', fontWeight: 'bold' }}>Vendedor</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell>{nota.playa}</TableCell>
-                            <TableCell>{nota.clima}</TableCell>
-                            <TableCell>
+                            <TableCell sx={{ fontSize: '16px' }}>{nota.playa}</TableCell>
+                            <TableCell sx={{ fontSize: '16px' }}>{nota.clima}</TableCell>
+                            <TableCell sx={{ fontSize: '16px' }}>
                                 {nota.vendedor_id
                                     ? `${nota.vendedor_id.nombre} ${nota.vendedor_id.apellido}`
                                     : 'No asignado'}
@@ -97,7 +100,7 @@ const NotaActiva = () => {
             </TableContainer>
 
             {/* Catálogo de helados */}
-            <Typography variant="h6" sx={{ mt: 3 }} color="textPrimary" align="center">
+            <Typography variant="h5" sx={{ mt: 4, fontSize: '24px', textAlign: 'center' }} color="textPrimary">
                 Catálogo de Helados
             </Typography>
             {Array.isArray(nota.catalogo) && nota.catalogo.length > 0 ? (
@@ -105,9 +108,9 @@ const NotaActiva = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell align="center"><strong>Imagen</strong></TableCell>
-                                <TableCell align="center"><strong>Nombre del Helado</strong></TableCell>
-                                <TableCell align="center"><strong>Cantidad Total</strong></TableCell>
+                                <TableCell align="center" sx={{ fontSize: '18px', fontWeight: 'bold' }}>Imagen</TableCell>
+                                <TableCell align="center" sx={{ fontSize: '18px', fontWeight: 'bold' }}>Nombre del Helado</TableCell>
+                                <TableCell align="center" sx={{ fontSize: '18px', fontWeight: 'bold' }}>Cantidad Total</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -117,43 +120,45 @@ const NotaActiva = () => {
                                         <img
                                             src={item.helado_id.imagen}
                                             alt={item.helado_id.nombre}
-                                            width={60}
-                                            height={60}
+                                            width={80}
+                                            height={80}
                                             style={{ borderRadius: '8px' }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center">{item.helado_id.nombre}</TableCell>
-                                    <TableCell align="center">{item.cantidadTotal}</TableCell>
+                                    <TableCell align="center" sx={{ fontSize: '16px' }}>{item.helado_id.nombre}</TableCell>
+                                    <TableCell align="center" sx={{ fontSize: '16px' }}>{item.cantidadTotal}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
             ) : (
-                <Typography variant="body2" sx={{ mt: 2, color: 'textSecondary' }} align="center">
+                <Typography variant="body1" sx={{ mt: 2, fontSize: '16px', color: 'textSecondary', textAlign: 'center' }}>
                     No hay artículos en el catálogo.
                 </Typography>
             )}
 
             {/* Botones de acciones */}
-            <Grid container spacing={2} justifyContent="center" sx={{ mt: 3 }}>
-                <Grid item xs={6} sm={3}>
-                    <Button fullWidth variant="contained" color="primary" onClick={handleEditar}>
+            <Grid container spacing={2} justifyContent="center" sx={{ mt: 4 }}>
+                <Grid item xs={6} sm={4}>
+                    <Button fullWidth variant="contained" color="primary" sx={{ fontSize: '18px', py: 2 }} onClick={handleEditar}>
                         Editar
                     </Button>
                 </Grid>
-                <Grid item xs={6} sm={3}>
-                    <Button fullWidth variant="contained" color="secondary" onClick={handleRecargarCatalogo}>
+                <Grid item xs={6} sm={4}>
+                    <Button fullWidth variant="contained" color="secondary" sx={{ fontSize: '18px', py: 2 }} onClick={handleRecargarCatalogo}>
                         Recargar
                     </Button>
                 </Grid>
-                <Grid item xs={6} sm={3}>
-                    <Button fullWidth variant="contained" color="error" onClick={handleEliminar}>
-                        Eliminar
-                    </Button>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                    <Button fullWidth variant="contained" color="success" onClick={handleFinalizarNota}>
+                {usuarioRol === 'administrador' && (
+                    <Grid item xs={6} sm={4}>
+                        <Button fullWidth variant="contained" color="error" sx={{ fontSize: '18px', py: 2 }} onClick={handleEliminar}>
+                            Eliminar
+                        </Button>
+                    </Grid>
+                )}
+                <Grid item xs={6} sm={4}>
+                    <Button fullWidth variant="contained" color="success" sx={{ fontSize: '18px', py: 2 }} onClick={handleFinalizarNota}>
                         Finalizar
                     </Button>
                 </Grid>

@@ -15,16 +15,15 @@ const CrearNota = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Obtener helados activos y vendedores para los menús desplegables
         const fetchData = async () => {
             try {
-                const heladoResponse = await axios.get('/api/helado?estado=activo'); // Filtrar helados por estado activo
+                const heladoResponse = await axios.get('/api/helado?estado=activo');
                 const vendedorResponse = await axios.get('/api/vendedor');
                 const heladosActivos = heladoResponse.data.map((helado) => ({
                     helado_id: helado._id,
                     nombre: helado.nombre,
                     imagen: helado.imagen,
-                    cantidad_inicial: 0,
+                    cantidad_inicial: '',
                 }));
                 setCatalogo(heladosActivos);
                 setVendedores(vendedorResponse.data);
@@ -39,13 +38,12 @@ const CrearNota = () => {
         const cantidadNumerica = parseInt(cantidad, 10);
 
         if (cantidadNumerica < 0) {
-            // Si se ingresa un valor negativo, mostrar un alerta
             Swal.fire('Error', 'La cantidad no puede ser negativa.', 'error');
-            return;  // No actualizamos el estado si el número es negativo
+            return;
         }
 
         const newCatalogo = [...catalogo];
-        newCatalogo[index].cantidad_inicial = isNaN(cantidadNumerica) ? 0 : cantidadNumerica;
+        newCatalogo[index].cantidad_inicial = isNaN(cantidadNumerica) ? '' : cantidadNumerica;  // Usar cadena vacía si no es un número
         setCatalogo(newCatalogo);
     };
 
@@ -56,98 +54,87 @@ const CrearNota = () => {
         if (!vendedor) newErrors.vendedor = 'Seleccione un vendedor';
         if (!playa) newErrors.playa = 'Seleccione una playa';
         if (!clima) newErrors.clima = 'Seleccione el clima';
-        if (catalogo.every(item => item.cantidad_inicial === 0)) {
-            newErrors.catalogo = 'Agregue cantidades para al menos un helado';
+        if (catalogo.every(item => item.cantidad_inicial === '')) {  // Verificar si alguna cantidad no está vacía
+            newErrors.catalogo = 'Debe ingresar la cantidad inicial de los helados';
         }
 
         setErrors(newErrors);
 
-        if (Object.keys(newErrors).length === 0) {
-            try {
-                await axios.post('/api/nota', {
-                    vendedor_id: vendedor,
-                    playa,
-                    clima,
-                    catalogo,
-                    estado: 'activo',
-                });
+        if (Object.keys(newErrors).length > 0) {
+            return;
+        }
 
-                Swal.fire({
-                    title: 'Nota creada!',
-                    text: 'La nota de venta fue creada exitosamente.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar'
-                });
-                navigate('/notas-activas');
-            } catch (error) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.response ? error.response.data.message : 'Hubo un problema al crear la nota.',
-                    icon: 'error',
-                    confirmButtonText: 'Intentar de nuevo'
-                });
-            }
+        const nota = {
+            vendedor,
+            playa,
+            clima,
+            catalogo,
+        };
+
+        try {
+            await axios.post('/api/nota', nota);
+            Swal.fire('Nota creada', 'La nota ha sido creada exitosamente.', 'success');
+            navigate('/notas-activas');
+        } catch (error) {
+            console.error('Error al crear la nota:', error.response || error);
+            Swal.fire('Error', 'Hubo un problema al crear la nota.', 'error');
         }
     };
 
     return (
-        <Container maxWidth="md" sx={{ p: 4, backgroundColor: '#f5f5f5', borderRadius: 2, boxShadow: 2 }}>
-           <Typography variant="h4" align="center" gutterBottom sx={{ mb: 3, color: '#333' }}>
-                Crear Nota de Venta
+        <Container maxWidth="md">
+            <Typography variant="h4" align="center" gutterBottom color="black" sx={{ mb: 2 }}>
+                Crear Nota
             </Typography>
             <form onSubmit={handleSubmit}>
-                <FormControl fullWidth margin="normal">
-                    <InputLabel>Vendedor</InputLabel>
-                    <Select
-                        value={vendedor}
-                        onChange={(e) => setVendedor(e.target.value)}
-                        error={!!errors.vendedor}
-                    >
-                        {vendedores.map((vend) => (
-                            <MenuItem key={vend._id} value={vend._id}>{vend.nombre} {vend.apellido}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} md={4}>
+                        <FormControl fullWidth>
+                            <InputLabel>Vendedor</InputLabel>
+                            <Select
+                                value={vendedor}
+                                onChange={(e) => setVendedor(e.target.value)}
+                                label="Vendedor"
+                            >
+                                {vendedores.map((v) => (
+                                    <MenuItem key={v._id} value={v._id}>
+                                        {v.nombre}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField
+                            label="Playa"
+                            value={playa}
+                            onChange={(e) => setPlaya(e.target.value)}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <FormControl fullWidth>
+                            <InputLabel>Clima</InputLabel>
+                            <Select
+                                value={clima}
+                                onChange={(e) => setClima(e.target.value)}
+                                label="Clima"
+                            >
+                                <MenuItem value="Soleado">Soleado</MenuItem>
+                                <MenuItem value="Nublado">Nublado</MenuItem>
+                                <MenuItem value="Lluvia">Lluvia</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                </Grid>
 
-                <FormControl fullWidth margin="normal">
-                    <InputLabel>Playa</InputLabel>
-                    <Select
-                        value={playa}
-                        onChange={(e) => setPlaya(e.target.value)}
-                        error={!!errors.playa}
-                    >
-                        <MenuItem value="San José">San José</MenuItem>
-                        <MenuItem value="Mboi ka´e">Mboi ka´e</MenuItem>
-                        <MenuItem value="San Isidro">San Isidro</MenuItem>
-                        <MenuItem value="Evento">Evento</MenuItem>
-                    </Select>
-                </FormControl>
-
-                <FormControl fullWidth margin="normal">
-                    <InputLabel>Clima</InputLabel>
-                    <Select
-                        value={clima}
-                        onChange={(e) => setClima(e.target.value)}
-                        error={!!errors.clima}
-                    >
-                        <MenuItem value="soleado">Soleado</MenuItem>
-                        <MenuItem value="despejado">Despejado</MenuItem>
-                        <MenuItem value="nublado">Nublado</MenuItem>
-                        <MenuItem value="lluvia">Lluvia</MenuItem>
-                        <MenuItem value="tormenta">Tormenta</MenuItem>
-                    </Select>
-                </FormControl>
-
-                <Typography variant="h6" sx={{ mt: 3 }} color='black'>
-                    Catálogo de Helados
-                </Typography>
-                <TableContainer component={Paper} sx={{ mt: 3 }}>
+                <TableContainer component={Paper} sx={{ mt: 2 }}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Imagen</TableCell>
-                                <TableCell>Nombre del Helado</TableCell>
-                                <TableCell>Cantidad Inicial</TableCell>
+                                <TableCell><strong>Imagen</strong></TableCell>
+                                <TableCell><strong>Helado</strong></TableCell>
+                                <TableCell><strong>Cantidad Inicial</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -161,9 +148,10 @@ const CrearNota = () => {
                                         <TextField
                                             variant="outlined"
                                             type="number"
-                                            value={item.cantidad_inicial}
+                                            value={item.cantidad_inicial || ''}  // Usar cadena vacía por defecto si no hay cantidad
                                             onChange={(e) => handleChangeCantidad(index, e.target.value)}
                                             fullWidth
+                                            sx={{ fontSize: '18px' }}
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -172,24 +160,17 @@ const CrearNota = () => {
                     </Table>
                 </TableContainer>
 
-                {errors.catalogo && (
-                    <Typography color="error" sx={{ mt: 1 }}>
-                        {errors.catalogo}
-                    </Typography>
-                )}
+                {errors.catalogo && <Typography color="error">{errors.catalogo}</Typography>}
 
-                <Grid container spacing={2} justifyContent="center" sx={{ mt: 3 }}>
-                    <Grid item>
-                        <Button type="submit" variant="contained" color="primary">
-                            Crear Nota
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button variant="outlined" color="secondary" onClick={() => navigate('/notas-activas')}>
-                            Cancelar
-                        </Button>
-                    </Grid>
-                </Grid>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ mt: 3 }}
+                >
+                    Crear Nota
+                </Button>
             </form>
         </Container>
     );

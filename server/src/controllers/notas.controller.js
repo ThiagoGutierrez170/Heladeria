@@ -49,33 +49,46 @@ const ListaNotasActivas = async (req, res) => {
 };
 
 // Obtener una nota activa específica
-// Obtener una nota activa específica
 const TraerNotaActiva = async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Obtén la nota activa junto con los detalles del catálogo
         const notaActiva = await Nota.findById(id)
             .populate('vendedor_id', 'nombre apellido')
-            .populate('catalogo.helado_id', 'nombre imagen' ); // Popula el nombre del helado en catalogo
+            .populate('catalogo.helado_id', 'nombre imagen'); // Asegura que los helados están poblados
 
         if (!notaActiva) {
             return res.status(404).json({ error: 'Nota activa no encontrada' });
         }
 
-        // Calcular cantidadTotal para cada helado en el catálogo
-        const catalogoConCantidadTotal = notaActiva.catalogo.map(item => ({
-            helado_id: item.helado_id,
-            recargas: item.recargas,
-            cantidadTotal: item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0) // Suma de cantidad_inicial y todas las recargas
-        }));
+        // Mapeamos el catálogo y calculamos la cantidadTotal
+        const catalogoConCantidadTotal = notaActiva.catalogo.map((item) => {
+            const cantidadInicial = item.cantidad_inicial || 0; // Asegúrate de que cantidad_inicial no sea nulo
+            const recargas = Array.isArray(item.recargas) && item.recargas.length > 0
+                ? item.recargas.reduce((acc, r) => acc + (r || 0), 0) // Suma las recargas
+                : 0; // Si no hay recargas, la suma es 0
+
+            const cantidadTotal = cantidadInicial + recargas;
+
+            return {
+                helado_id: item.helado_id,
+                recargas: item.recargas || [], // Si no tiene recargas, aseguramos que sea un array vacío
+                cantidadTotal: cantidadTotal,
+            };
+        });
 
         res.status(200).json({
             ...notaActiva.toObject(),
-            catalogo: catalogoConCantidadTotal
+            catalogo: catalogoConCantidadTotal,
         });
     } catch (error) {
+        console.error('Error al obtener la nota activa:', error);
         res.status(500).json({ error: 'Error al obtener la nota activa', detalle: error.message });
     }
 };
+
+
 
 
 
@@ -108,18 +121,17 @@ const RecargarCatalogo = async (req, res) => {
                 const helado = await Helado.findById(helado_id);
                 if (!helado) return res.status(404).json({ error: `Helado con id ${helado_id} no encontrado` });
 
-                // Ajustar stock para que no sea menor que 0
-                const nuevoStock = Math.max(helado.stock - cantidad, 0);
-                helado.stock = nuevoStock;
+                // Ajustar el stock (sumar la cantidad de recarga al stock existente)
+                helado.stock += cantidad;
                 await helado.save();
 
                 const itemCatalogo = nota.catalogo.find(item => item.helado_id.equals(helado_id));
                 if (itemCatalogo) {
-                    itemCatalogo.recargas.push(cantidad);
+                    itemCatalogo.recargas.push(cantidad); // Sumar recarga al catálogo
                 } else {
                     nota.catalogo.push({ helado_id, cantidad_inicial: cantidad });
                 }
-            };
+            }
         }
 
         await nota.save();
@@ -128,6 +140,7 @@ const RecargarCatalogo = async (req, res) => {
         res.status(500).json({ error: 'Error al recargar catálogo', detalle: error.message });
     }
 };
+
 
 
 // Editar una nota activa
@@ -298,7 +311,6 @@ const FinalizarNota = async (req, res) => {
         const { id } = req.params;
 
         console.log('ID de la nota:', id);
-        console.log('Devoluciones recibidas:', devoluciones);
 
         // Encuentra la nota por ID
         const nota = await Nota.findById(id);
@@ -311,18 +323,22 @@ const FinalizarNota = async (req, res) => {
             const heladoId = item.helado_id.toString();
             const cantidadDevuelta = devoluciones[heladoId] || 0; // Devolución del frontend para este helado
 
-            // Calcula cantidad total disponible
+            // Calcula cantidad total disponible (inicial + recargas)
             const cantidadTotal = item.cantidad_inicial + (item.recargas || []).reduce((acc, r) => acc + r, 0);
-            
+
+            // Asegúrate de que la cantidad devuelta no exceda la cantidad total
+            if (cantidadDevuelta > cantidadTotal) {
+                return res.status(400).json({ error: `La cantidad devuelta para el helado ${heladoId} no puede ser mayor que la cantidad total (${cantidadTotal})` });
+            }
+
             // Calcula y asigna cantidad vendida
             item.cantidad_vendida = cantidadTotal - cantidadDevuelta;
-
-            console.log(`Helado ${heladoId}: Cantidad total = ${cantidadTotal}, Devolución = ${cantidadDevuelta}, Vendida = ${item.cantidad_vendida}`);
 
             // Actualiza el stock en el modelo Helado
             const helado = await Helado.findById(heladoId);
             if (helado) {
-                helado.stock += cantidadDevuelta;
+                // Asegúrate de que el helado tenga stock inicial y se actualice correctamente
+                helado.stock += cantidadDevuelta; // Añade la cantidad devuelta al stock
                 await helado.save();
             } else {
                 console.log(`Helado con ID ${heladoId} no encontrado`);
@@ -339,6 +355,7 @@ const FinalizarNota = async (req, res) => {
         res.status(500).json({ error: 'Error interno en el servidor', detalle: error.message });
     }
 };
+
 
 
 

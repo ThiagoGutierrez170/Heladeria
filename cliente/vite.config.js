@@ -6,10 +6,10 @@ export default defineConfig({
 
   plugins: [react()],
   server: {
-    port: 3000,//Configura el puerto que queremos usar
+    port: 5000,//Configura el puerto que queremos usar
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
         selfHandleResponse: false,

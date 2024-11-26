@@ -1,5 +1,3 @@
-# Heladería  
-
 ## Proyecto MERN - Sistema de Gestión de Inventario y Ventas  
 
 Este proyecto es una solución digital diseñada para gestionar la venta de helados y resolver el problema del administrador de heladeros de las tres playas de Encarnación, quien anteriormente utilizaba notas físicas para registrar las transacciones.  

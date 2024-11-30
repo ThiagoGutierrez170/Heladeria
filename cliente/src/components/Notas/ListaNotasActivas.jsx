@@ -7,14 +7,20 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Box from '@mui/material/Box';
 
 const ListaNotasActivas = () => {
     const [notas, setNotas] = useState([]);
     const [filteredNotas, setFilteredNotas] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedPlaya, setSelectedPlaya] = useState('');
     const navigate = useNavigate();
+
+    // Las opciones de playas
+    const playas = ['San José', 'Mboi ka´e', 'San Isidro', 'Evento'];
 
     useEffect(() => {
         const fetchNotasActivas = async () => {
@@ -22,11 +28,10 @@ const ListaNotasActivas = () => {
                 const response = await axios.get('/api/nota/activas');
                 const data = response.data.map((nota) => ({
                     ...nota,
-                    title: nota.nombre || nota.playa,
-                    firstLetter: (nota.nombre || nota.playa)[0].toUpperCase()
+                    title: nota.playa, // Aseguramos que el campo title sea la playa
                 }));
                 setNotas(data);
-                setFilteredNotas(data);
+                setFilteredNotas(data); // Inicialmente muestra todas
             } catch (error) {
                 console.error('Error al obtener las notas activas:', error);
             }
@@ -35,11 +40,13 @@ const ListaNotasActivas = () => {
         fetchNotasActivas();
     }, []);
 
-    const handleSearch = (event, value) => {
-        setSearchTerm(value.toLowerCase());
+    const handlePlayaChange = (event) => {
+        const selected = event.target.value;
+        setSelectedPlaya(selected);
+
+        // Filtramos las notas por la playa seleccionada
         const filtered = notas.filter((nota) =>
-            nota.playa.toLowerCase().includes(value.toLowerCase()) ||
-            (nota.nombre && nota.nombre.toLowerCase().includes(value.toLowerCase()))
+            nota.playa.toLowerCase().includes(selected.toLowerCase())
         );
         setFilteredNotas(filtered);
     };
@@ -50,7 +57,7 @@ const ListaNotasActivas = () => {
 
     return (
         <Container>
-            <Typography variant="h4" align="center" color='black' m={4} gutterBottom>
+            <Typography variant="h4" align="center" color="black" m={4} gutterBottom>
                 Notas Activas
             </Typography>
             <Button
@@ -73,39 +80,39 @@ const ListaNotasActivas = () => {
                 +
             </Button>
 
-            <Autocomplete
-                options={notas}
-                groupBy={(option) => option.firstLetter}
-                getOptionLabel={(option) => option.title}
-                onInputChange={handleSearch}
-                sx={{
-                    width: {
-                        xs: '100%',
-                        sm: '80%',
-                        md: 1300
-                    },
-                    mb: 4
-                }}
-                renderInput={(params) => (
-                    <TextField {...params} label="Buscar por playa" />
-                )}
-            />
+            {/* Select para filtrar por playa */}
+            <Box sx={{ mb: 4 }}>
+                <FormControl fullWidth>
+                    <InputLabel>Selecciona una Playa</InputLabel>
+                    <Select
+                        value={selectedPlaya}
+                        onChange={handlePlayaChange}
+                        label="Selecciona una Playa"
+                    >
+                        <MenuItem value="">
+                            <em>Todos</em>
+                        </MenuItem>
+                        {playas.map((playa) => (
+                            <MenuItem key={playa} value={playa}>
+                                {playa}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+
             <Grid container spacing={3}>
                 {filteredNotas.map((nota) => (
                     <Grid item xs={12} sm={6} md={4} key={nota._id}>
                         <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
                             <CardContent>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
                                     {nota.playa}
                                 </Typography>
-                                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                                    Clima: {nota.clima}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                                    Estado: {nota.estado}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                                    Vendedor: {nota.vendedor_id ? `${nota.vendedor_id.nombre} ${nota.vendedor_id.apellido}` : 'Sin vendedor asignado'}
+                                <Typography variant="h6" sx={{ mb: 1 }}>
+                                    {nota.vendedor_id
+                                        ? `${nota.vendedor_id.nombre} ${nota.vendedor_id.apellido}`
+                                        : 'Sin vendedor asignado'}
                                 </Typography>
                                 <Button
                                     variant="contained"

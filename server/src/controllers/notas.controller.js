@@ -109,28 +109,49 @@ const RecargarCatalogo = async (req, res) => {
             return res.status(404).json({ error: 'Nota activa no encontrada' });
         }
 
-        // Transformar el objeto recargas en un arreglo
-        const recargasArray = Object.keys(recargas).map(helado_id => ({
-            helado_id,
-            cantidad: recargas[helado_id]
-        }));
+        if (!Array.isArray(nota.catalogo)) nota.catalogo = [];
+
+        // Convertir recargas en un array filtrando entradas inválidas
+        const recargasArray = Object.entries(recargas)
+            .map(([helado_id, cantidad]) => ({
+                helado_id,
+                cantidad: parseInt(cantidad, 10) || 0
+            }))
+            .filter(item => mongoose.Types.ObjectId.isValid(item.helado_id) && item.cantidad > 0);
 
         for (let recarga of recargasArray) {
             const { helado_id, cantidad } = recarga;
-            if (cantidad > 0) {
-                const helado = await Helado.findById(helado_id);
-                if (!helado) return res.status(404).json({ error: `Helado con id ${helado_id} no encontrado` });
 
-                // Ajustar el stock (sumar la cantidad de recarga al stock existente)
-                helado.stock += cantidad;
-                await helado.save();
+            // Verificar si el helado existe
+            const helado = await Helado.findById(helado_id);
+            if (!helado) {
+                return res.status(404).json({ error: `Helado con ID ${helado_id} no encontrado` });
+            }
 
-                const itemCatalogo = nota.catalogo.find(item => item.helado_id.equals(helado_id));
-                if (itemCatalogo) {
-                    itemCatalogo.recargas.push(cantidad); // Sumar recarga al catálogo
+            // Reducir el stock del helado
+            helado.stock -= cantidad;
+            await helado.save();
+
+            // Buscar el helado en el catálogo de la nota
+            const itemCatalogo = nota.catalogo.find(item => String(item.helado_id) === String(helado_id));
+
+            if (itemCatalogo) {
+                // Si existe en el catálogo
+                if (itemCatalogo.cantidad_inicial === 0) {
+                    // Si no tiene cantidad inicial, asignar la cantidad aquí
+                    itemCatalogo.cantidad_inicial = cantidad;
                 } else {
-                    nota.catalogo.push({ helado_id, cantidad_inicial: cantidad });
+                    // Si ya tiene cantidad inicial, agregar a recargas
+                    itemCatalogo.recargas = itemCatalogo.recargas || [];
+                    itemCatalogo.recargas.push(cantidad);
                 }
+            } else {
+                // Si no existe en el catálogo, agregarlo con cantidad inicial
+                nota.catalogo.push({
+                    helado_id,
+                    cantidad_inicial: cantidad,
+                    recargas: []
+                });
             }
         }
 
@@ -140,6 +161,8 @@ const RecargarCatalogo = async (req, res) => {
         res.status(500).json({ error: 'Error al recargar catálogo', detalle: error.message });
     }
 };
+
+
 
 
 
@@ -196,7 +219,7 @@ const TraerFactura = async (req, res) => {
         // Encuentra la nota por ID y popula el vendedor y el catálogo
         const nota = await Nota.findById(id)
             .populate('vendedor_id', 'nombre apellido') // Popula el vendedor
-            .populate('catalogo.helado_id', 'nombre precioBase'); // Popula el nombre y precio base del helado
+            .populate('catalogo.helado_id', 'nombre precioBase imagen'); // Popula el nombre, precio base e imagen del helado
 
         if (!nota || nota.estado !== 'finalizado') {
             return res.status(404).json({ error: 'Nota finalizada no encontrada' });
@@ -207,6 +230,7 @@ const TraerFactura = async (req, res) => {
             const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
             const cantidadVendida = item.cantidad_vendida;
             return {
+                imagen: item.helado_id.imagen, // Imagen del helado
                 nombre: item.helado_id.nombre,
                 cantidadTotal,
                 cantidadVendida,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     AppBar,
     Box,
@@ -15,53 +15,48 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Collapse
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import IceCreamIcon from '@mui/icons-material/Icecream'; // Icono para Helados
 import PeopleIcon from '@mui/icons-material/People'; // Icono para Vendedores
 import NoteIcon from '@mui/icons-material/Note'; // Icono para Notas
 import PersonIcon from '@mui/icons-material/Person'; // Icono para Usuarios
 import AssignmentIcon from '@mui/icons-material/Assignment'; // Icono para Registro de Notas
 import Swal from 'sweetalert2';
-import IcecreamIcon from '@mui/icons-material/Icecream';
 import './Navbar.css';
 
 const pages = [
     { name: 'Helados', route: '/helados', icon: <IceCreamIcon /> },
     { name: 'Vendedores', route: '/vendedores', icon: <PeopleIcon /> },
-    { name: 'Notas', route: '/notas-activas', icon: <NoteIcon /> },
-    { name: 'Usuarios', route: '/usuarios', icon: <PersonIcon /> },
+    { name: 'Notas Activas', route: '/notas-activas', icon: <NoteIcon /> },
     { name: 'Notas Finalizadas', route: '/registro-finalizados', icon: <AssignmentIcon /> },
-    { name: 'Notas Finalizadas', route: '/S-registro-finalizados', icon: <AssignmentIcon /> }
+    { name: 'Usuarios', route: '/usuarios', icon: <PersonIcon /> },
 ];
 
 const Navbar = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [openSubmenu, setOpenSubmenu] = useState({}); // Estado para manejar submenús
 
     const usuarioRol = localStorage.getItem('rol');
 
     const navigate = useNavigate();
-    const location = useLocation();
 
+    // Función para abrir/cerrar el menú lateral
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
     };
 
-    // Función para abrir el menú de usuario
+    // Función para abrir el menú del usuario
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
     };
 
-    // Función para cerrar el menú de usuario
+    // Función para cerrar el menú del usuario
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
 
+    // Función para cerrar sesión
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('rol');
@@ -69,21 +64,21 @@ const Navbar = () => {
         navigate('/login');
     };
 
-
-    const toggleSubmenu = (name) => {
-        setOpenSubmenu((prev) => ({ ...prev, [name]: !prev[name] }));
-    };
-
     return (
         <Box sx={{ display: 'flex' }}>
+            {/* Navbar superior */}
             <AppBar position="fixed" sx={{ zIndex: 1201 }}>
                 <Toolbar>
                     <IconButton size="large" color="inherit" aria-label="menu" onClick={toggleDrawer}>
                         <MenuIcon />
-                    
                     </IconButton>
-                    <IcecreamIcon />
-                    <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' , marginLeft: '10px' }}>
+                    <IceCreamIcon />
+                    <Typography
+                        variant="h6"
+                        component={Link}
+                        to="/"
+                        sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', marginLeft: '10px' }}
+                    >
                         Gestión de Inventario de Helados
                     </Typography>
                     <Box sx={{ flexGrow: 0 }}>
@@ -104,144 +99,59 @@ const Navbar = () => {
                 </Toolbar>
             </AppBar>
 
-            {/* Sidebar */}
-            <Drawer anchor="left" open={drawerOpen} onClose={() => toggleDrawer(false)}>
+            {/* Menú lateral desplegable */}
+            <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer}>
+                <br /><br /><br />
                 <List>
+                    {/* Helados */}
+                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
+                        <ListItem key="helados" disablePadding>
+                            <ListItemButton component={Link} to="/helados">
+                                <IceCreamIcon />
+                                <ListItemText primary="Helados" />
+                            </ListItemButton>
+                        </ListItem>
+                    )}
 
-                    <ListItem button onClick={() => toggleSubmenu('')}>
-                        {openSubmenu[''] ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={openSubmenu['']} timeout="auto" unmountOnExit>
-
-                    </Collapse>
-                    <br />
                     {/* Vendedores */}
                     {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <>
-                            <ListItem button onClick={() => toggleSubmenu('vendedores')}>
-                                <ListItemText primary="Gestión de Vendedores" /> {/* Cambiado el nombre aquí */}
-                                {openSubmenu['vendedores'] ? <ExpandLess /> : <ExpandMore />}
-                            </ListItem>
-                            <Collapse in={openSubmenu['vendedores']} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    {pages.filter(page => page.name === "Vendedores").map(page => (
-                                        <ListItem key={page.name} disablePadding>
-                                            <ListItemButton component={Link} to={page.route}>
-                                                {page.icon}
-                                                <ListItemText primary={page.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        </>
-                    )}
-
-                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <>
-                            <ListItem button onClick={() => toggleSubmenu('helados')}>
-                                <ListItemText primary="Helados" />
-                                {openSubmenu['helados'] ? <ExpandLess /> : <ExpandMore />}
-                            </ListItem>
-                            <Collapse in={openSubmenu['helados']} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    {pages.filter(page => page.name === "Helados").map(page => (
-                                        <ListItem key={page.name} disablePadding>
-                                            <ListItemButton component={Link} to={page.route}>
-                                                {page.icon}
-                                                <ListItemText primary={page.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        </>
-                    )}
-
-                                        {/* Notas finalizadas - Visible solo para administrador y usuario */}
-                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <>
-                            <ListItemButton onClick={() => toggleSubmenu('notas-finalizadas')}>
-                                <ListItemText primary="Registros Finalizados" />
-                                {openSubmenu['notas-finalizadas'] ? <ExpandLess /> : <ExpandMore />}
+                        <ListItem key="vendedores" disablePadding>
+                            <ListItemButton component={Link} to="/vendedores">
+                                <PeopleIcon />
+                                <ListItemText primary="Vendedores" />
                             </ListItemButton>
-                            <Collapse in={openSubmenu['notas-finalizadas']} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    <ListItem disablePadding>
-                                        <ListItemButton component={Link} to="/registro-finalizados">
-                                            <AssignmentIcon />
-                                            <ListItemText primary="Notas Finalizadas" />
-                                        </ListItemButton>
-                                    </ListItem>
-                                </List>
-                            </Collapse>
-                        </>
+                        </ListItem>
                     )}
 
-                    {/* Registros Finalizados - Visible solo para supervisor */}
-                    {usuarioRol === 'supervisor' && (
-                        <>
-                            <ListItemButton onClick={() => toggleSubmenu('S-registro-finalizados')}>
-                                <ListItemText primary="Registros Finalizados" />
-                                {openSubmenu['S-registro-finalizados'] ? <ExpandLess /> : <ExpandMore />}
-                            </ListItemButton>
-                            <Collapse in={openSubmenu['S-registro-finalizados']} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    <ListItem disablePadding>
-                                        <ListItemButton component={Link} to="/S-registro-finalizados">
-                                            <AssignmentIcon />
-                                            <ListItemText primary="Notas Finalizadas" />
-                                        </ListItemButton>
-                                    </ListItem>
-                                </List>
-                            </Collapse>
-                        </>
-                    )}
-
-                    {/* Notas */}
+                    {/* Notas Activas */}
                     {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <>
-                            <ListItem button onClick={() => toggleSubmenu('notas')}>
+                        <ListItem key="notas" disablePadding>
+                            <ListItemButton component={Link} to="/notas-activas">
+                                <NoteIcon />
                                 <ListItemText primary="Notas Activas" />
-                                {openSubmenu['notas'] ? <ExpandLess /> : <ExpandMore />}
-                            </ListItem>
-                            <Collapse in={openSubmenu['notas']} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    {pages.filter(page => page.name === "Notas").map(page => (
-                                        <ListItem key={page.name} disablePadding>
-                                            <ListItemButton component={Link} to={page.route}>
-                                                {page.icon}
-                                                <ListItemText primary={page.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        </>
+                            </ListItemButton>
+                        </ListItem>
+                    )}
+
+                    {/* Notas Finalizadas */}
+                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
+                        <ListItem key="notas-finalizadas" disablePadding>
+                            <ListItemButton component={Link} to="/registro-finalizados">
+                                <AssignmentIcon />
+                                <ListItemText primary="Notas Finalizadas" />
+                            </ListItemButton>
+                        </ListItem>
                     )}
 
                     {/* Usuarios */}
                     {usuarioRol === 'administrador' && (
-                        <>
-                            <ListItem button onClick={() => toggleSubmenu('usuarios')}>
+                        <ListItem key="usuarios" disablePadding>
+                            <ListItemButton component={Link} to="/usuarios">
+                                <PersonIcon />
                                 <ListItemText primary="Usuarios" />
-                                {openSubmenu['usuarios'] ? <ExpandLess /> : <ExpandMore />}
-                            </ListItem>
-                            <Collapse in={openSubmenu['usuarios']} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    {pages.filter(page => page.name === "Usuarios").map(page => (
-                                        <ListItem key={page.name} disablePadding>
-                                            <ListItemButton component={Link} to={page.route}>
-                                                {page.icon}
-                                                <ListItemText primary={page.name} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        </>
+                            </ListItemButton>
+                        </ListItem>
                     )}
-
                 </List>
             </Drawer>
 
@@ -249,7 +159,6 @@ const Navbar = () => {
             <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
                 {/* Aquí va el contenido principal de la aplicación */}
             </Box>
-
         </Box>
     );
 };

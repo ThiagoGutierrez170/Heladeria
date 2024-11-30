@@ -152,7 +152,7 @@ const CrearNota = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell>Imagen</TableCell>
-                                <TableCell>Nombre del Helado</TableCell>
+                                <TableCell>Helado</TableCell>
                                 <TableCell>Cantidad Inicial</TableCell>
                             </TableRow>
                         </TableHead>
@@ -162,7 +162,11 @@ const CrearNota = () => {
                                     <TableCell>
                                         <img src={item.imagen} alt={item.nombre} style={{ width: 50, height: 50 }} />
                                     </TableCell>
-                                    <TableCell>{item.nombre}</TableCell>
+                                    <TableCell >
+                                        <Typography sx={{ color: 'black', fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                            {item.nombre}
+                                        </Typography>
+                                    </TableCell>
                                     <TableCell>
                                         <TextField
                                             label="Cantidad Inicial"

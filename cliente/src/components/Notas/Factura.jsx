@@ -29,6 +29,7 @@ const Factura = () => {
 
                 const catalogoCalculado = detallesFactura.map((item) => ({
                     nombre: item.nombre,
+                    imagen: item.imagen, // Se incluye la imagen en el catálogo
                     cantidadVendida: item.cantidadVendida,
                     gananciaBaseHelado: item.gananciaBase
                 }));
@@ -60,7 +61,7 @@ const Factura = () => {
 
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" color='black' gutterBottom>
+            <Typography variant="h4" align="center" color="black" gutterBottom>
                 Factura de Nota
             </Typography>
 
@@ -90,25 +91,31 @@ const Factura = () => {
                         <Grid item xs={12}>
                             <Typography variant="body1">
                                 <strong>Vendedor: </strong>
-                                {notaInfo.vendedor ?
-                                    `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}`
-                                    : "Información de vendedor no disponible"}
+                                {notaInfo.vendedor
+                                    ? `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido}`
+                                    : 'Información de vendedor no disponible'}
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1" color='black'><strong>Playa:</strong> {notaInfo.playa}</Typography>
+                            <Typography variant="body1" color="black">
+                                <strong>Playa:</strong> {notaInfo.playa}
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1" color='black'><strong>Clima:</strong> {notaInfo.clima}</Typography>
+                            <Typography variant="body1" color="black">
+                                <strong>Clima:</strong> {notaInfo.clima}
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="body1"><strong>Fecha:</strong> {notaInfo.fecha}</Typography>
+                            <Typography variant="body1">
+                                <strong>Fecha:</strong> {notaInfo.fecha}
+                            </Typography>
                         </Grid>
                     </Grid>
                 </Paper>
             )}
 
-            <Typography variant="h6" align="center" color='black' gutterBottom>
+            <Typography variant="h6" align="center" color="black" gutterBottom>
                 Ganancias Base de la Nota
             </Typography>
             <Divider sx={{ my: 3 }} />
@@ -117,14 +124,35 @@ const Factura = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Nombre del helado</strong></TableCell>
-                            <TableCell align="center"><strong>Cantidad Vendida</strong></TableCell>
-                            <TableCell align="center"><strong>Total del Helado (Gs)</strong></TableCell>
+                            <TableCell>
+                                <strong>Imagen</strong>
+                            </TableCell>
+                            <TableCell>
+                                <strong>Helado</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Cantidad Vendida</strong>
+                            </TableCell>
+                            <TableCell align="center">
+                                <strong>Total del Helado (Gs)</strong>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {catalogo.map((item, index) => (
                             <TableRow key={index}>
+                                <TableCell>
+                                    <img
+                                        src={item.imagen}
+                                        alt={item.nombre}
+                                        style={{
+                                            width: 50,
+                                            height: 50,
+                                            objectFit: 'cover',
+                                            borderRadius: '5px',
+                                        }}
+                                    />
+                                </TableCell>
                                 <TableCell>{item.nombre}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
                                 <TableCell align="center">{formatearGs(item.gananciaBaseHelado)} Gs</TableCell>
@@ -135,10 +163,11 @@ const Factura = () => {
             </TableContainer>
 
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h5" align="center" color='black' sx={{ mt: 2 }}>
-                Ganancia base total: {formatearGs(gananciaTotal)} Gs
+            <Typography variant="h4" align="center" color="black" sx={{ mt: 2 }}>
+                Ganancia total: {formatearGs(gananciaTotal)} Gs
             </Typography>
-            <br /><br />
+            <br />
+            <br />
         </Container>
     );
 };

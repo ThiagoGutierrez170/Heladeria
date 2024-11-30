@@ -125,8 +125,10 @@ const FinalizarNota = () => {
                                                 style={{ borderRadius: '8px' }}
                                             />
                                         </TableCell>
-                                        <TableCell align="center" sx={{ fontSize: '14px' }}>
+                                        <TableCell >
+                                            <Typography sx={{ color: 'black', fontSize: '1.1rem', fontWeight: 'bold' }}>
                                             {item.helado_id.nombre}
+                                            </Typography>
                                         </TableCell>
                                         <TableCell align="center" sx={{ fontSize: '14px' }}>
                                             {item.cantidadTotal}

@@ -7,9 +7,11 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import BeachDateFilter from '../BeachDateFilter.jsx'; // Importa el componente de filtrado
 
 const RegistroFinalizadosS = () => {
     const [notasFinalizadas, setNotasFinalizadas] = useState([]);
+    const [filteredNotas, setFilteredNotas] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,6 +19,7 @@ const RegistroFinalizadosS = () => {
             try {
                 const response = await axios.get('/api/nota/finalizadas');
                 setNotasFinalizadas(response.data);
+                setFilteredNotas(response.data); // Inicializa con todas las notas
             } catch (error) {
                 console.error('Error al cargar las notas finalizadas:', error);
             }
@@ -25,6 +28,24 @@ const RegistroFinalizadosS = () => {
         fetchNotasFinalizadas();
     }, []);
 
+    const handleFilter = (filters) => {
+        const { beach, startDate, endDate } = filters;
+        let filtered = notasFinalizadas;
+
+        if (beach) {
+            filtered = filtered.filter((nota) => nota.playa === beach);
+        }
+
+        if (startDate && endDate) {
+            filtered = filtered.filter((nota) => {
+                const noteDate = new Date(nota.createdAt);
+                return noteDate >= new Date(startDate) && noteDate <= new Date(endDate);
+            });
+        }
+
+        setFilteredNotas(filtered); // Actualiza las notas filtradas
+    };
+
     // Función para ver el detalle de la nota
     const handleVerDetalle = (id) => {
         navigate(`/S-detalle-nota/${id}`);
@@ -32,12 +53,15 @@ const RegistroFinalizadosS = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color="text.primary" gutterBottom>
                 Registro de Notas Finalizadas
             </Typography>
             <Divider sx={{ my: 3 }} />
 
-            {notasFinalizadas.map((nota) => {
+            {/* Agrega el filtro de playa y fecha */}
+            <BeachDateFilter onFilter={handleFilter} />
+
+            {filteredNotas.map((nota) => {
                 // Calcular la ganancia base total sumando cada gananciaBase en detallesGanancias
                 const gananciaBaseTotal = nota.detallesGanancias.reduce((total, detalle) => total + detalle.gananciaBase, 0);
 

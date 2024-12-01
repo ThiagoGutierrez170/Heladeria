@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';  // Asegúrate de importar useNavigate
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -12,7 +12,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Button from '@mui/material/Button';  // Asegúrate de importar Button
+import Button from '@mui/material/Button';
 
 const DetalleNotaS = () => {
     const { id } = useParams();
@@ -21,15 +21,13 @@ const DetalleNotaS = () => {
     const [gananciaBase, setGananciaBase] = useState(0);
     const [gananciaTotal, setGananciaTotal] = useState(0);
     const [notaInfo, setNotaInfo] = useState(null);
-    const navigate = useNavigate();  // Para navegar
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchNota = async () => {
             try {
                 const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
                 const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima, fecha } = response.data;
-                console.log(response.data);
-
                 setDetallesGanancias(detallesGanancias);
                 setGananciaMinima(gananciaMinima);
                 setGananciaBase(gananciaBase);
@@ -43,15 +41,23 @@ const DetalleNotaS = () => {
         fetchNota();
     }, [id]);
 
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
         <Container maxWidth="md" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" color="text.primary" gutterBottom>
                 Detalle de la Nota
             </Typography>
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => navigate('/S-registro-finalizados')}  
+                onClick={() => navigate('/S-registro-finalizados')}
                 sx={{
                     mb: 2,
                     display: 'flex',
@@ -93,7 +99,7 @@ const DetalleNotaS = () => {
                 </Paper>
             )}
 
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" color="text.primary" gutterBottom>
                 Detalle de Ganancias de la Nota
             </Typography>
             <Divider sx={{ my: 3 }} />
@@ -115,9 +121,9 @@ const DetalleNotaS = () => {
                             <TableRow key={index}>
                                 <TableCell>{item.nombre}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{item.gananciaMinima.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaBase.toFixed(0)} Gs</TableCell>
-                                <TableCell align="center">{item.gananciaTotal.toFixed(0)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaMinima)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaBase)} Gs</TableCell>
+                                <TableCell align="center">{formatearGs(item.gananciaTotal)} Gs</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -126,7 +132,7 @@ const DetalleNotaS = () => {
 
             {/* Tabla con las ganancias totales */}
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" color="text.primary" gutterBottom>
                 Ganancias Totales de la Nota
             </Typography>
             <TableContainer component={Paper} sx={{ mb: 3 }}>
@@ -140,9 +146,9 @@ const DetalleNotaS = () => {
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell align="center">{gananciaMinima.toFixed(0)} Gs</TableCell>
-                            <TableCell align="center">{gananciaBase.toFixed(0)} Gs</TableCell>
-                            <TableCell align="center">{gananciaTotal.toFixed(0)} Gs</TableCell>
+                            <TableCell align="center">{formatearGs(gananciaMinima)} Gs</TableCell>
+                            <TableCell align="center">{formatearGs(gananciaBase)} Gs</TableCell>
+                            <TableCell align="center">{formatearGs(gananciaTotal)} Gs</TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>

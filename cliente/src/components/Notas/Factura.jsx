@@ -164,7 +164,7 @@ const Factura = () => {
 
             <Divider sx={{ my: 3 }} />
             <Typography variant="h4" align="center" color="black" sx={{ mt: 2 }}>
-                Ganancia total: {formatearGs(gananciaTotal)} Gs
+                Total: {formatearGs(gananciaTotal)} Gs
             </Typography>
             <br />
             <br />

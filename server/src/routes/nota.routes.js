@@ -20,6 +20,8 @@ NotaRouter.put('/activas/:id/finalizar', notaController.FinalizarNota);
 NotaRouter.get('/finalizadas', notaController.ListaNotasFinalizada);
 NotaRouter.get('/finalizadas/:id/factura', notaController.TraerFactura);
 NotaRouter.get('/finalizadas/:id/detalle', notaController.DetalleNota);
+NotaRouter.put('/finalizadas/:id', notaController.EditarFinalizado);
+
 
 // Ruta para eliminar una nota (solo accesible por administradores)
 NotaRouter.delete('/:id', notaController.Eliminar);

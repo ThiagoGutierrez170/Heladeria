@@ -263,40 +263,37 @@ const DetalleNota = async (req, res) => {
     try {
         const { id } = req.params;
         const nota = await Nota.findById(id)
-            .populate('catalogo.helado_id') // Popula la información del helado en el catálogo
-            .populate('vendedor_id', 'nombre apellido'); // Popula solo nombre y apellido del vendedor
+            .populate('catalogo.helado_id')  // Popula la información del helado en el catálogo
+            .populate('vendedor_id', 'nombre apellido');  // Popula solo nombre y apellido del vendedor
 
         // Verificar que la nota exista y que su estado sea 'finalizado'
         if (!nota || nota.estado !== 'finalizado') {
             return res.status(404).json({ error: 'Nota finalizada no encontrada' });
         }
 
-        // Calcular detalles de ganancias para cada helado en el catálogo
+        // Asegurarse de que la cantidad vendida esté directamente en la base de datos
         const detallesGanancias = nota.catalogo.map(item => {
-            const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
-            const cantidadVendida = cantidadTotal - (item.cantidad_devuelta || 0);
-
             return {
+                helado_id: item.helado_id,
                 nombre: item.helado_id.nombre,
                 imagen: item.helado_id.imagen,
-                cantidadTotal,
-                cantidadVendida,
-                gananciaMinima: cantidadVendida * item.helado_id.costo,
-                gananciaBase: cantidadVendida * item.helado_id.precioBase,
-                gananciaTotal: cantidadVendida * item.helado_id.precioVenta
+                cantidadVendida: item.cantidad_vendida,  // Usamos la cantidad vendida directamente de la base de datos
+                gananciaMinima: item.cantidad_vendida * item.helado_id.costo,
+                gananciaBase: item.cantidad_vendida * item.helado_id.precioBase,
+                gananciaTotal: item.cantidad_vendida * item.helado_id.precioVenta
             };
         });
 
-        // Calcular ganancias totales
+        // Calcular las ganancias totales
         const gananciaMinima = detallesGanancias.reduce((acc, item) => acc + item.gananciaMinima, 0);
         const gananciaBase = detallesGanancias.reduce((acc, item) => acc + item.gananciaBase, 0);
         const gananciaTotal = detallesGanancias.reduce((acc, item) => acc + item.gananciaTotal, 0);
 
         // Enviar la respuesta con la estructura esperada
-        res.status(200).json({ 
-            detallesGanancias, 
-            gananciaMinima, 
-            gananciaBase, 
+        res.status(200).json({
+            detallesGanancias,
+            gananciaMinima,
+            gananciaBase,
             gananciaTotal,
             vendedor_id: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
             playa: nota.playa,
@@ -307,6 +304,7 @@ const DetalleNota = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener el detalle de la nota', detalle: error.message });
     }
 };
+
 
 
 // Eliminar una nota (solo visible para el administrador)
@@ -380,6 +378,57 @@ const FinalizarNota = async (req, res) => {
     }
 };
 
+// Editar una nota finalizada
+const EditarFinalizado = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { heladoId, cantidadVendida } = req.body;
+
+        console.log('Datos recibidos:', { heladoId, cantidadVendida });
+
+        if (!heladoId || cantidadVendida === undefined) {
+            return res.status(400).json({ error: 'heladoId y cantidadVendida son requeridos' });
+        }
+
+        // Verificar que la cantidadVendida sea un número válido
+        if (isNaN(cantidadVendida) || cantidadVendida < 0) {
+            return res.status(400).json({ error: 'La cantidad vendida debe ser un número positivo' });
+        }
+
+        const nota = await Nota.findById(id);
+        if (!nota) {
+            return res.status(404).json({ error: 'Nota no encontrada' });
+        }
+
+        if (nota.estado !== 'finalizado') {
+            return res.status(400).json({ error: 'La nota no está finalizada' });
+        }
+
+        const helado = nota.catalogo.find(h => h.helado_id.toString() === heladoId);
+        if (!helado) {
+            return res.status(404).json({ error: 'Helado no encontrado en la nota' });
+        }
+
+        // Verificar si la cantidad vendida no excede la cantidad original
+        if (cantidadVendida > helado.cantidad_inicial) {
+            return res.status(400).json({ error: 'La cantidad vendida no puede ser mayor que la cantidad inicial' });
+        }
+
+        helado.cantidad_vendida = cantidadVendida;
+
+        await nota.save();
+
+        res.status(200).json({ mensaje: 'Cantidad vendida actualizada exitosamente', nota });
+    } catch (error) {
+        console.error('Error al actualizar la cantidad vendida:', error); // Esto ayudará a depurar el error
+        res.status(500).json({ error: 'Error al editar la cantidad vendida del helado', detalle: error.message });
+    }
+};
+
+
+
+
+
 
 
 
@@ -395,5 +444,6 @@ export default {
     TraerFactura,
     DetalleNota,
     FinalizarNota,
+    EditarFinalizado,
     Eliminar
 };

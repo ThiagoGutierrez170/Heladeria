@@ -87,6 +87,22 @@ const DetalleNota = () => {
                 Volver
             </Button>
 
+            {/* Botón para ir a la vista de edición */}
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate(`/editar-finalizado/${id}`)} // Navega a la vista de edición con el id de la nota
+                sx={{
+                    mb: 2,
+                    width: '100%',
+                    fontSize: '1rem',
+                    bgcolor: 'secondary.main',
+                    '&:hover': { bgcolor: 'secondary.dark' },
+                }}
+            >
+                Editar Nota
+            </Button>
+
             {notaInfo && (
                 <Paper sx={{ p: 2, mb: 3 }}>
                     <TableContainer>

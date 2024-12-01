@@ -15,6 +15,7 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
+    Collapse
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import IceCreamIcon from '@mui/icons-material/Icecream'; // Icono para Helados
@@ -36,9 +37,9 @@ const pages = [
 const Navbar = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [openSubmenu, setOpenSubmenu] = useState({}); // Añadido para manejar el estado de los submenús
 
     const usuarioRol = localStorage.getItem('rol');
-
     const navigate = useNavigate();
 
     // Función para abrir/cerrar el menú lateral
@@ -64,9 +65,13 @@ const Navbar = () => {
         navigate('/login');
     };
 
+    // Función para manejar la apertura/cierre de submenús
+    const toggleSubmenu = (name) => {
+        setOpenSubmenu((prev) => ({ ...prev, [name]: !prev[name] }));
+    };
+
     return (
         <Box sx={{ display: 'flex' }}>
-            {/* Navbar superior */}
             <AppBar position="fixed" sx={{ zIndex: 1201 }}>
                 <Toolbar>
                     <IconButton size="large" color="inherit" aria-label="menu" onClick={toggleDrawer}>
@@ -101,58 +106,76 @@ const Navbar = () => {
 
             {/* Menú lateral desplegable */}
             <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer}>
-                <br /><br /><br />
-                <List>
-                    {/* Helados */}
-                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <ListItem key="helados" disablePadding>
-                            <ListItemButton component={Link} to="/helados">
-                                <IceCreamIcon />
-                                <ListItemText primary="Helados" />
-                            </ListItemButton>
-                        </ListItem>
-                    )}
+                <Box sx={{ minWidth: 250, marginTop: '64px' }}>
+                    <List>
+                        {/* Helados */}
+                        {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
+                            <ListItem key="helados" disablePadding>
+                                <ListItemButton component={Link} to="/helados">
+                                    <IceCreamIcon />
+                                    <ListItemText primary="Helados" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
 
-                    {/* Vendedores */}
-                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <ListItem key="vendedores" disablePadding>
-                            <ListItemButton component={Link} to="/vendedores">
-                                <PeopleIcon />
-                                <ListItemText primary="Vendedores" />
-                            </ListItemButton>
-                        </ListItem>
-                    )}
+                        {/* Vendedores */}
+                        {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
+                            <ListItem key="vendedores" disablePadding>
+                                <ListItemButton component={Link} to="/vendedores">
+                                    <PeopleIcon />
+                                    <ListItemText primary="Vendedores" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
 
-                    {/* Notas Activas */}
-                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <ListItem key="notas" disablePadding>
-                            <ListItemButton component={Link} to="/notas-activas">
-                                <NoteIcon />
-                                <ListItemText primary="Notas Activas" />
-                            </ListItemButton>
-                        </ListItem>
-                    )}
+                        {/* Notas Activas */}
+                        {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
+                            <ListItem key="notas" disablePadding>
+                                <ListItemButton component={Link} to="/notas-activas">
+                                    <NoteIcon />
+                                    <ListItemText primary="Notas Activas" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
 
-                    {/* Notas Finalizadas */}
-                    {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
-                        <ListItem key="notas-finalizadas" disablePadding>
-                            <ListItemButton component={Link} to="/registro-finalizados">
-                                <AssignmentIcon />
-                                <ListItemText primary="Notas Finalizadas" />
-                            </ListItemButton>
-                        </ListItem>
-                    )}
+                        {/* Notas Finalizadas */}
+                        {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
+                            <ListItem key="notas-finalizadas" disablePadding>
+                                <ListItemButton component={Link} to="/registro-finalizados">
+                                    <AssignmentIcon />
+                                    <ListItemText primary="Notas Finalizadas" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
 
-                    {/* Usuarios */}
-                    {usuarioRol === 'administrador' && (
-                        <ListItem key="usuarios" disablePadding>
-                            <ListItemButton component={Link} to="/usuarios">
-                                <PersonIcon />
-                                <ListItemText primary="Usuarios" />
-                            </ListItemButton>
-                        </ListItem>
-                    )}
-                </List>
+                        {/* Submenú para supervisor - Registros Finalizados */}
+                        {usuarioRol === 'supervisor' && (
+                            <>
+                                
+                                <Collapse in={openSubmenu['S-registro-finalizados']} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        <ListItem disablePadding>
+                                            <ListItemButton component={Link} to="/S-registro-finalizados">
+                                                <AssignmentIcon />
+                                                <ListItemText primary="Notas Finalizadas (Supervisor)" />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    </List>
+                                </Collapse>
+                            </>
+                        )}
+
+                        {/* Usuarios */}
+                        {usuarioRol === 'administrador' && (
+                            <ListItem key="usuarios" disablePadding>
+                                <ListItemButton component={Link} to="/usuarios">
+                                    <PersonIcon />
+                                    <ListItemText primary="Usuarios" />
+                                </ListItemButton>
+                            </ListItem>
+                        )}
+                    </List>
+                </Box>
             </Drawer>
 
             {/* Contenido Principal */}

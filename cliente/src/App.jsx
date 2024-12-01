@@ -30,6 +30,7 @@ import ListaHelados from './components/Helados/ListaHelados';
 import EditarHelado from './components/Helados/EditarHelado';
 import ListaVendedores from './components/Vendedores/VendedoresList';
 import Home from './components/Home/Home.jsx';
+import EditarFinalizado from './components/Notas/EditarFinalizado.jsx';
 
 const App = () => {
   const [estaAutenticado, setEstaAutenticado] = useState(false);
@@ -118,6 +119,7 @@ const App = () => {
             <Route path="/registro-finalizados" element={<RutaPrivada element={<RegistroFinalizados />} />} />
             <Route path="/nota-detalle/:id" element={<RutaPrivada element={<DetalleNota />} />} />
             <Route path="/agregar-nota" element={<RutaPrivada element={<CrearNota />} />} />
+            <Route path="/editar-finalizado/:id" element={<RutaPrivada element={<EditarFinalizado />} />} />
 
             <Route path="/agregar-helado" element={<RutaPrivada element={<CrearHelado />} />} />
             <Route path="/helados" element={<RutaPrivada element={<ListaHelados />} />} />

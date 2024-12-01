@@ -135,6 +135,7 @@ const ListaNotasActivas = () => {
                     </Grid>
                 ))}
             </Grid>
+            <br /> <br />
         </Container>
     );
 };

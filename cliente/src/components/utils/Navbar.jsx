@@ -150,19 +150,12 @@ const Navbar = () => {
 
                         {/* Submenú para supervisor - Registros Finalizados */}
                         {usuarioRol === 'supervisor' && (
-                            <>
-                                
-                                <Collapse in={openSubmenu['S-registro-finalizados']} timeout="auto" unmountOnExit>
-                                    <List component="div" disablePadding>
-                                        <ListItem disablePadding>
-                                            <ListItemButton component={Link} to="/S-registro-finalizados">
-                                                <AssignmentIcon />
-                                                <ListItemText primary="Notas Finalizadas (Supervisor)" />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    </List>
-                                </Collapse>
-                            </>
+                            <ListItem disablePadding>
+                                <ListItemButton component={Link} to="/S-registro-finalizados">
+                                    <AssignmentIcon />
+                                    <ListItemText primary="Notas Finalizadas (Supervisor)" />
+                                </ListItemButton>
+                            </ListItem>
                         )}
 
                         {/* Usuarios */}

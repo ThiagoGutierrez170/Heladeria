@@ -12,6 +12,7 @@ const CrearNota = () => {
     const [catalogo, setCatalogo] = useState([]);
     const [vendedores, setVendedores] = useState([]);
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false); // Estado para manejar el bloqueo del botón
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -61,6 +62,7 @@ const CrearNota = () => {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
+            setIsSubmitting(true); // Bloquear el botón
             try {
                 await axios.post('/api/nota', {
                     vendedor_id: vendedor,
@@ -84,6 +86,8 @@ const CrearNota = () => {
                     icon: 'error',
                     confirmButtonText: 'Intentar de nuevo'
                 });
+            } finally {
+                setIsSubmitting(false); // Desbloquear el botón
             }
         }
     };
@@ -173,9 +177,8 @@ const CrearNota = () => {
                                             type="number"
                                             variant="outlined"
                                             fullWidth
-                                            value={item.cantidad_inicial|| ''}
+                                            value={item.cantidad_inicial || ''}
                                             onChange={(e) => handleChangeCantidad(index, e.target.value)}
-                                           
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -192,8 +195,8 @@ const CrearNota = () => {
 
                 <Grid container spacing={2} justifyContent="center" sx={{ mt: 3 }}>
                     <Grid item>
-                        <Button type="submit" variant="contained" color="primary">
-                            Crear Nota
+                        <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+                            {isSubmitting ? 'Creando...' : 'Crear Nota'}
                         </Button>
                     </Grid>
                     <Grid item>

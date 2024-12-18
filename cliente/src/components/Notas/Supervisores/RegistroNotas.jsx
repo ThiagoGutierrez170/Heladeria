@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import BeachDateFilter from '../BeachDateFilter.jsx'; // Importa el componente de filtrado
 
-const RegistroFinalizadosS = () => {
+const RegistroFinalizados = () => {
     const [notasFinalizadas, setNotasFinalizadas] = useState([]);
     const [filteredNotas, setFilteredNotas] = useState([]);
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ const RegistroFinalizadosS = () => {
             try {
                 const response = await axios.get('/api/nota/finalizadas');
                 setNotasFinalizadas(response.data);
-                setFilteredNotas(response.data); // Inicializa con todas las notas
+                setFilteredNotas(response.data);
             } catch (error) {
                 console.error('Error al cargar las notas finalizadas:', error);
             }
@@ -43,53 +43,67 @@ const RegistroFinalizadosS = () => {
             });
         }
 
-        setFilteredNotas(filtered); // Actualiza las notas filtradas
+        setFilteredNotas(filtered);
     };
 
-    // Función para ver el detalle de la nota
     const handleVerDetalle = (id) => {
         navigate(`/S-detalle-nota/${id}`);
     };
 
+    const formatearGs = (valor) => {
+        return new Intl.NumberFormat('es-PY', {
+            style: 'decimal',
+            maximumFractionDigits: 0,
+            minimumFractionDigits: 0
+        }).format(valor);
+    };
+
     return (
-        <Container maxWidth="lg" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" color="text.primary" gutterBottom>
-                Registro de Notas Finalizadas
+        <Container maxWidth="lg" sx={{ mt: 0 }}>
+            <Typography variant="h4" align="center" color="black" gutterBottom>
+                Registro de Notas Finalizadas 
             </Typography>
             <Divider sx={{ my: 3 }} />
 
-            {/* Agrega el filtro de playa y fecha */}
-            <BeachDateFilter onFilter={handleFilter} />
+            <BeachDateFilter onFilter={handleFilter} /> 
 
             {filteredNotas.map((nota) => {
-                // Calcular la ganancia base total sumando cada gananciaBase en detallesGanancias
-                const gananciaBaseTotal = nota.detallesGanancias.reduce((total, detalle) => total + detalle.gananciaBase, 0);
+                const fechaNota = new Date(nota.createdAt).toLocaleDateString();
 
                 return (
                     <Paper key={nota._id} sx={{ p: 3, mb: 3 }}>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={3}>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Vendedor:</strong> {nota.vendedor_id?.nombre} {nota.vendedor_id?.apellido}</Typography>
+                                <Typography variant="body1" color="black">
+                                    <strong>Vendedor:</strong> {nota.vendedor_id?.nombre} {nota.vendedor_id?.apellido}
+                                </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Playa:</strong> {nota.playa}</Typography>
+                                <Typography variant="body1" color="black">
+                                    <strong>Playa:</strong> {nota.playa}
+                                </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Clima:</strong> {nota.clima}</Typography>
+                                <Typography variant="body1" color="black">
+                                    <strong>Clima:</strong> {nota.clima}
+                                </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Ganancia Base Total:</strong> {gananciaBaseTotal.toFixed(0)} Gs</Typography>
+                                <Typography variant="body1" color="black">
+                                    <strong>Ganancia Total de Venta:</strong> {formatearGs(nota.gananciaVentaTotal)} Gs 
+                                </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1"><strong>Fecha:</strong> {new Date(nota.createdAt).toLocaleDateString()}</Typography>
+                                <Typography variant="body1">
+                                    <strong>Fecha:</strong> {fechaNota}
+                                </Typography>
                             </Grid>
-                            {/* Botones para ver detalle y factura */}
                             <Grid item xs={12} sm={6} md={3}>
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     onClick={() => handleVerDetalle(nota._id)}
-                                    sx={{ mt: 2 }}
+                                    sx={{ mt: 2, width: '100%' }}
                                 >
                                     Ver Detalle
                                 </Button>
@@ -102,4 +116,4 @@ const RegistroFinalizadosS = () => {
     );
 };
 
-export default RegistroFinalizadosS;
+export default RegistroFinalizados;

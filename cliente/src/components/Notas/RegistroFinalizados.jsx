@@ -62,7 +62,6 @@ const RegistroFinalizados = () => {
         }).format(valor);
     };
 
-
     return (
         <Container maxWidth="lg" sx={{ mt: 0 }}>
             <Typography variant="h4" align="center" color="black" gutterBottom>
@@ -73,7 +72,6 @@ const RegistroFinalizados = () => {
             <BeachDateFilter onFilter={handleFilter} /> 
 
             {filteredNotas.map((nota) => {
-                const gananciaBaseTotal = nota.detallesGanancias.reduce((total, detalle) => total + detalle.gananciaBase, 0);
                 const fechaNota = new Date(nota.createdAt).toLocaleDateString();
 
                 return (
@@ -96,7 +94,7 @@ const RegistroFinalizados = () => {
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <Typography variant="body1" color="black">
-                                <Typography variant="body1" color='black'><strong>Ganancia Base Total:</strong> {formatearGs(gananciaBaseTotal)} Gs</Typography>
+                                    <strong>Ganancia Base Total:</strong> {formatearGs(nota.gananciaBaseTotal)} Gs
                                 </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>

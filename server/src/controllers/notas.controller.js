@@ -188,24 +188,36 @@ const EditarNotaActiva = async (req, res) => {
     }
 };
 
-// Lista de notas finalizadas (información y cálculos de ganancias)
+// Lista de notas finalizadas (información y cálculos de ganancias base total)
+// Lista de notas finalizadas (usando cantidad vendida para calcular la ganancia base total)
 const ListaNotasFinalizada = async (req, res) => {
     try {
-        const notasFinalizadas = await Nota.find({ estado: 'finalizado' }).populate('vendedor_id', 'nombre apellido').populate('catalogo.helado_id', 'costo precioBase precioVenta');
+        const notasFinalizadas = await Nota.find({ estado: 'finalizado' })
+            .populate('vendedor_id', 'nombre apellido') // Solo los campos necesarios
+            .populate('catalogo.helado_id', 'precioBase precioVenta'); // Incluye precioVenta para cálculo
 
         const notasConGanancias = notasFinalizadas.map(nota => {
-            const detallesGanancias = nota.catalogo.map(item => {
-                const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
-                const cantidadVendida = cantidadTotal - (item.cantidad_devuelta || 0);
-                return {
-                    helado_id: item.helado_id._id,
-                    gananciaMinima: cantidadVendida * item.helado_id.costo,
-                    gananciaBase: cantidadVendida * item.helado_id.precioBase,
-                    gananciaTotal: cantidadVendida * item.helado_id.precioVenta
-                };
-            });
-            return { ...nota.toObject(), detallesGanancias };
+            // Calculamos ganancia base total directamente con 'cantidad_vendida'
+            const gananciaBaseTotal = nota.catalogo.reduce((total, item) => {
+                return total + item.cantidad_vendida * item.helado_id.precioBase;
+            }, 0);
+
+            // Calculamos ganancia venta total directamente con 'cantidad_vendida'
+            const gananciaVentaTotal = nota.catalogo.reduce((total, item) => {
+                return total + item.cantidad_vendida * item.helado_id.precioVenta;
+            }, 0);
+
+            return {
+                _id: nota._id,
+                vendedor_id: nota.vendedor_id,
+                playa: nota.playa,
+                clima: nota.clima,
+                createdAt: nota.createdAt,
+                gananciaBaseTotal, // Calculado con cantidad_vendida y precioBase
+                gananciaVentaTotal // Calculado con cantidad_vendida y precioVenta
+            };
         });
+
         res.status(200).json(notasConGanancias);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener notas finalizadas', detalle: error.message });

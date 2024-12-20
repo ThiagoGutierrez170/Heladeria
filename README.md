@@ -56,3 +56,8 @@ Crea un archivo `.env` en la carpeta `backend` con las siguientes variables:
 PORT=5000  
 MONGO_URI=tu_uri_de_mongo  
 JWT_SECRET=tu_secreto_jwt  
+
+# Variables para el administrador predeterminado
+ADMIN_EMAIL=[correo_del_administrador]  
+ADMIN_PASSWORD=[contraseña_del_administrador]  
+ADMIN_USERNAME=[nombre_del_administrador] 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import {
     Container, Typography, Grid, Paper, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow, TextField, Button
@@ -18,7 +19,7 @@ const EditarFinalizado = () => {
     useEffect(() => {
         const fetchNota = async () => {
             try {
-                const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
+                const response = await api.get(`/nota/finalizadas/${id}/detalle`);
                 const { detallesGanancias } = response.data; // Ya no necesitamos las ganancias aquí
                 setDetallesGanancias(detallesGanancias);
             } catch (error) {
@@ -62,7 +63,7 @@ const EditarFinalizado = () => {
 
             try {
                 // Hacer PUT con la información correcta
-                await axios.put(`/api/nota/finalizadas/${id}`, {
+                await api.put(`/nota/finalizadas/${id}`, {
                     heladoId: selectedHelado.helado_id._id,  // Aquí se debe enviar el id del helado
                     cantidadVendida: selectedHelado.cantidadVendida
                 });
@@ -72,7 +73,7 @@ const EditarFinalizado = () => {
                 setSelectedHelado(null);
 
                 // Volver a cargar los detalles de la nota
-                const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
+                const response = await api.get(`/nota/finalizadas/${id}/detalle`);
                 setDetallesGanancias(response.data.detallesGanancias);
 
             } catch (error) {

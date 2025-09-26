@@ -11,7 +11,8 @@ import {
     FormControlLabel,
     FormHelperText,
 } from '@mui/material';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import SaveIcon from '@mui/icons-material/Save';
@@ -27,7 +28,7 @@ const EditarVendedor = () => {
     useEffect(() => {
         const fetchVendedor = async () => {
             try {
-                const response = await axios.get(`/api/vendedor/${id}`);
+                const response = await api.get(`/vendedor/${id}`);
                 setVendedor(response.data);
                 setLoading(false);
             } catch (error) {
@@ -54,7 +55,7 @@ const EditarVendedor = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`/api/vendedor/${id}`, vendedor);
+            await api.put(`/vendedor/${id}`, vendedor);
             Swal.fire('Éxito', 'El vendedor ha sido actualizado.', 'success');
             navigate('/vendedores');
         } catch (error) {

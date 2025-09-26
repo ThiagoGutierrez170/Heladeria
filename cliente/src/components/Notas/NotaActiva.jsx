@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import {
     Container, Typography, Button, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Paper, Box, Grid
@@ -17,7 +18,7 @@ const NotaActiva = () => {
         const fetchNotaDetalle = async () => {
             try {
                 setUsuarioRol(localStorage.getItem('rol'));
-                const response = await axios.get(`/api/nota/activas/${id}`);
+                const response = await api.get(`/nota/activas/${id}`);
                 setNota(response.data);
             } catch (error) {
                 Swal.fire('Error', 'Hubo un problema al cargar la nota.', 'error');
@@ -41,7 +42,7 @@ const NotaActiva = () => {
         });
         if (confirm.isConfirmed) {
             try {
-                await axios.delete(`/api/nota/${id}`);
+                await api.delete(`/nota/${id}`);
                 Swal.fire('Eliminado!', 'La nota ha sido eliminada.', 'success');
                 navigate('/notas-activas');
             } catch (error) {

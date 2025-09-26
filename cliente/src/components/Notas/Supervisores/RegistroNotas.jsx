@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../../utils/api';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -17,7 +18,7 @@ const RegistroFinalizados = () => {
     useEffect(() => {
         const fetchNotasFinalizadas = async () => {
             try {
-                const response = await axios.get('/api/nota/finalizadas');
+                const response = await api.get('/nota/finalizadas');
                 setNotasFinalizadas(response.data);
                 setFilteredNotas(response.data);
             } catch (error) {

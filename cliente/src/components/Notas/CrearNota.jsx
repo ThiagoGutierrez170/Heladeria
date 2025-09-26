@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Grid, TextField, Typography, Button, MenuItem, Select, InputLabel, FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import 'sweetalert2/src/sweetalert2.scss';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 
 const CrearNota = () => {
@@ -18,8 +19,8 @@ const CrearNota = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const heladoResponse = await axios.get('/api/helado?estado=activo');
-                const vendedorResponse = await axios.get('/api/vendedor');
+                const heladoResponse = await api.get('/helado?estado=activo');
+                const vendedorResponse = await api.get('/vendedor');
                 const heladosActivos = heladoResponse.data.map((helado) => ({
                     helado_id: helado._id,
                     nombre: helado.nombre,
@@ -64,7 +65,7 @@ const CrearNota = () => {
         if (Object.keys(newErrors).length === 0) {
             setIsSubmitting(true); // Bloquear el botón
             try {
-                await axios.post('/api/nota', {
+                await api.post('/nota', {
                     vendedor_id: vendedor,
                     playa,
                     clima,

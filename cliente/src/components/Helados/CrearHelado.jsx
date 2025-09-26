@@ -3,7 +3,8 @@ import { Button, Container, TextField, Typography, FormControlLabel, Checkbox, S
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Swal from 'sweetalert2';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -54,7 +55,7 @@ const CrearHelado = () => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                await axios.post('/api/helado', datosFormulario);
+                await api.post('/helado', datosFormulario);
                 Swal.fire('Helado agregado!', 'Has agregado correctamente el helado.', 'success');
                 setDatosFormulario({
                     nombre: '',

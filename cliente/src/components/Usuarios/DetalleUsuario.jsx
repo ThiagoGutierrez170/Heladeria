@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     Button,
@@ -25,7 +26,7 @@ const DetalleUsuario = () => {
         }
 
         const fetchUsuario = async () => {
-            const res = await axios.get(`/api/usuario/${id}`);
+            const res = await api.get(`/usuario/${id}`);
             setUsuario(res.data);
         };
         fetchUsuario();
@@ -35,7 +36,7 @@ const DetalleUsuario = () => {
         const confirmDelete = window.confirm('¿Estás seguro de que quieres eliminar este usuario?');
         if (confirmDelete) {
             try {
-                await axios.delete(`/api/usuario/eliminar/${id}`);
+                await api.delete(`/usuario/eliminar/${id}`);
                 alert('Usuario eliminado');
                 navigate('/usuarios');
             } catch (error) {

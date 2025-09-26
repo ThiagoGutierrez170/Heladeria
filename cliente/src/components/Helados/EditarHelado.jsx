@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, TextField, Button, Stack, Checkbox, FormControlLabel } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
@@ -23,7 +24,7 @@ const EditarHelado = () => {
     useEffect(() => {
         const obtenerHelado = async () => {
             try {
-                const response = await axios.get(`/api/helado/${id}`);
+                const response = await api.get(`/helado/${id}`);
                 setHelado(response.data);
             } catch (error) {
                 console.error('Error al obtener el helado:', error);
@@ -44,7 +45,7 @@ const EditarHelado = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`/api/helado/${id}`, helado);
+            await api.put(`/helado/${id}`, helado);
             Swal.fire('Éxito', 'El helado ha sido actualizado.', 'success');
             navigate('/helados');
         } catch (error) {

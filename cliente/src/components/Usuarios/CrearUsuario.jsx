@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import {
     Button,
@@ -45,7 +46,7 @@ const CrearUsuario = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post('/api/usuario/', usuario);
+            await api.post('/usuario/', usuario);
             Swal.fire('Usuario agregado!', 'Has agregado correctamente al usuario.', 'success');
             navigate('/usuarios');
         } catch (error) {

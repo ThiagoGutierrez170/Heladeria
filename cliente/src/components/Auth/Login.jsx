@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { Button, Container, Stack, TextField, Typography, CircularProgress, Box } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -15,7 +16,7 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await axios.post('/api/sesiones/login', { correo: email, contraseña: password });
+            const response = await api.post('/sesiones/login', { correo: email, contraseña: password });
             const { token, usuario } = response.data;
 
             localStorage.setItem('token', token);

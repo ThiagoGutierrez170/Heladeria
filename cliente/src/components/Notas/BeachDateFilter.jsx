@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -19,7 +20,7 @@ const BeachDateFilter = ({ onFilter }) => {
   useEffect(() => {
     const fetchBeaches = async () => {
       try {
-        const response = await axios.get('/api/nota/finalizadas');
+        const response = await api.get('/nota/finalizadas');
         const beachesSet = new Set(response.data.map((nota) => nota.playa));
         setBeaches(Array.from(beachesSet));
       } catch (error) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import Swal from 'sweetalert2';
 import {
     Container, Typography, Grid, Paper, Divider, Table, TableBody,
@@ -20,7 +21,7 @@ const DetalleNota = () => {
     useEffect(() => {
         const fetchNota = async () => {
             try {
-                const response = await axios.get(`/api/nota/finalizadas/${id}/detalle`);
+                const response = await api.get(`/nota/finalizadas/${id}/detalle`);
                 const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima, fecha } = response.data;
 
                 setDetallesGanancias(detallesGanancias);
@@ -50,7 +51,7 @@ const DetalleNota = () => {
 
         if (confirm.isConfirmed) {
             try {
-                await axios.delete(`/api/nota/${id}`);
+                await api.delete(`/nota/${id}`);
                 Swal.fire('Eliminado!', 'La nota ha sido eliminada.', 'success');
                 navigate('/registro-finalizados');
             } catch (error) {

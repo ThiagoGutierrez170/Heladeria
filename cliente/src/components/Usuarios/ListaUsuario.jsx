@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import {
     Container,
@@ -33,7 +34,7 @@ const ListaUsuario = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const res = await axios.get('/api/usuario/lista', {
+                const res = await api.get('/usuario/lista', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setUsuarios(res.data);

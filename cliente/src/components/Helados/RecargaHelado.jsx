@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import Swal from 'sweetalert2';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Typography, CircularProgress } from '@mui/material';
 
@@ -26,7 +27,7 @@ const RecargaHelado = ({ open, onClose, helado, obtenerHelados }) => {
         setLoading(true); // Activar la animación de carga
 
         try {
-            await axios.put(`/api/helado/recargar/${helado._id}`, {
+            await api.put(`/helado/recargar/${helado._id}`, {
                 cantidadCajas: cantidadCajas,  // Enviar solo la cantidad de cajas en el cuerpo
             });
             obtenerHelados(); // Actualizar la lista de helados

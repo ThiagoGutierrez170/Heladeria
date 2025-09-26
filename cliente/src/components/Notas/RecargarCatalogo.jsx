@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { Container, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Swal from 'sweetalert2';
 
@@ -16,11 +17,11 @@ const RecargarCatalogo = () => {
         const fetchCatalogo = async () => {
             try {
                 // Obtener los helados activos
-                const heladosResponse = await axios.get('/api/helado?estado=true');
+                const heladosResponse = await api.get('/helado?estado=true');
                 setHelados(heladosResponse.data);
 
                 // Obtener la nota y el catálogo de la misma
-                const response = await axios.get(`/api/nota/activas/${id}`);
+                const response = await api.get(`/nota/activas/${id}`);
                 
                 if (response.data && Array.isArray(response.data.catalogo)) {
                     setCatalogo(response.data.catalogo);
@@ -54,7 +55,7 @@ const RecargarCatalogo = () => {
         e.preventDefault();
 
         try {
-            await axios.put(`/api/nota/recargar/${id}`, { recargas });
+            await api.put(`/nota/recargar/${id}`, { recargas });
             Swal.fire('Recarga Exitosa', 'Las cantidades han sido recargadas en el catálogo.', 'success');
             navigate(`/notas-activas/`);
         } catch (error) {

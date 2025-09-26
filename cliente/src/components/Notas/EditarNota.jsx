@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
@@ -30,7 +31,7 @@ const EditarNota = () => {
         // Obtener la nota por su ID
         const fetchNota = async () => {
             try {
-                const response = await axios.get(`/api/nota/activas/${id}`);
+                const response = await api.get(`/nota/activas/${id}`);
                 const notaData = response.data;
 
                 // Asegurarse de que el vendedor esté correctamente asignado
@@ -46,7 +47,7 @@ const EditarNota = () => {
         // Obtener la lista de vendedores
         const fetchVendedores = async () => {
             try {
-                const response = await axios.get('/api/vendedor'); // Cambia esta URL a la correcta en tu backend
+                const response = await api.get('/vendedor'); // Cambia esta URL a la correcta en tu backend
                 setVendedores(response.data);
             } catch (error) {
                 console.error('Error al cargar los vendedores:', error);
@@ -74,7 +75,7 @@ const EditarNota = () => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                await axios.put(`/api/nota/activas/${id}`, nota);
+                await api.put(`/nota/activas/${id}`, nota);
                 Swal.fire('Guardado', 'La nota ha sido actualizada con éxito', 'success');
                 navigate('/notas-activas');
             } catch (error) {

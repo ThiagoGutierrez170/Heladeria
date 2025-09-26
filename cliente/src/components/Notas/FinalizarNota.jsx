@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import {
     Container,
     Typography,
@@ -26,7 +27,7 @@ const FinalizarNota = () => {
     useEffect(() => {
         const fetchCatalogo = async () => {
             try {
-                const response = await axios.get(`/api/nota/activas/${id}`);
+                const response = await api.get(`/nota/activas/${id}`);
 
                 if (response.data && Array.isArray(response.data.catalogo)) {
                     setCatalogo(response.data.catalogo);
@@ -73,7 +74,7 @@ const FinalizarNota = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.put(`/api/nota/activas/${id}/finalizar`, { devoluciones });
+            const response = await api.put(`/nota/activas/${id}/finalizar`, { devoluciones });
 
             if (response.status === 200) {
                 Swal.fire('Nota Finalizada', 'Los helados devueltos han sido registrados y el stock se ha actualizado.', 'success');

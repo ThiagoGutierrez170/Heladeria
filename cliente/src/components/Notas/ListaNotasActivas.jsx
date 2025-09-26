@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
@@ -25,7 +26,7 @@ const ListaNotasActivas = () => {
     useEffect(() => {
         const fetchNotasActivas = async () => {
             try {
-                const response = await axios.get('/api/nota/activas');
+                const response = await api.get('/nota/activas');
                 const data = response.data.map((nota) => ({
                     ...nota,
                     title: nota.playa, // Aseguramos que el campo title sea la playa

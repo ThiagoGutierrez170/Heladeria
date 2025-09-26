@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-const InfoModal = lazy(() => import('../vendedores/VendedorDetalles'));
+const InfoModal = lazy(() => import('../Vendedores/VendedorDetalles'));
 import AddIcon from '@mui/icons-material/Add';
 
 const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile , usuarioRol }) => (

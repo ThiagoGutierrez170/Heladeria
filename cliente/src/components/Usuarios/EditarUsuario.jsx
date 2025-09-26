@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     Container,
@@ -40,7 +41,7 @@ const EditarUsuario = () => {
 
         const fetchUsuario = async () => {
             try {
-                const res = await axios.get(`/api/usuario/${id}`);
+                const res = await api.get(`/usuario/${id}`);
                 const { nombreUsuario, correo, rol } = res.data;
                 setUsuario({
                     nombreUsuario,
@@ -62,7 +63,7 @@ const EditarUsuario = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`/api/usuario/${id}`, usuario);
+            await api.put(`/usuario/${id}`, usuario);
             Swal.fire('Usuario actualizado', 'El usuario ha sido actualizado.', 'success');
             navigate('/usuarios');  // Redirige a la lista de usuarios
         } catch (error) {

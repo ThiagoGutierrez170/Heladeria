@@ -3,7 +3,8 @@ import { Typography, Paper, CircularProgress, IconButton, Button, TextField, use
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import InfoIcon from '@mui/icons-material/Info';
 import AddIcon from '@mui/icons-material/Add';
@@ -67,7 +68,7 @@ const ListaHelados = () => {
     const obtenerHelados = async (page = 1, pageSize = 10) => {
         setLoading(true);
         try {
-            const response = await axios.get(`/api/helado?page=${page}&pageSize=${pageSize}`);
+            const response = await api.get(`/helado?page=${page}&pageSize=${pageSize}`);
             setHelados(response.data);
             setHeladosFiltrados(response.data);
         } catch (error) {
@@ -103,7 +104,7 @@ const ListaHelados = () => {
         });
         if (result.isConfirmed) {
             try {
-                await axios.delete(`/api/helado/${heladoId}`);
+                await api.delete(`/helado/${heladoId}`);
                 setHelados(prev => prev.filter(helado => helado._id !== heladoId));
                 Swal.fire('Eliminado!', 'El helado ha sido eliminado.', 'success');
             } catch (error) {

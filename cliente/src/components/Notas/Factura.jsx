@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -24,7 +25,7 @@ const Factura = () => {
     useEffect(() => {
         const fetchNota = async () => {
             try {
-                const response = await axios.get(`/api/nota/finalizadas/${id}/factura`);
+                const response = await api.get(`/nota/finalizadas/${id}/factura`);
                 const { detallesFactura, gananciaTotalBase, vendedor, playa, clima, createdAt } = response.data;
 
                 const catalogoCalculado = detallesFactura.map((item) => ({

@@ -4,7 +4,8 @@ import { Typography, Paper, CircularProgress, IconButton, Button, useTheme, useM
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../../utils/api';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
@@ -99,7 +100,7 @@ const VendedoresList = () => {
     const fetchVendedores = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`/api/vendedor/`);
+            const response = await api.get(`/vendedor/`);
             setVendedores(response.data);
             if (!Array.isArray(response.data)) {
                 console.error('Expected an array but got:', response.data);
@@ -128,7 +129,7 @@ const VendedoresList = () => {
         });
         if (result.isConfirmed) {
             try {
-                await axios.delete(`/api/vendedor/${vendedorId}`);
+                await api.delete(`/vendedor/${vendedorId}`);
                 setVendedores(prev => prev.filter(vendedor => vendedor._id !== vendedorId));
                 Swal.fire('Eliminado!', 'El vendedor ha sido eliminado.', 'success');
             } catch (error) {

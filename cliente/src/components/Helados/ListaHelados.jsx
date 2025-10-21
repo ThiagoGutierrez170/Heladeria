@@ -1,9 +1,9 @@
+/* eslint-disable react/display-name */
 import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Typography, Paper, CircularProgress, IconButton, Button, TextField, useTheme, useMediaQuery } from '@mui/material';
+import { Typography, Paper, CircularProgress, IconButton, Button, TextField, useTheme, useMediaQuery, Box } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-//import axios from 'axios';
 import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import InfoIcon from '@mui/icons-material/Info';
@@ -16,31 +16,30 @@ const HeladoDetalles = lazy(() => import('./HeladoDetalle'));
 import RecargaHelado from './RecargaHelado';
 
 
-
+// Componente de Botones de Acción
 const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobile, usuarioRol }) => (
-    <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
-        <IconButton size={isMobile ? "small" : "medium"} color="default" onClick={onInfo} sx={{ m: 0.5 }}>
+    <Box sx={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+        <IconButton size={isMobile ? "small" : "medium"} color="default" onClick={onInfo} sx={{ m: 0.5 }} aria-label="Información">
             <InfoIcon />
         </IconButton>
         
-        {usuarioRol === 'administrador' && (
-            <>
-                <IconButton size={isMobile ? "small" : "medium"} color="primary" onClick={onEdit} sx={{ m: 0.5 }}>
-                    <EditIcon />
-                </IconButton>
-                <IconButton size={isMobile ? "small" : "medium"} color="error" onClick={onDelete} sx={{ m: 0.5 }}>
-                    <DeleteIcon />
-                </IconButton>
-            </>
-        )}
-
-        <IconButton size={isMobile ? "small" : "medium"} color="secondary" onClick={onRecarga} sx={{ m: 0.5 }}>
+        <IconButton size={isMobile ? "small" : "medium"} color="secondary" onClick={onRecarga} sx={{ m: 0.5 }} aria-label="Recargar Stock">
             <AddIcon />
         </IconButton>
-    </div>
+
+        <IconButton size={isMobile ? "small" : "medium"} color="primary" onClick={onEdit} sx={{ m: 0.5 }} aria-label="Editar">
+            <EditIcon />
+        </IconButton>
+        
+        {usuarioRol === 'administrador' && (
+            <IconButton size={isMobile ? "small" : "medium"} color="error" onClick={onDelete} sx={{ m: 0.5 }} aria-label="Eliminar">
+                <DeleteIcon />
+            </IconButton>
+        )}
+    </Box>
 ));
 
-
+// Componente Principal
 const ListaHelados = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -56,7 +55,7 @@ const ListaHelados = () => {
 
     const [usuarioRol, setUsuarioRol] = useState(localStorage.getItem('rol'));
 
-    // Update role when localStorage changes
+    // Hook para actualizar el rol si cambia en localStorage
     useEffect(() => {
         const handleStorageChange = () => {
             setUsuarioRol(localStorage.getItem('rol'));
@@ -65,10 +64,15 @@ const ListaHelados = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
-    const obtenerHelados = async (page = 1, pageSize = 10) => {
+    // Función CORREGIDA para obtener los helados: se eliminan los parámetros de paginación
+    // para cargar todos los datos en el cliente y que ag-Grid maneje la paginación.
+    const obtenerHelados = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get(`/helado?page=${page}&pageSize=${pageSize}`);
+            // ** CORRECCIÓN CLAVE **: Llamada sin parámetros de paginación para obtener todos los datos.
+            const response = await api.get(`/helado/`); 
+            
+            // Asumiendo que `response.data` es el array completo de helados.
             setHelados(response.data);
             setHeladosFiltrados(response.data);
         } catch (error) {
@@ -77,11 +81,11 @@ const ListaHelados = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []); 
 
     useEffect(() => {
         obtenerHelados();
-    }, []);
+    }, [obtenerHelados]);
 
     useEffect(() => {
         const filtrarHelados = () => {
@@ -130,6 +134,18 @@ const ListaHelados = () => {
         setOpenRecargaModal(true);
     }, [helados]);
 
+    const getActionCellRenderer = useCallback((isMobileView) => (params) => (
+        <ActionButtons
+            onInfo={() => handleInfo(params.data._id || params.data.id)} 
+            onEdit={() => handleEdit(params.data._id || params.data.id)}
+            onDelete={() => handleDelete(params.data._id || params.data.id)}
+            onRecarga={() => handleRecarga(params.data._id || params.data.id)}
+            isMobile={isMobileView}
+            usuarioRol={usuarioRol}
+        />
+    ), [handleInfo, handleEdit, handleDelete, handleRecarga, usuarioRol]);
+
+
     const mobileColumns = useMemo(() => [
         {
             headerName: "Helados",
@@ -161,18 +177,9 @@ const ListaHelados = () => {
             headerName: "Acciones",
             field: "acciones",
             width: 160,
-            cellRenderer: (params) => (
-                <ActionButtons
-                    onInfo={() => handleInfo(params.data.id)}
-                    onEdit={() => handleEdit(params.data.id)}
-                    onDelete={() => handleDelete(params.data.id)}
-                    onRecarga={() => handleRecarga(params.data.id)}
-                    isMobile={true}
-                    usuarioRol={usuarioRol}
-                />
-            ),
+            cellRenderer: getActionCellRenderer(true),
         }
-    ], [handleInfo, handleEdit, handleDelete, handleRecarga, usuarioRol]);
+    ], [getActionCellRenderer]); 
 
     const desktopColumns = useMemo(() => [
         {
@@ -204,45 +211,39 @@ const ListaHelados = () => {
             field: "costo",
             flex: 1,
             width: 100,
+            valueFormatter: (params) => `$${params.value}`, 
         },
         {
             headerName: "Precio Base",
             field: "precioBase",
             flex: 1,
             width: 120,
+            valueFormatter: (params) => `$${params.value}`, 
         },
         {
             headerName: "Precio Venta",
             field: "precioVenta",
             flex: 1,
             width: 120,
+            valueFormatter: (params) => `$${params.value}`, 
         },
         {
             headerName: "Stock",
             field: "stock",
             flex: 1,
             width: 100,
+            cellStyle: (params) => (params.value < 5 ? { backgroundColor: '#ffdddd' } : null), 
         },
         {
             headerName: "Acciones",
             field: "acciones",
             width: 200,
-            cellRenderer: (params) => (
-                <ActionButtons
-                    onInfo={() => handleInfo(params.data.id)}
-                    onEdit={() => handleEdit(params.data.id)}
-                    onDelete={() => handleDelete(params.data.id)}
-                    onRecarga={() => handleRecarga(params.data.id)}
-                    isMobile={false}
-                    usuarioRol={usuarioRol}
-                    
-                />
-            ),
+            cellRenderer: getActionCellRenderer(false),
         }
-    ], [handleInfo, handleEdit, handleDelete, handleRecarga,usuarioRol]);
+    ], [getActionCellRenderer]); 
 
     return (
-        <div style={{ padding: isMobile ? '16px' : '24px' }}>
+        <Box sx={{ padding: isMobile ? '16px' : '24px' }}>
             <Typography
                 variant={isMobile ? "h6" : "h5"}
                 align="center"
@@ -250,10 +251,10 @@ const ListaHelados = () => {
                 color="primary"
                 sx={{ mb: 3 }}
             >
-                Lista de Helados
+                Lista de Helados 🍨
             </Typography>
 
-            <div style={{
+            <Box sx={{
                 display: 'flex',
                 gap: '16px',
                 flexDirection: isMobile ? 'column' : 'row',
@@ -265,7 +266,7 @@ const ListaHelados = () => {
                     variant="outlined"
                     value={terminoBusqueda}
                     onChange={(e) => setTerminoBusqueda(e.target.value)}
-                    placeholder="Buscar helados"
+                    placeholder="Buscar helados por nombre"
                     InputProps={{
                         startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} />,
                     }}
@@ -280,20 +281,21 @@ const ListaHelados = () => {
                     }}
                 >
                     <AddIcon sx={{ mr: 1 }} />
-                    {!isMobile}
+                    {isMobile ? 'Agregar' : 'Agregar Helado'}
                 </Button>
-            </div>
+            </Box>
 
             {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
                     <CircularProgress color="primary" />
-                </div>
+                </Box>
             ) : (
                 <Paper
                     sx={{
-                        height: isMobile ? '70vh' : '590px',
+                        // ** CORRECCIÓN CLAVE 2 **: Altura automática en móvil para que ag-Grid con autoHeight funcione.
+                        height: isMobile ? 'auto' : '590px',
                         width: '100%',
-                        overflow: 'hidden',
+                        overflow: isMobile ? 'visible' : 'hidden', // Asegura visibilidad en móvil
                         borderRadius: '8px'
                     }}
                     className="ag-theme-alpine"
@@ -301,18 +303,14 @@ const ListaHelados = () => {
                     <AgGridReact
                         ref={gridRef}
                         rowData={heladosFiltrados.map((helado) => ({
-                            id: helado._id,
-                            nombre: helado.nombre,
-                            imagen: helado.imagen,
-                            costo: helado.costo,
-                            precioBase: helado.precioBase,
-                            precioVenta: helado.precioVenta,
-                            stock: helado.stock,
+                            ...helado,
+                            id: helado._id, 
                         }))}
                         columnDefs={isMobile ? mobileColumns : desktopColumns}
                         pagination={true}
-                        paginationPageSize={isMobile ? 20 : 10}  // Página por defecto 20 en móvil y 10 en desktop
-                        paginationPageSizeSelector={isMobile ? [20] : [10, 30, 50, 100]}  // Selector de tamaño de página solo en desktop
+                        paginationPageSize={isMobile ? 20 : 10}
+                        paginationPageSizeSelector={isMobile ? [20] : [10, 30, 50, 100]}
+                        // ** CORRECCIÓN CLAVE 3 **: Usa 'autoHeight' en móvil.
                         domLayout={isMobile ? 'autoHeight' : 'normal'}
                         defaultColDef={{
                             sortable: true,
@@ -322,35 +320,35 @@ const ListaHelados = () => {
                         suppressMovableColumns={isMobile}
                         headerHeight={isMobile ? 40 : 48}
                         rowHeight={isMobile ? 100 : 52}
-                        paginationPanelStyle={{
-                            fontSize: isMobile ? '36px' : '24px', // Aumenta el tamaño de la fuente de los botones de paginación
-                        }}
                         gridOptions={{
-                            paginationPageSize: isMobile ? 20 : 10, // Página por defecto en móvil (20) y en escritorio (10)
-                            paginationPageSizeSelector: isMobile ? [] : [10, 30, 50, 100], // No mostrar selector en móvil
+                            paginationPageSize: isMobile ? 20 : 10,
+                            paginationPageSizeSelector: isMobile ? [] : [10, 30, 50, 100],
                         }}
                     />
                 </Paper>
             )}
 
             <Suspense fallback={<CircularProgress />}>
-                {openInfoModal && (
+                {openInfoModal && selectedHelado && (
                     <HeladoDetalles
                         open={openInfoModal}
                         onClose={() => setOpenInfoModal(false)}
                         helado={selectedHelado}
                     />
                 )}
-                {openRecargaModal && (
+                {openRecargaModal && selectedHelado && (
                     <RecargaHelado
                         open={openRecargaModal}
-                        onClose={() => setOpenRecargaModal(false)}
+                        onClose={() => {
+                            setOpenRecargaModal(false);
+                            obtenerHelados(); // Recarga los datos después de cerrar el modal
+                        }}
                         helado={selectedHelado}
                         obtenerHelados={obtenerHelados}
                     />
                 )}
             </Suspense>
-        </div>
+        </Box>
     );
 };
 

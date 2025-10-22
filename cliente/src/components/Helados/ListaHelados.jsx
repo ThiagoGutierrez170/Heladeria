@@ -16,6 +16,37 @@ const HeladoDetalles = lazy(() => import('./HeladoDetalle'));
 import RecargaHelado from './RecargaHelado';
 
 
+// **NUEVA FUNCIÓN DE FORMATO DE MONEDA/NÚMEROS**
+// Configurada para usar separador de miles (.), sin decimales si es entero.
+const currencyFormatter = (value) => {
+    if (value === null || value === undefined) return '$0';
+
+    // Asegura que el valor sea un número
+    const numberValue = parseFloat(value);
+    if (isNaN(numberValue)) return '$0';
+
+    // Configura el formateador para la localización chilena/sudamericana (es-CL)
+    // que usa punto como separador de miles y coma como separador de decimales.
+    // 'maximumFractionDigits: 2' permite hasta dos decimales si los tiene.
+    const formatter = new Intl.NumberFormat('es-CL', {
+        style: 'currency',
+        currency: 'CLP', // Usamos CLP como placeholder para el símbolo y formato
+        minimumFractionDigits: 0, // Mínimo de 0 decimales
+        maximumFractionDigits: 2  // Máximo de 2 decimales (para 5.500)
+    });
+
+    // Formatea el valor y reemplaza el símbolo de moneda local (CLP) por '$' si es necesario
+    // o simplemente usa el formato 'decimal' si no quieres el símbolo de moneda fijo.
+    // Usaremos el formato simple y agregamos el signo '$' manualmente para mayor control.
+    const formattedNumber = new Intl.NumberFormat('es-CL', {
+        minimumFractionDigits: numberValue % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+    }).format(numberValue);
+
+    return `$${formattedNumber}`;
+};
+// -----------------------------------------------------
+
 // Componente de Botones de Acción
 const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, onRecarga, isMobile, usuarioRol }) => (
     <Box sx={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
@@ -64,20 +95,18 @@ const ListaHelados = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
-    // Función CORREGIDA para obtener los helados: se eliminan los parámetros de paginación
-    // para cargar todos los datos en el cliente y que ag-Grid maneje la paginación.
+    // Función de obtención de helados (Sin paginación en el frontend)
     const obtenerHelados = useCallback(async () => {
         setLoading(true);
         try {
-            // ** CORRECCIÓN CLAVE **: Llamada sin parámetros de paginación para obtener todos los datos.
             const response = await api.get(`/helado/`); 
-            
-            // Asumiendo que `response.data` es el array completo de helados.
             setHelados(response.data);
             setHeladosFiltrados(response.data);
         } catch (error) {
             console.error('Error al obtener los helados:', error);
-            Swal.fire('Error', 'Error al obtener los helados', 'error');
+            if (!error.message.includes('canceled')) {
+                Swal.fire('Error', 'Error al obtener los helados. Intente nuevamente.', 'error');
+            }
         } finally {
             setLoading(false);
         }
@@ -87,6 +116,7 @@ const ListaHelados = () => {
         obtenerHelados();
     }, [obtenerHelados]);
 
+    // Lógica de filtrado
     useEffect(() => {
         const filtrarHelados = () => {
             const filtrados = helados.filter((helado) =>
@@ -97,6 +127,8 @@ const ListaHelados = () => {
         filtrarHelados();
     }, [terminoBusqueda, helados]);
 
+    // Manejadores de Acción
+    
     const handleDelete = useCallback(async (heladoId) => {
         const result = await Swal.fire({
             title: '¿Estás seguro?',
@@ -108,14 +140,20 @@ const ListaHelados = () => {
         });
         if (result.isConfirmed) {
             try {
-                await api.delete(`/helado/${heladoId}`);
+                await api.delete(`/helado/${heladoId}`); 
+                
                 setHelados(prev => prev.filter(helado => helado._id !== heladoId));
                 Swal.fire('Eliminado!', 'El helado ha sido eliminado.', 'success');
             } catch (error) {
-                Swal.fire('Error', 'Hubo un problema al eliminar el helado.', 'error');
+                obtenerHelados(); 
+                console.error('Error al eliminar el helado:', error);
+                
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Hubo un problema al eliminar el helado. (Error 400 en servidor)';
+                
+                Swal.fire('Error', errorMessage, 'error');
             }
         }
-    }, []);
+    }, [obtenerHelados]);
 
 
     const handleEdit = useCallback((heladoId) => {
@@ -134,18 +172,24 @@ const ListaHelados = () => {
         setOpenRecargaModal(true);
     }, [helados]);
 
-    const getActionCellRenderer = useCallback((isMobileView) => (params) => (
-        <ActionButtons
-            onInfo={() => handleInfo(params.data._id || params.data.id)} 
-            onEdit={() => handleEdit(params.data._id || params.data.id)}
-            onDelete={() => handleDelete(params.data._id || params.data.id)}
-            onRecarga={() => handleRecarga(params.data._id || params.data.id)}
-            isMobile={isMobileView}
-            usuarioRol={usuarioRol}
-        />
-    ), [handleInfo, handleEdit, handleDelete, handleRecarga, usuarioRol]);
+    // Renderizador de Celdas de Acción
+    const getActionCellRenderer = useCallback((isMobileView) => (params) => {
+        const id = params.data._id || params.data.id; 
+        
+        return (
+            <ActionButtons
+                onInfo={() => handleInfo(id)} 
+                onEdit={() => handleEdit(id)}
+                onDelete={() => handleDelete(id)}
+                onRecarga={() => handleRecarga(id)}
+                isMobile={isMobileView}
+                usuarioRol={usuarioRol}
+            />
+        );
+    }, [handleInfo, handleEdit, handleDelete, handleRecarga, usuarioRol]);
 
 
+    // Definición de Columnas para Móvil (sin cambios en formato numérico aquí)
     const mobileColumns = useMemo(() => [
         {
             headerName: "Helados",
@@ -153,7 +197,7 @@ const ListaHelados = () => {
             flex: 1,
             minWidth: 150,
             cellRenderer: (params) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <img
                         src={params.data.imagen}
                         alt={params.value}
@@ -164,13 +208,13 @@ const ListaHelados = () => {
                             objectFit: 'cover'
                         }}
                     />
-                    <div>
-                        <div style={{ fontWeight: 'bold' }}>{params.value}</div>
-                        <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                    <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{params.value}</Typography>
+                        <Typography variant="caption" color="textSecondary">
                             Stock: {params.data.stock}
-                        </div>
-                    </div>
-                </div>
+                        </Typography>
+                    </Box>
+                </Box>
             ),
         },
         {
@@ -181,17 +225,17 @@ const ListaHelados = () => {
         }
     ], [getActionCellRenderer]); 
 
+    // Definición de Columnas para Escritorio (APLICACIÓN DEL FORMATO)
     const desktopColumns = useMemo(() => [
         {
             headerName: "Nombre",
             field: "nombre",
-            flex: 1,
-            minWidth: 300,
+            flex: 2, 
+            minWidth: 200,
         },
         {
             headerName: "Imagen",
             field: "imagen",
-            flex: 1,
             width: 100,
             cellRenderer: (params) => (
                 <img
@@ -209,36 +253,38 @@ const ListaHelados = () => {
         {
             headerName: "Costo",
             field: "costo",
-            flex: 1,
             width: 100,
-            valueFormatter: (params) => `$${params.value}`, 
+            // Uso de la nueva función currencyFormatter
+            valueFormatter: (params) => currencyFormatter(params.value), 
         },
         {
             headerName: "Precio Base",
             field: "precioBase",
-            flex: 1,
             width: 120,
-            valueFormatter: (params) => `$${params.value}`, 
+            // Uso de la nueva función currencyFormatter
+            valueFormatter: (params) => currencyFormatter(params.value), 
         },
         {
             headerName: "Precio Venta",
             field: "precioVenta",
-            flex: 1,
             width: 120,
-            valueFormatter: (params) => `$${params.value}`, 
+            // Uso de la nueva función currencyFormatter
+            valueFormatter: (params) => currencyFormatter(params.value), 
         },
         {
             headerName: "Stock",
             field: "stock",
-            flex: 1,
             width: 100,
-            cellStyle: (params) => (params.value < 5 ? { backgroundColor: '#ffdddd' } : null), 
+            cellStyle: (params) => (params.value < 5 ? { backgroundColor: '#ffdddd', fontWeight: 'bold' } : null), 
         },
         {
             headerName: "Acciones",
             field: "acciones",
             width: 200,
             cellRenderer: getActionCellRenderer(false),
+            suppressMovable: true,
+            suppressResize: true,
+            lockVisible: true, 
         }
     ], [getActionCellRenderer]); 
 
@@ -292,10 +338,9 @@ const ListaHelados = () => {
             ) : (
                 <Paper
                     sx={{
-                        // ** CORRECCIÓN CLAVE 2 **: Altura automática en móvil para que ag-Grid con autoHeight funcione.
-                        height: isMobile ? 'auto' : '590px',
+                        height: isMobile ? 'auto' : '590px', 
                         width: '100%',
-                        overflow: isMobile ? 'visible' : 'hidden', // Asegura visibilidad en móvil
+                        overflow: isMobile ? 'visible' : 'hidden', 
                         borderRadius: '8px'
                     }}
                     className="ag-theme-alpine"
@@ -310,7 +355,6 @@ const ListaHelados = () => {
                         pagination={true}
                         paginationPageSize={isMobile ? 20 : 10}
                         paginationPageSizeSelector={isMobile ? [20] : [10, 30, 50, 100]}
-                        // ** CORRECCIÓN CLAVE 3 **: Usa 'autoHeight' en móvil.
                         domLayout={isMobile ? 'autoHeight' : 'normal'}
                         defaultColDef={{
                             sortable: true,
@@ -341,7 +385,7 @@ const ListaHelados = () => {
                         open={openRecargaModal}
                         onClose={() => {
                             setOpenRecargaModal(false);
-                            obtenerHelados(); // Recarga los datos después de cerrar el modal
+                            obtenerHelados(); 
                         }}
                         helado={selectedHelado}
                         obtenerHelados={obtenerHelados}

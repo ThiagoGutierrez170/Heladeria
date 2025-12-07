@@ -193,7 +193,8 @@ const EditarNotaActiva = async (req, res) => {
 const ListaNotasFinalizada = async (req, res) => {
     try {
         const notasFinalizadas = await Nota.find({ estado: 'finalizado' })
-            .populate('vendedor_id', 'nombre apellido');
+            .populate('vendedor_id', 'nombre apellido')
+            .sort({ createdAt: -1 });
 
         const notasConGanancias = notasFinalizadas.map(nota => {
             return {

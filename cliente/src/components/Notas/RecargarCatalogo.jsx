@@ -13,6 +13,8 @@ const RecargarCatalogo = () => {
     const [helados, setHelados] = useState([]); // Lista de todos los helados activos
     const [recargas, setRecargas] = useState({});
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     useEffect(() => {
         const fetchCatalogo = async () => {
             try {
@@ -53,7 +55,7 @@ const RecargarCatalogo = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setIsSubmitting(true);
         try {
             await api.put(`/nota/recargar/${id}`, { recargas });
             Swal.fire('Recarga Exitosa', 'Las cantidades han sido recargadas en el catálogo.', 'success');
@@ -61,6 +63,7 @@ const RecargarCatalogo = () => {
         } catch (error) {
             console.error('Error en la solicitud de recarga:', error.response || error);
             Swal.fire('Error', 'Hubo un problema al recargar el catálogo', 'error');
+            setIsSubmitting(false);
         }
     };
 

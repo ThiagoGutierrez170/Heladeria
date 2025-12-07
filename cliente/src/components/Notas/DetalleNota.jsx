@@ -1,208 +1,157 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-//import axios from 'axios';
 import api from '../../utils/api';
 import Swal from 'sweetalert2';
 import {
-    Container, Typography, Grid, Paper, Divider, Table, TableBody,
-    TableCell, TableContainer, TableHead, TableRow, Button
+    Container, Typography, Paper, Divider, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow, Button, CircularProgress, Box
 } from '@mui/material';
 
 const DetalleNota = () => {
     const { id } = useParams();
-    const [detallesGanancias, setDetallesGanancias] = useState([]);
-    const [gananciaMinima, setGananciaMinima] = useState(0);
-    const [gananciaBase, setGananciaBase] = useState(0);
-    const [gananciaTotal, setGananciaTotal] = useState(0);
-    const [notaInfo, setNotaInfo] = useState(null);
-    const [fechaNota, setFechaNota] = useState('');
     const navigate = useNavigate();
+
+    // Estados
+    const [detallesGanancias, setDetallesGanancias] = useState([]);
+    const [totales, setTotales] = useState({ minima: 0, base: 0, venta: 0 });
+    const [notaInfo, setNotaInfo] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchNota = async () => {
             try {
                 const response = await api.get(`/nota/finalizadas/${id}/detalle`);
-                const { detallesGanancias, gananciaMinima, gananciaBase, gananciaTotal, vendedor_id, playa, clima, fecha } = response.data;
+                
+                // Ahora response.data será un OBJETO puro, gracias al arreglo en el backend
+                if (response.data) {
+                    const { 
+                        detallesGanancias, 
+                        gananciaMinima, gananciaBase, gananciaTotal, 
+                        vendedor_id, playa, clima, fecha 
+                    } = response.data;
 
-                setDetallesGanancias(detallesGanancias);
-                setGananciaMinima(gananciaMinima);
-                setGananciaBase(gananciaBase);
-                setGananciaTotal(gananciaTotal);
-                setNotaInfo({ vendedor: vendedor_id, playa, clima });
-                setFechaNota(fecha);
+                    setDetallesGanancias(detallesGanancias || []);
+                    setTotales({ 
+                        minima: gananciaMinima || 0, 
+                        base: gananciaBase || 0, 
+                        venta: gananciaTotal || 0 
+                    });
+                    setNotaInfo({ vendedor: vendedor_id, playa, clima, fecha });
+                }
             } catch (error) {
-                console.error('Error al cargar el detalle de la nota:', error);
+                console.error('Error cargando nota:', error);
+                Swal.fire('Error', 'No se pudieron cargar los detalles', 'error');
+            } finally {
+                setLoading(false);
             }
         };
-        fetchNota();
+
+        if (id) fetchNota();
     }, [id]);
 
     const handleEliminar = async () => {
-        const confirm = await Swal.fire({
-            title: '¿Estás seguro?',
-            text: "Esta acción eliminará la nota de forma permanente.",
+        const result = await Swal.fire({
+            title: '¿Eliminar Nota?',
+            text: "Se borrará permanentemente.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Eliminar',
-            cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Sí, eliminar'
         });
 
-        if (confirm.isConfirmed) {
+        if (result.isConfirmed) {
             try {
                 await api.delete(`/nota/${id}`);
-                Swal.fire('Eliminado!', 'La nota ha sido eliminada.', 'success');
+                await Swal.fire('Eliminado', '', 'success');
                 navigate('/registro-finalizados');
             } catch (error) {
-                Swal.fire('Error!', 'Hubo un problema al eliminar la nota.', 'error');
+                Swal.fire('Error', 'No se pudo eliminar', 'error');
             }
         }
     };
 
-    const formatearGs = (valor) => {
-        return new Intl.NumberFormat('es-PY', {
-            style: 'decimal',
-            maximumFractionDigits: 0,
-            minimumFractionDigits: 0
-        }).format(valor);
-    };
+    const formatearGs = (valor) => new Intl.NumberFormat('es-PY', { style: 'decimal' }).format(valor || 0);
+
+    if (loading) return <Box display="flex" justifyContent="center" mt={5}><CircularProgress /></Box>;
+    if (!notaInfo) return <Typography align="center" mt={5}>No se encontró la nota.</Typography>;
 
     return (
-        <Container maxWidth="md" sx={{ mt: 5 }}>
-            <Typography variant="h4" align="center" color="text.primary" gutterBottom>
-                Detalle de la Nota
-            </Typography>
+        <Container maxWidth="md" sx={{ mt: 5, pb: 5 }}>
+            <Typography variant="h4" align="center" gutterBottom>Detalle de la Nota</Typography>
 
-            <Button
-                variant="contained"
-                onClick={() => navigate('/registro-finalizados')}
-                sx={{
-                    mb: 2,
-                    width: '100%',
-                    fontSize: '1rem',
-                    bgcolor: 'primary.main',
-                    '&:hover': { bgcolor: 'primary.dark' },
-                }}
-            >
-                Volver
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                <Button variant="contained" onClick={() => navigate(-1)} fullWidth>Volver</Button>
+                <Button variant="contained" color="secondary" onClick={() => navigate(`/editar-finalizado/${id}`)} fullWidth>Editar Nota</Button>
+            </Box>
 
-            {/* Botón para ir a la vista de edición */}
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => navigate(`/editar-finalizado/${id}`)} // Navega a la vista de edición con el id de la nota
-                sx={{
-                    mb: 2,
-                    width: '100%',
-                    fontSize: '1rem',
-                    bgcolor: 'secondary.main',
-                    '&:hover': { bgcolor: 'secondary.dark' },
-                }}
-            >
-                Editar Nota
-            </Button>
+            <Paper sx={{ p: 2, mb: 3 }}>
+                <TableContainer>
+                    <Table size="small">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell><strong>Vendedor</strong></TableCell>
+                                <TableCell><strong>Playa</strong></TableCell>
+                                <TableCell><strong>Clima</strong></TableCell>
+                                <TableCell><strong>Fecha</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>{notaInfo.vendedor ? `${notaInfo.vendedor.nombre} ${notaInfo.vendedor.apellido || ''}` : 'N/A'}</TableCell>
+                                <TableCell>{notaInfo.playa}</TableCell>
+                                <TableCell>{notaInfo.clima}</TableCell>
+                                <TableCell>{notaInfo.fecha ? new Date(notaInfo.fecha).toLocaleDateString() : '-'}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
 
-            {notaInfo && (
-                <Paper sx={{ p: 2, mb: 3 }}>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell><strong>Vendedor</strong></TableCell>
-                                    <TableCell><strong>Playa</strong></TableCell>
-                                    <TableCell><strong>Clima</strong></TableCell>
-                                    <TableCell><strong>Fecha</strong></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>{notaInfo.vendedor?.nombre ?? 'Información no disponible'}</TableCell>
-                                    <TableCell>{notaInfo.playa}</TableCell>
-                                    <TableCell>{notaInfo.clima}</TableCell>
-                                    <TableCell>{new Date(fechaNota).toLocaleDateString()}</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
-            )}
-
-            <Typography variant="h6" align="center" color="text.primary" gutterBottom>
-                Detalle de Ganancias de la Nota
-            </Typography>
-            <Divider sx={{ my: 3 }} />
+            <Typography variant="h6" align="center" gutterBottom>Productos Vendidos</Typography>
+            <Divider sx={{ mb: 2 }} />
 
             <TableContainer component={Paper} sx={{ mb: 3 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Imagen</strong></TableCell>
-                            <TableCell><strong>Nombre del helado</strong></TableCell>
-                            <TableCell align="center"><strong>Cantidad Vendida</strong></TableCell>
-                            <TableCell align="center"><strong>Ganancia Mínima (Gs)</strong></TableCell>
-                            <TableCell align="center"><strong>Ganancia Base (Gs)</strong></TableCell>
-                            <TableCell align="center"><strong>Ganancia Total (Gs)</strong></TableCell>
+                            <TableCell><strong>Img</strong></TableCell>
+                            <TableCell><strong>Producto</strong></TableCell>
+                            <TableCell align="center"><strong>Cant.</strong></TableCell>
+                            <TableCell align="right"><strong>G. Mínima</strong></TableCell>
+                            <TableCell align="right"><strong>G. Base</strong></TableCell>
+                            <TableCell align="right"><strong>G. Total</strong></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {detallesGanancias.map((item, index) => (
                             <TableRow key={index}>
                                 <TableCell>
-                                    <img
-                                        src={item.imagen}
-                                        alt={item.nombre}
-                                        style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '5px' }}
-                                    />
+                                    <img src={item.imagen} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} />
                                 </TableCell>
-                                <TableCell>{item.nombre ?? 'Nombre no disponible'}</TableCell>
+                                <TableCell>{item.nombre}</TableCell>
                                 <TableCell align="center">{item.cantidadVendida}</TableCell>
-                                <TableCell align="center">{formatearGs(item.gananciaMinima)} Gs</TableCell>
-                                <TableCell align="center">{formatearGs(item.gananciaBase)} Gs</TableCell>
-                                <TableCell align="center">{formatearGs(item.gananciaTotal)} Gs</TableCell>
+                                <TableCell align="right">{formatearGs(item.gananciaMinima)}</TableCell>
+                                <TableCell align="right">{formatearGs(item.gananciaBase)}</TableCell>
+                                <TableCell align="right">{formatearGs(item.gananciaTotal)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" align="center" color="text.primary" gutterBottom>
-                Ganancias Totales de la Nota
-            </Typography>
-            <TableContainer component={Paper} sx={{ mb: 3 }}>
-                <Table size="small">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell><strong>Ganancia Mínima Total</strong></TableCell>
-                            <TableCell><strong>Ganancia Base Total</strong></TableCell>
-                            <TableCell><strong>Ganancia Total</strong></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell>{formatearGs(gananciaMinima)} Gs</TableCell>
-                            <TableCell>{formatearGs(gananciaBase)} Gs</TableCell>
-                            <TableCell>{formatearGs(gananciaTotal)} Gs</TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            <Button
-                variant="contained"
-                color="error"
-                onClick={handleEliminar}
-                sx={{
-                    width: '100%',
-                    fontSize: '1rem',
-                    py: 1.5,
-                    mt: 2,
-                }}
-            >
+            <Paper sx={{ p: 2, bgcolor: '#f5f5f5' }}>
+                <Typography variant="h6" align="center" gutterBottom>Totales</Typography>
+                <Box display="flex" justifyContent="space-around">
+                    <Typography color="textSecondary">Mínima: <b>{formatearGs(totales.minima)} Gs</b></Typography>
+                    <Typography color="primary">Base: <b>{formatearGs(totales.base)} Gs</b></Typography>
+                    <Typography color="success.main">Total: <b>{formatearGs(totales.venta)} Gs</b></Typography>
+                </Box>
+            </Paper>
+            
+            <Button variant="contained" color="error"   fullWidth sx={{ mt: 3 }} onClick={handleEliminar}>
                 Eliminar Nota
             </Button>
+
         </Container>
     );
 };

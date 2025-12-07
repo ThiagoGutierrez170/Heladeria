@@ -18,6 +18,14 @@ const CatalogoSchema = new Schema({
     cantidad_vendida: {
         type: Number,
         default: 0  // Inicialmente no se ha vendido nada
+    },
+    precio: { 
+        type: Number, 
+        default: 0 
+    }, // Guardamos el precio unitario (Base) al momento de cerrar
+    subtotal: { 
+        type: Number, 
+        default: 0 
     }
 });
 
@@ -45,11 +53,24 @@ const NotaSchema = new Schema({
     clima: {
         type: String,
         enum: ['soleado', 'despejado', 'nublado', 'lluvia', 'tormenta'],  // Se puede actualizar luego con datos del clima
+        default: 'soleado'
     },
     creador: {
         type: Schema.Types.ObjectId, // Referencia al usuario
         required: [false, "No se encontró el creador"],
         ref: 'Usuario' // Referencia al modelo de usuario
+    },
+    totalCosto: { 
+        type: Number, 
+        default: 0 
+    },   // Ganancia Mínima Total
+    totalBase: { 
+        type: Number, 
+        default: 0 
+    },    // Ganancia Base Total
+    totalVenta: { 
+        type: Number, 
+        default: 0 
     }
 },{ timestamps: true });
 

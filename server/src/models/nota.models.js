@@ -50,6 +50,13 @@ const NotaSchema = new Schema({
         enum: ['San José', 'Mboi ka´e', 'San Isidro', 'Evento'],  // Valores permitidos para la playa
         required: true
     },
+    /*
+    Turno: {
+        type: String,
+        enum: ['Dia', 'Noche'],  // Valores permitidos para el turno
+        required: true
+    },
+    */ 
     clima: {
         type: String,
         enum: ['soleado', 'despejado', 'nublado', 'lluvia', 'tormenta'],  // Se puede actualizar luego con datos del clima

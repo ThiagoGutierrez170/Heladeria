@@ -74,6 +74,7 @@ const TraerNotaActiva = async (req, res) => {
             return {
                 helado_id: item.helado_id,
                 recargas: item.recargas || [], // Si no tiene recargas, aseguramos que sea un array vacío
+                cantidad_inicial: cantidadInicial,
                 cantidadTotal: cantidadTotal,
             };
         });
@@ -87,12 +88,6 @@ const TraerNotaActiva = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener la nota activa', detalle: error.message });
     }
 };
-
-
-
-
-
-
 
 // Recargar el catálogo de una nota existente
 const RecargarCatalogo = async (req, res) => {
@@ -167,23 +162,91 @@ const RecargarCatalogo = async (req, res) => {
 
 
 // Editar una nota activa
+// Editar una nota activa (Con gestión inteligente de stock)
 const EditarNotaActiva = async (req, res) => {
     try {
         const { id } = req.params;
-        const { vendedor_id, playa, clima } = req.body;
+        const { vendedor_id, playa, clima, catalogoNuevosDatos } = req.body;
 
         const nota = await Nota.findById(id);
         if (!nota || nota.estado !== 'activo') {
             return res.status(404).json({ error: 'Nota activa no encontrada' });
         }
 
+        // 1. Actualizar datos básicos
         nota.vendedor_id = vendedor_id || nota.vendedor_id;
         nota.playa = playa || nota.playa;
         nota.clima = clima || nota.clima;
+
+        // 2. Gestión del Catálogo y Stock (Solo si se envía un nuevo catálogo)
+        if (catalogoNuevosDatos && Array.isArray(catalogoNuevosDatos)) {
+            
+            // Recorremos los datos que vienen del frontend
+            // Formato esperado: [{ helado_id: "...", cantidad_inicial: 5 }, ...]
+            
+            const nuevoCatalogoProcesado = [];
+
+            for (let itemNuevo of catalogoNuevosDatos) {
+                const heladoId = itemNuevo.helado_id;
+                const nuevaCantidadInicial = parseInt(itemNuevo.cantidad_inicial, 10) || 0;
+
+                // Buscamos si este helado ya existía en la nota
+                const itemExistente = nota.catalogo.find(i => i.helado_id.toString() === heladoId);
+                const cantidadAnterior = itemExistente ? itemExistente.cantidad_inicial : 0;
+
+                const diferencia = nuevaCantidadInicial - cantidadAnterior;
+
+                if (diferencia !== 0) {
+                    const helado = await Helado.findById(heladoId);
+                    if (helado) {
+                        // Si diferencia es positiva (ej: 5 - 2 = 3), restamos 3 al stock
+                        // Si diferencia es negativa (ej: 2 - 5 = -3), sumamos 3 al stock (devolvemos)
+
+                        helado.stock -= diferencia; 
+                        await helado.save();
+                    }
+                }
+
+                // Solo agregamos al nuevo catálogo si la cantidad es mayor a 0
+                if (nuevaCantidadInicial > 0) {
+                    nuevoCatalogoProcesado.push({
+                        helado_id: heladoId,
+                        cantidad_inicial: nuevaCantidadInicial,
+                        recargas: itemExistente ? itemExistente.recargas : [], // Mantenemos las recargas si existían
+                        cantidad_vendida: 0 // Reseteamos vendida porque es una nota activa
+                    });
+                }
+            }
+
+            // 3. Manejar helados que fueron ELIMINADOS de la lista (estaban antes, no están ahora)
+            // (Opcional: Si el frontend envía la lista completa, los que falten se asumen borrados)
+            // Para simplificar, asumimos que el frontend envía TODOS los helados con cantidad 0 si los quiere borrar.
+            // O bien, comparamos IDs:
+            
+            const idsNuevos = catalogoNuevosDatos.map(i => i.helado_id);
+            const itemsEliminados = nota.catalogo.filter(i => !idsNuevos.includes(i.helado_id.toString()));
+
+            for (let itemEliminado of itemsEliminados) {
+                // Devolver todo el stock (inicial + recargas)
+                const totalADevolver = itemEliminado.cantidad_inicial + itemEliminado.recargas.reduce((a, b) => a + b, 0);
+                if (totalADevolver > 0) {
+                    const helado = await Helado.findById(itemEliminado.helado_id);
+                    if (helado) {
+                        helado.stock += totalADevolver;
+                        await helado.save();
+                    }
+                }
+            }
+
+            // Asignamos el nuevo catálogo reemplazando el anterior
+            nota.catalogo = nuevoCatalogoProcesado;
+        }
+
         await nota.save();
 
         res.status(200).json({ mensaje: 'Nota activa actualizada exitosamente', nota });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error al editar la nota activa', detalle: error.message });
     }
 };
@@ -544,7 +607,30 @@ const MigrarNotasViejas = async (req, res) => {
         res.status(500).json({ error: 'Error en migración' });
     }
 };*/
- 
+
+/*
+const MigrarTurnoYClima = async (req, res) => {
+    try {
+        // 1. Actualizar todas las notas: poner turno 'Dia' y borrar clima
+        const resultado = await Nota.updateMany(
+            {}, // Filtro vacío para afectar a TODAS las notas
+            { 
+                $set: { turno: 'Dia' },     // Agrega el campo turno
+                $unset: { clima: "" }       // Elimina el campo clima
+            }
+        );
+
+        res.json({ 
+            mensaje: 'Migración de turno y clima completada', 
+            notas_modificadas: resultado.modifiedCount 
+        });
+
+    } catch (error) {
+        console.error("Error en la migración:", error);
+        res.status(500).json({ error: 'Error interno durante la migración' });
+    }
+};*/
+
 export default {
     Crear,
     ListaNotasActivas,
@@ -558,4 +644,5 @@ export default {
     EditarFinalizado,
     Eliminar,
     //MigrarNotasViejas
+    //MigrarTurnoYClima
 };

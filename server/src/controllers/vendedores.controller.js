@@ -18,7 +18,7 @@ const vendedorController = {
 
     obtenerVendedor: async (req, res) => {
         try {
-            const vendedores = await Vendedor.find();
+            const vendedores = await Vendedor.find({ estado: true });
             res.json(vendedores);
         } catch (error) {
             res.status(500).json({ error: 'Error al obtener vendedores', detalle: error.message });

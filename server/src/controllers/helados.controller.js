@@ -25,7 +25,8 @@ const heladoController = {
 
     obtenerHelado: async (req, res) => {
         try {
-            const helados = await Helado.find();
+            const helados = await Helado.find({ estado: true })
+                .sort({ precioVenta: 1 });
             res.json(helados);
         } catch (error) {
             res.status(500).json({ error: 'Error al obtener helados', detalle: error.message });

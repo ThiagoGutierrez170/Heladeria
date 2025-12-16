@@ -15,7 +15,6 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Collapse
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import IceCreamIcon from '@mui/icons-material/Icecream'; // Icono para Helados
@@ -26,18 +25,9 @@ import AssignmentIcon from '@mui/icons-material/Assignment'; // Icono para Regis
 import Swal from 'sweetalert2';
 import './Navbar.css';
 
-const pages = [
-    { name: 'Helados', route: '/helados', icon: <IceCreamIcon /> },
-    { name: 'Vendedores', route: '/vendedores', icon: <PeopleIcon /> },
-    { name: 'Notas Activas', route: '/notas-activas', icon: <NoteIcon /> },
-    { name: 'Notas Finalizadas', route: '/registro-finalizados', icon: <AssignmentIcon /> },
-    { name: 'Usuarios', route: '/usuarios', icon: <PersonIcon /> },
-];
-
 const Navbar = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [openSubmenu, setOpenSubmenu] = useState({}); // Añadido para manejar el estado de los submenús
 
     const usuarioRol = localStorage.getItem('rol');
     const navigate = useNavigate();
@@ -45,6 +35,11 @@ const Navbar = () => {
     // Función para abrir/cerrar el menú lateral
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
+    };
+
+    // Función para cerrar el menú lateral explícitamente
+    const closeDrawer = () => {
+        setDrawerOpen(false);
     };
 
     // Función para abrir el menú del usuario
@@ -65,26 +60,21 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    // Función para manejar la apertura/cierre de submenús
-    const toggleSubmenu = (name) => {
-        setOpenSubmenu((prev) => ({ ...prev, [name]: !prev[name] }));
-    };
-
     return (
         <Box sx={{ display: 'flex' }}>
             <AppBar position="fixed" sx={{ zIndex: 1201 }}>
                 <Toolbar>
-                    <IconButton size="large" color="inherit" aria-label="menu" onClick={toggleDrawer}>
+                    <IconButton size="large" color="inherit" aria-label="menu" onClick={toggleDrawer} edge="start">
                         <MenuIcon />
                     </IconButton>
-                    <IceCreamIcon />
+                    <IceCreamIcon sx={{ ml: 2, mr: 1 }} />
                     <Typography
                         variant="h6"
                         component={Link}
                         to="/"
-                        sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', marginLeft: '10px' }}
+                        sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
                     >
-                        Gestión de Inventario de Helados
+                        Gestión de Inventario
                     </Typography>
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Abrir configuración">
@@ -106,13 +96,16 @@ const Navbar = () => {
 
             {/* Menú lateral desplegable */}
             <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer}>
-                <Box sx={{ minWidth: 250, marginTop: '64px' }}>
+                <Box 
+                    sx={{ minWidth: 250, marginTop: '64px' }}
+                    role="presentation"
+                >
                     <List>
                         {/* Helados */}
                         {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
                             <ListItem key="helados" disablePadding>
-                                <ListItemButton component={Link} to="/helados">
-                                    <IceCreamIcon />
+                                <ListItemButton component={Link} to="/helados" onClick={closeDrawer}>
+                                    <IceCreamIcon sx={{ mr: 2 }} />
                                     <ListItemText primary="Helados" />
                                 </ListItemButton>
                             </ListItem>
@@ -121,8 +114,8 @@ const Navbar = () => {
                         {/* Vendedores */}
                         {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
                             <ListItem key="vendedores" disablePadding>
-                                <ListItemButton component={Link} to="/vendedores">
-                                    <PeopleIcon />
+                                <ListItemButton component={Link} to="/vendedores" onClick={closeDrawer}>
+                                    <PeopleIcon sx={{ mr: 2 }} />
                                     <ListItemText primary="Vendedores" />
                                 </ListItemButton>
                             </ListItem>
@@ -131,8 +124,8 @@ const Navbar = () => {
                         {/* Notas Activas */}
                         {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
                             <ListItem key="notas" disablePadding>
-                                <ListItemButton component={Link} to="/notas-activas">
-                                    <NoteIcon />
+                                <ListItemButton component={Link} to="/notas-activas" onClick={closeDrawer}>
+                                    <NoteIcon sx={{ mr: 2 }} />
                                     <ListItemText primary="Notas Activas" />
                                 </ListItemButton>
                             </ListItem>
@@ -141,8 +134,8 @@ const Navbar = () => {
                         {/* Notas Finalizadas */}
                         {(usuarioRol === 'administrador' || usuarioRol === 'usuario') && (
                             <ListItem key="notas-finalizadas" disablePadding>
-                                <ListItemButton component={Link} to="/registro-finalizados">
-                                    <AssignmentIcon />
+                                <ListItemButton component={Link} to="/registro-finalizados" onClick={closeDrawer}>
+                                    <AssignmentIcon sx={{ mr: 2 }} />
                                     <ListItemText primary="Notas Finalizadas" />
                                 </ListItemButton>
                             </ListItem>
@@ -151,9 +144,9 @@ const Navbar = () => {
                         {/* Submenú para supervisor - Registros Finalizados */}
                         {usuarioRol === 'supervisor' && (
                             <ListItem disablePadding>
-                                <ListItemButton component={Link} to="/S-registro-finalizados">
-                                    <AssignmentIcon />
-                                    <ListItemText primary="Notas Finalizadas (Supervisor)" />
+                                <ListItemButton component={Link} to="/S-registro-finalizados" onClick={closeDrawer}>
+                                    <AssignmentIcon sx={{ mr: 2 }} />
+                                    <ListItemText primary="Notas Finalizadas (Sup)" />
                                 </ListItemButton>
                             </ListItem>
                         )}
@@ -161,8 +154,8 @@ const Navbar = () => {
                         {/* Usuarios */}
                         {usuarioRol === 'administrador' && (
                             <ListItem key="usuarios" disablePadding>
-                                <ListItemButton component={Link} to="/usuarios">
-                                    <PersonIcon />
+                                <ListItemButton component={Link} to="/usuarios" onClick={closeDrawer}>
+                                    <PersonIcon sx={{ mr: 2 }} />
                                     <ListItemText primary="Usuarios" />
                                 </ListItemButton>
                             </ListItem>

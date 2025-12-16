@@ -1,75 +1,40 @@
 /* eslint-disable react/display-name */
 import React, { lazy, Suspense, useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Typography, Paper, CircularProgress, IconButton, Button, useTheme, useMediaQuery } from '@mui/material';
+import { Typography, Paper, CircularProgress, IconButton, Button, useTheme, useMediaQuery, Chip, Box } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-//import axios from 'axios';
 import api from '../../utils/api';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-const InfoModal = lazy(() => import('../Vendedores/VendedorDetalles'));
 import AddIcon from '@mui/icons-material/Add';
 
-const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile , usuarioRol }) => (
+const InfoModal = lazy(() => import('../Vendedores/VendedorDetalles'));
+
+const ActionButtons = React.memo(({ onEdit, onDelete, onInfo, isMobile, usuarioRol }) => (
     <div
         style={{
             display: 'flex',
-            justifyContent: 'center', // Centra los iconos horizontalmente
-            alignItems: 'center', // Centra los iconos verticalmente
-            gap: isMobile ? '10px' : '5px', // Espacio entre los iconos
-            padding: isMobile ? '10px' : '0', // Padding para la vista móvil
-            height: '100%', // Asegura que la altura ocupe todo el espacio disponible de la celda
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: isMobile ? '10px' : '5px',
+            height: '100%',
+            width: '100%'
         }}
     >
-        <IconButton
-            size={isMobile ? "large" : "medium"}
-            color="default"
-            onClick={onInfo}
-            sx={{
-                m: 0.5,
-                minWidth: isMobile ? '50px' : 'auto',
-                height: isMobile ? '50px' : 'auto',
-                width: isMobile ? '50px' : 'auto',
-                fontSize: isMobile ? '24px' : 'inherit',
-            }}
-        >
-            <InfoIcon />
+        <IconButton size={isMobile ? "large" : "small"} onClick={onInfo} color="info">
+            <InfoIcon fontSize={isMobile ? "medium" : "small"} />
         </IconButton>
-        <IconButton
-            size={isMobile ? "large" : "medium"}
-            color="primary"
-            onClick={onEdit}
-            sx={{
-                m: 0.5,
-                minWidth: isMobile ? '50px' : 'auto',
-                height: isMobile ? '50px' : 'auto',
-                width: isMobile ? '50px' : 'auto',
-                fontSize: isMobile ? '24px' : 'inherit',
-            }}
-        >
-            <EditIcon />
+        <IconButton size={isMobile ? "large" : "small"} onClick={onEdit} color="primary">
+            <EditIcon fontSize={isMobile ? "medium" : "small"} />
         </IconButton>
         {usuarioRol === 'administrador' && (
-            <>
-        <IconButton
-            size={isMobile ? "large" : "medium"}
-            color="error"
-            onClick={onDelete}
-            sx={{
-                m: 0.5,
-                minWidth: isMobile ? '50px' : 'auto',
-                height: isMobile ? '50px' : 'auto',
-                width: isMobile ? '50px' : 'auto',
-                fontSize: isMobile ? '24px' : 'inherit',
-            }}
-        >
-            <DeleteIcon />
-        </IconButton>
-            </>
+            <IconButton size={isMobile ? "large" : "small"} onClick={onDelete} color="error">
+                <DeleteIcon fontSize={isMobile ? "medium" : "small"} />
+            </IconButton>
         )}
     </div>
 ));
@@ -87,7 +52,6 @@ const VendedoresList = () => {
 
     const [usuarioRol, setUsuarioRol] = useState(localStorage.getItem('rol'));
 
-    // Update role when localStorage changes
     useEffect(() => {
         const handleStorageChange = () => {
             setUsuarioRol(localStorage.getItem('rol'));
@@ -96,19 +60,22 @@ const VendedoresList = () => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
-
     const fetchVendedores = async () => {
         setLoading(true);
         try {
             const response = await api.get(`/vendedor/`);
-            setVendedores(response.data);
-            if (!Array.isArray(response.data)) {
-                console.error('Expected an array but got:', response.data);
-                setVendedores([]);
-            }
+            
+            // Aseguramos el orden: Activos (true) primero, Inactivos (false) al final
+            const listaOrdenada = response.data.sort((a, b) => {
+                if (a.estado === b.estado) return 0;
+                return a.estado ? -1 : 1;
+            });
+            
+            setVendedores(listaOrdenada);
         } catch (error) {
             console.error('Error al obtener los vendedores:', error);
             Swal.fire('Error', 'Error al obtener los vendedores', 'error');
+            setError(true);
         } finally {
             setLoading(false);
         }
@@ -148,29 +115,45 @@ const VendedoresList = () => {
         setOpenInfoModal(true);
     }, [vendedores]);
 
+    // --- COLUMNAS MÓVIL (Solo Nombre) ---
     const mobileColumns = useMemo(() => [
         {
             headerName: "Vendedores",
-            field: "nombre", // Suponiendo que "nombre" contiene solo el primer nombre
-            flex: 1,
+            field: "nombre",
+            flex: 1, 
             minWidth: 150,
             cellRenderer: (params) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div>
-                        <div style={{ fontWeight: 'bold' }}>
-                            {params.data.nombre} {params.data.apellido}
-                        </div>
-                        <div style={{ fontSize: '0.8rem', color: '#666', fontWeight: 'bold' }}>
-                            Estado: {params.data.estado}
-                        </div>
-                    </div>
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center', 
+                    height: '100%', 
+                    lineHeight: '1.4',
+                    paddingLeft: '5px'
+                }}>
+                    {/* Solo mostramos el nombre */}
+                    <span style={{ fontWeight: 'bold', fontSize: '1rem', color: '#333' }}>
+                        {params.data.nombre} 
+                    </span>
+                    <span style={{ 
+                        fontSize: '0.8rem', 
+                        color: params.data.estado ? '#2e7d32' : '#d32f2f',
+                        display: 'flex', alignItems: 'center', gap: '4px'
+                    }}>
+                        <span style={{ 
+                            width: '8px', height: '8px', borderRadius: '50%', 
+                            backgroundColor: params.data.estado ? '#2e7d32' : '#d32f2f',
+                            display: 'inline-block'
+                        }}></span>
+                        {params.data.estado ? 'Activo' : 'Inactivo'}
+                    </span>
                 </div>
             ),
         },
         {
             headerName: "Acciones",
-            field: "acciones",
-            width: 160,
+            width: 140, 
+            cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 },
             cellRenderer: (params) => (
                 <ActionButtons
                     onInfo={() => handleInfo(params.data._id)}
@@ -183,99 +166,109 @@ const VendedoresList = () => {
         }
     ], [handleInfo, handleEdit, handleDelete, usuarioRol]);
 
+    // --- COLUMNAS ESCRITORIO (Solo Nombre) ---
     const desktopColumns = useMemo(() => [
+        { headerName: "Nombre", field: "nombre", flex: 1 },
+        // Eliminé la columna "Apellido"
+        { headerName: "C.I.", field: "ci", width: 120 },
+        { 
+            headerName: "Estado", 
+            field: "estado", 
+            width: 120,
+            cellStyle: { display: 'flex', alignItems: 'center' },
+            cellRenderer: (params) => (
+                <Chip 
+                    label={params.value ? "Activo" : "Inactivo"} 
+                    color={params.value ? "success" : "default"} 
+                    size="small" 
+                    variant="outlined"
+                />
+            )
+        },
         {
-            headerName: "Vendedores",
-            children: [
-                { headerName: "Nombre", field: "nombre", flex: 1, minWidth: 200 },
-                { headerName: "Apellido", field: "apellido", flex: 1, minWidth: 200 },
-                { headerName: "C.I.", field: "ci", flex: 0.5, minWidth: 150 },
-                { headerName: "Contacto", field: "contacto", flex: 1, minWidth: 200 },
-                { headerName: "Estado", field: "estado", flex: 1, minWidth: 100 },
-                {
-                    headerName: "Acciones",
-                    field: "acciones",
-                    cellRenderer: (params) => (
-                        <ActionButtons
-                            onInfo={() => handleInfo(params.data._id)}
-                            onEdit={() => handleEdit(params.data._id)}
-                            onDelete={() => handleDelete(params.data._id)}
-                            isMobile={false}
-                            usuarioRol={usuarioRol}
-                        />
-                    ),
-                },
-            ],
+            headerName: "Acciones",
+            field: "acciones",
+            width: 120,
+            cellRenderer: (params) => (
+                <ActionButtons
+                    onInfo={() => handleInfo(params.data._id)}
+                    onEdit={() => handleEdit(params.data._id)}
+                    onDelete={() => handleDelete(params.data._id)}
+                    isMobile={false}
+                    usuarioRol={usuarioRol}
+                />
+            ),
         },
     ], [handleInfo, handleEdit, handleDelete, usuarioRol]);
 
     return (
-        <>
-            <div style={{ padding: isMobile ? '10px' : '2px' }}>
-                <Typography variant={isMobile ? "h6" : "h5"} align="center" gutterBottom color="primary" sx={{ mb: 0 }}>
-                    Lista de Vendedores
+        <div style={{ 
+            padding: isMobile ? '10px 5px' : '20px', 
+            maxWidth: '1200px', 
+            margin: '0 auto',
+            height: '100vh', 
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} px={1}>
+                <Typography variant={isMobile ? "h5" : "h4"} component="h1" color="primary" fontWeight="bold">
+                    Vendedores
                 </Typography>
-
                 <Button
                     variant="contained"
                     color="primary"
+                    startIcon={<AddIcon />}
                     onClick={() => navigate('/agregar-vendedor')}
-                    sx={{
-                        mb: 2,
-                        padding: '12px 24px',
-                        fontSize: '16px',
-                        backgroundColor: '#1976d2',
-                        '&:hover': { backgroundColor: '#155a8a' },
-                    }}
+                    size={isMobile ? "medium" : "large"}
                 >
-                    <AddIcon sx={{ mr: 0 }} />
+                    Nuevo
                 </Button>
+            </Box>
 
-                {loading ? (
-                    <CircularProgress color="primary" />
-                ) : error ? (
-                    <Typography variant="body1" color="error.main" align="center">
-                        Error al cargar la lista de vendedores
-                    </Typography>
-                ) : (
-                    <Paper sx={{ height: isMobile ? '70vh' : '590px', width: '100%', borderRadius: '8px' }} className="ag-theme-alpine">
-                        <AgGridReact
-                            ref={gridRef}
-                            rowData={vendedores.map((vendedor) => ({
-                                _id: vendedor._id,
-                                nombre: vendedor.nombre,
-                                apellido: vendedor.apellido,
-                                ci: vendedor.ci,
-                                contacto: vendedor.contacto,
-                                estado: vendedor.estado ? 'Activo' : 'Inactivo',
-                            }))}
-                            columnDefs={isMobile ? mobileColumns : desktopColumns}
-                            pagination={true}
-                            paginationPageSize={isMobile ? 20 : 10}
-                            paginationPageSizeSelector={false}  // Desactiva el selector de páginas en móviles
-                            domLayout={isMobile ? 'autoHeight' : 'normal'}
-                            defaultColDef={{
-                                sortable: true,
-                                filter: true,
-                                resizable: !isMobile,
-                            }}
-                            suppressMovableColumns={isMobile}
-                            headerHeight={isMobile ? 40 : 48}
-                            rowHeight={isMobile ? 100 : 52}
-                            paginationPanelStyle={{
-                                fontSize: isMobile ? '36px' : '24px',
-                            }}
-                        />
+            {loading ? (
+                <Box display="flex" justifyContent="center" mt={5}>
+                    <CircularProgress />
+                </Box>
+            ) : error ? (
+                <Typography color="error" align="center">Error al cargar datos.</Typography>
+            ) : (
+                <div style={{ 
+                    flex: 1, 
+                    width: '100%', 
+                    overflow: 'hidden' 
+                }} 
+                className="ag-theme-alpine"
+                >
+                    <AgGridReact
+                        ref={gridRef}
+                        rowData={vendedores}
+                        columnDefs={isMobile ? mobileColumns : desktopColumns}
+                        // --- SIN PAGINACIÓN ---
+                        pagination={false} 
+                        domLayout={'normal'} 
+                        defaultColDef={{
+                            sortable: true,
+                            filter: true,
+                            resizable: true,
+                            suppressMenu: isMobile,
+                        }}
+                        rowHeight={isMobile ? 80 : 50}
+                        headerHeight={50}
+                        animateRows={true}
+                    />
+                </div>
+            )}
 
-                    </Paper>
+            <Suspense fallback={null}>
+                {openInfoModal && selectedVendedor && (
+                    <InfoModal 
+                        open={openInfoModal} 
+                        onClose={() => setOpenInfoModal(false)} 
+                        vendedor={selectedVendedor} 
+                    />
                 )}
-                <Suspense fallback={<CircularProgress color="secondary" />}>
-                    {openInfoModal && (
-                        <InfoModal open={openInfoModal} onClose={() => setOpenInfoModal(false)} vendedor={selectedVendedor} />
-                    )}
-                </Suspense>
-            </div>
-        </>
+            </Suspense>
+        </div>
     );
 };
 

@@ -9,9 +9,7 @@ import {
     Stack,
     Checkbox,
     FormControlLabel,
-    FormHelperText,
 } from '@mui/material';
-//import axios from 'axios';
 import api from '../../utils/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -20,7 +18,15 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 const EditarVendedor = () => {
     const { id } = useParams();
-    const [vendedor, setVendedor] = useState(null);
+    // Inicializamos con un objeto base para evitar errores de uncontrolled components
+    const [vendedor, setVendedor] = useState({
+        nombre: '',
+        apellido: '',
+        edad: '',
+        ci: '',
+        contacto: '',
+        estado: true
+    });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const navigate = useNavigate();
@@ -32,6 +38,7 @@ const EditarVendedor = () => {
                 setVendedor(response.data);
                 setLoading(false);
             } catch (error) {
+                console.error(error);
                 setError(true);
                 setLoading(false);
             }
@@ -44,8 +51,14 @@ const EditarVendedor = () => {
         setVendedor({ ...vendedor, [name]: value });
     };
 
+    // Manejador específico para el Checkbox
     const handleEstadoChange = (e) => {
-        setVendedor({ ...vendedor, estado: e.target.checked });
+        const { name, value } = e.target;
+        setVendedor({ 
+            ...vendedor, 
+            // Si el campo es 'edad', lo convertimos a número (o string vacío si borran todo)
+            [name]: name === 'edad' ? (value === '' ? '' : Number(value)) : value 
+        });
     };
 
     const handleCancel = () => {
@@ -56,9 +69,10 @@ const EditarVendedor = () => {
         e.preventDefault();
         try {
             await api.put(`/vendedor/${id}`, vendedor);
-            Swal.fire('Éxito', 'El vendedor ha sido actualizado.', 'success');
+            await Swal.fire('Éxito', 'El vendedor ha sido actualizado.', 'success');
             navigate('/vendedores');
         } catch (error) {
+            console.error(error);
             Swal.fire('Error', 'Hubo un problema al actualizar el vendedor.', 'error');
         }
     };
@@ -73,8 +87,8 @@ const EditarVendedor = () => {
 
     if (error) {
         return (
-            <Typography variant="body1" color="error.main" align="center">
-                Error al cargar los datos del vendedor
+            <Typography variant="body1" color="error.main" align="center" sx={{ mt: 5 }}>
+                Error al cargar los datos del vendedor. Intente nuevamente.
             </Typography>
         );
     }
@@ -107,13 +121,23 @@ const EditarVendedor = () => {
                     variant="outlined"
                     sx={{ mb: 2 }}
                     required
-                    autoFocus
                 />
                 <TextField
                     fullWidth
                     label="Apellido"
                     name="apellido"
                     value={vendedor.apellido}
+                    onChange={handleChange}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    required
+                />
+                <TextField
+                    fullWidth
+                    label="Edad"
+                    name="edad"
+                    type="number"
+                    value={vendedor.edad}
                     onChange={handleChange}
                     variant="outlined"
                     sx={{ mb: 2 }}
@@ -139,21 +163,21 @@ const EditarVendedor = () => {
                     sx={{ mb: 3 }}
                     required
                 />
+                
+                {/* Checkbox corregido */}
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={vendedor.estado || false}
+                            checked={!!vendedor.estado} // Aseguramos que sea booleano
                             onChange={handleEstadoChange}
-                            sx={{
-                                '&.Mui-checked': {
-                                    color: '#1976d2',
-                                },
-                            }}
+                            name="estado"
+                            color="primary"
                         />
                     }
-                    label="Estado"
-                    sx={{ mb: 3, fontSize: '16px', color: '#333' }}
+                    label={vendedor.estado ? "Activo" : "Inactivo"}
+                    sx={{ mb: 3, color: '#333' }}
                 />
+
                 <Stack direction="row" spacing={2} justifyContent="center">
                     <Button
                         variant="contained"

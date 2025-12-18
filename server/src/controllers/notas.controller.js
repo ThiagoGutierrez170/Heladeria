@@ -283,32 +283,45 @@ const TraerFactura = async (req, res) => {
 
         // Encuentra la nota por ID y popula el vendedor y el catálogo
         const nota = await Nota.findById(id)
-            .populate('vendedor_id', 'nombre apellido') // Popula el vendedor
-            .populate('catalogo.helado_id', 'nombre precioBase imagen'); // Popula el nombre, precio base e imagen del helado
+            .populate('vendedor_id', 'nombre apellido') 
+            .populate('catalogo.helado_id', 'nombre precioBase imagen'); 
 
         if (!nota || nota.estado !== 'finalizado') {
             return res.status(404).json({ error: 'Nota finalizada no encontrada' });
         }
 
+        let calculoTotalEnVivo = 0; // Variable para recalcular el total
+
         // Crea el detalle de la factura calculando la ganancia base
         const detallesFactura = nota.catalogo.map(item => {
+            // Protección por si se borró el helado
+            if (!item.helado_id) return null;
+
             const cantidadTotal = item.cantidad_inicial + item.recargas.reduce((acc, r) => acc + r, 0);
             const cantidadVendida = item.cantidad_vendida;
+            
+            // Usamos el precio guardado en el item si existe, si no el del helado actual
+            const precioUnitario = item.precio || item.helado_id.precioBase;
+            const gananciaItem = cantidadVendida * precioUnitario;
+
+            calculoTotalEnVivo += gananciaItem; // Sumamos al total global
+
             return {
-                imagen: item.helado_id.imagen, // Imagen del helado
+                imagen: item.helado_id.imagen, 
                 nombre: item.helado_id.nombre,
                 cantidadTotal,
                 cantidadVendida,
-                gananciaBase: cantidadVendida * item.helado_id.precioBase
+                gananciaBase: gananciaItem
             };
-        });
+        }).filter(item => item !== null);
 
-        const gananciaTotalBase = nota.totalBase;
+        // Usamos el cálculo en vivo si el guardado en BD es 0 o inconsistente
+        // Esto soluciona el error visual del "0"
+        const gananciaTotalBase = (nota.totalBase > 0) ? nota.totalBase : calculoTotalEnVivo;
 
-        // Incluye en la respuesta la información completa de la nota, incluyendo createdAt
         res.status(200).json({
             detallesFactura,
-            gananciaTotalBase,
+            gananciaTotalBase, // Ahora enviamos el valor asegurado
             vendedor: nota.vendedor_id ? { nombre: nota.vendedor_id.nombre, apellido: nota.vendedor_id.apellido } : null,
             playa: nota.playa,
             clima: nota.clima,

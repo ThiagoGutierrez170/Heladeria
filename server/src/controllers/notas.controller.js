@@ -178,56 +178,64 @@ const EditarNotaActiva = async (req, res) => {
         nota.playa = playa || nota.playa;
         nota.clima = clima || nota.clima;
 
-        // 2. Gestión del Catálogo y Stock (Solo si se envía un nuevo catálogo)
+        // 2. Gestión del Catálogo y Stock
         if (catalogoNuevosDatos && Array.isArray(catalogoNuevosDatos)) {
-            
-            // Recorremos los datos que vienen del frontend
-            // Formato esperado: [{ helado_id: "...", cantidad_inicial: 5 }, ...]
             
             const nuevoCatalogoProcesado = [];
 
             for (let itemNuevo of catalogoNuevosDatos) {
                 const heladoId = itemNuevo.helado_id;
                 const nuevaCantidadInicial = parseInt(itemNuevo.cantidad_inicial, 10) || 0;
+                // Aseguramos que recargas sea un array de números
+                const nuevasRecargas = Array.isArray(itemNuevo.recargas) 
+                    ? itemNuevo.recargas.map(r => parseInt(r, 10) || 0) 
+                    : [];
 
-                // Buscamos si este helado ya existía en la nota
+                // Buscamos datos anteriores
                 const itemExistente = nota.catalogo.find(i => i.helado_id.toString() === heladoId);
-                const cantidadAnterior = itemExistente ? itemExistente.cantidad_inicial : 0;
+                
+                const cantidadInicialAnterior = itemExistente ? itemExistente.cantidad_inicial : 0;
+                // Sumamos las recargas viejas
+                const sumaRecargasAnterior = itemExistente 
+                    ? itemExistente.recargas.reduce((acc, curr) => acc + curr, 0) 
+                    : 0;
 
-                const diferencia = nuevaCantidadInicial - cantidadAnterior;
+                // Sumamos las recargas nuevas
+                const sumaRecargasNueva = nuevasRecargas.reduce((acc, curr) => acc + curr, 0);
 
+                // Calculamos el TOTAL (Inicial + Recargas) anterior vs nuevo
+                const totalAnterior = cantidadInicialAnterior + sumaRecargasAnterior;
+                const totalNuevo = nuevaCantidadInicial + sumaRecargasNueva;
+
+                const diferencia = totalNuevo - totalAnterior;
+
+                // Ajuste de Stock
                 if (diferencia !== 0) {
                     const helado = await Helado.findById(heladoId);
                     if (helado) {
-                        // Si diferencia es positiva (ej: 5 - 2 = 3), restamos 3 al stock
-                        // Si diferencia es negativa (ej: 2 - 5 = -3), sumamos 3 al stock (devolvemos)
-
+                        // Si diferencia es positiva (aumentó la nota), restamos stock
+                        // Si diferencia es negativa (disminuyó la nota), sumamos stock
                         helado.stock -= diferencia; 
                         await helado.save();
                     }
                 }
 
-                // Solo agregamos al nuevo catálogo si la cantidad es mayor a 0
-                if (nuevaCantidadInicial > 0) {
+                // Solo agregamos al nuevo catálogo si hay movimiento (inicial > 0 o hay recargas)
+                if (nuevaCantidadInicial > 0 || nuevasRecargas.length > 0) {
                     nuevoCatalogoProcesado.push({
                         helado_id: heladoId,
                         cantidad_inicial: nuevaCantidadInicial,
-                        recargas: itemExistente ? itemExistente.recargas : [], // Mantenemos las recargas si existían
-                        cantidad_vendida: 0 // Reseteamos vendida porque es una nota activa
+                        recargas: nuevasRecargas, // <--- Aquí guardamos las nuevas recargas editadas
+                        cantidad_vendida: 0 
                     });
                 }
             }
 
-            // 3. Manejar helados que fueron ELIMINADOS de la lista (estaban antes, no están ahora)
-            // (Opcional: Si el frontend envía la lista completa, los que falten se asumen borrados)
-            // Para simplificar, asumimos que el frontend envía TODOS los helados con cantidad 0 si los quiere borrar.
-            // O bien, comparamos IDs:
-            
+            // 3. Manejar helados ELIMINADOS (Devolución total de stock)
             const idsNuevos = catalogoNuevosDatos.map(i => i.helado_id);
             const itemsEliminados = nota.catalogo.filter(i => !idsNuevos.includes(i.helado_id.toString()));
 
             for (let itemEliminado of itemsEliminados) {
-                // Devolver todo el stock (inicial + recargas)
                 const totalADevolver = itemEliminado.cantidad_inicial + itemEliminado.recargas.reduce((a, b) => a + b, 0);
                 if (totalADevolver > 0) {
                     const helado = await Helado.findById(itemEliminado.helado_id);
@@ -238,12 +246,10 @@ const EditarNotaActiva = async (req, res) => {
                 }
             }
 
-            // Asignamos el nuevo catálogo reemplazando el anterior
             nota.catalogo = nuevoCatalogoProcesado;
         }
 
         await nota.save();
-
         res.status(200).json({ mensaje: 'Nota activa actualizada exitosamente', nota });
     } catch (error) {
         console.error(error);

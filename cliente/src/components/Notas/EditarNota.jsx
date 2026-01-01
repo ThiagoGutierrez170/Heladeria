@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { 
     Container, Typography, TextField, Button, MenuItem, 
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, CircularProgress
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, CircularProgress,
+    IconButton, Tooltip
 } from '@mui/material';
+import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material'; // Importar Iconos
 import Swal from 'sweetalert2';
 
 const EditarNota = () => {
@@ -56,17 +58,26 @@ const EditarNota = () => {
                         return String(idEnNota) === String(helado._id);
                     });
                     
-                    // Si existe y es mayor a 0, usamos el numero. Si es 0 o no existe, usamos cadena vacía ''
                     let cantidad = '';
-                    if (itemEnNota && itemEnNota.cantidad_inicial > 0) {
-                        cantidad = itemEnNota.cantidad_inicial;
+                    // Usamos un array vacío si no hay recargas
+                    let recargas = [];
+
+                    if (itemEnNota) {
+                        if (itemEnNota.cantidad_inicial > 0) {
+                            cantidad = itemEnNota.cantidad_inicial;
+                        }
+                        // Aseguramos que recargas sea un array
+                        if (Array.isArray(itemEnNota.recargas)) {
+                            recargas = itemEnNota.recargas;
+                        }
                     }
 
                     return {
                         helado_id: helado._id,
                         nombre: helado.nombre,
                         imagen: helado.imagen,
-                        cantidad_inicial: cantidad 
+                        cantidad_inicial: cantidad,
+                        recargas: recargas // Array de números [10, 5, ...]
                     };
                 });
 
@@ -88,13 +99,12 @@ const EditarNota = () => {
         setNota({ ...nota, [name]: value });
     };
 
+    // Manejo de Cantidad Inicial
     const handleCantidadChange = (heladoId, nuevaCantidad) => {
         const valorNumerico = parseInt(nuevaCantidad, 10);
-
-        // Si es vacío, dejamos vacío. Si es número válido positivo, usamos el número.
         let valorFinal = '';
         if (nuevaCantidad !== '') {
-            if (valorNumerico < 0) return; // No permitir negativos
+            if (valorNumerico < 0) return;
             valorFinal = valorNumerico;
         }
 
@@ -105,6 +115,47 @@ const EditarNota = () => {
             return item;
         }));
     };
+
+    // --- FUNCIONES NUEVAS PARA RECARGAS ---
+
+    // Editar valor de una recarga específica
+    const handleRecargaValueChange = (heladoId, index, nuevoValor) => {
+        const valorNumerico = parseInt(nuevoValor, 10);
+        if (nuevoValor !== '' && valorNumerico < 0) return; // No negativos
+
+        setCatalogoExtendido(prev => prev.map(item => {
+            if (item.helado_id === heladoId) {
+                const nuevasRecargas = [...item.recargas];
+                // Si está vacío el input, ponemos 0 momentáneamente o manejamos como vacío
+                nuevasRecargas[index] = nuevoValor === '' ? 0 : valorNumerico; 
+                return { ...item, recargas: nuevasRecargas };
+            }
+            return item;
+        }));
+    };
+
+    // Agregar nueva ranura de recarga (inicia en 0)
+    const handleAddRecarga = (heladoId) => {
+        setCatalogoExtendido(prev => prev.map(item => {
+            if (item.helado_id === heladoId) {
+                return { ...item, recargas: [...item.recargas, 0] };
+            }
+            return item;
+        }));
+    };
+
+    // Eliminar una recarga
+    const handleRemoveRecarga = (heladoId, index) => {
+        setCatalogoExtendido(prev => prev.map(item => {
+            if (item.helado_id === heladoId) {
+                const nuevasRecargas = item.recargas.filter((_, i) => i !== index);
+                return { ...item, recargas: nuevasRecargas };
+            }
+            return item;
+        }));
+    };
+
+    // --------------------------------------
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -118,16 +169,17 @@ const EditarNota = () => {
             vendedor_id: nota.vendedor,
             playa: nota.playa,
             clima: nota.clima,
-            // Convertimos las cadenas vacías a 0 antes de enviar al backend
             catalogoNuevosDatos: catalogoExtendido.map(item => ({
                 helado_id: item.helado_id,
-                cantidad_inicial: item.cantidad_inicial === '' ? 0 : item.cantidad_inicial
+                cantidad_inicial: item.cantidad_inicial === '' ? 0 : item.cantidad_inicial,
+                // Filtramos recargas que sean 0 para no llenar la BD de ceros, opcional
+                recargas: item.recargas
             }))
         };
 
         try {
             await api.put(`/nota/activas/${id}`, payload);
-            await Swal.fire('Actualizado', 'La nota se ha actualizado correctamente.', 'success');
+            await Swal.fire('Actualizado', 'La nota y sus recargas se han actualizado correctamente.', 'success');
             navigate('/notas-activas');
         } catch (error) {
             console.error(error);
@@ -145,7 +197,7 @@ const EditarNota = () => {
     }
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h4" align="center" gutterBottom color="text.primary">
                 Editar Nota Activa
             </Typography>
@@ -193,15 +245,27 @@ const EditarNota = () => {
 
                 <Paper sx={{ p: 2, mb: 3 }}>
                     <Typography variant="h6" gutterBottom>
-                        Catálogo de Helados
+                        Catálogo y Recargas
                     </Typography>
-                    <TableContainer>
-                        <Table size="small">
+                    <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+                        <Table size="small" sx={{ minWidth: 600 }}> {/* Evita que la tabla se colapse demasiado en móvil */}
                             <TableHead>
                                 <TableRow>
-                                    <TableCell align="center"><strong>Imagen</strong></TableCell>
-                                    <TableCell><strong>Producto</strong></TableCell>
-                                    <TableCell align="center" sx={{ width: 180 }}><strong>Cant. Inicial</strong></TableCell>
+                                    <TableCell align="center" sx={{ width: 60 }}><strong>Imagen</strong></TableCell>
+                                    <TableCell sx={{ minWidth: 80 }}><strong>Producto</strong></TableCell>
+                                    
+                                    {/* CAMBIO CLAVE: minWidth en lugar de width fijo */}
+                                    <TableCell 
+                                        align="center" 
+                                        sx={{ 
+                                            minWidth: 110, // Garantiza espacio para el input en móviles
+                                            width: 150 
+                                        }}
+                                    >
+                                        <strong>Cant. Inicial</strong>
+                                    </TableCell>
+                                    
+                                    <TableCell align="left" sx={{ minWidth: 200 }}><strong>Recargas (Editar)</strong></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -211,11 +275,15 @@ const EditarNota = () => {
                                             <img 
                                                 src={item.imagen} 
                                                 alt={item.nombre} 
-                                                style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} 
+                                                style={{ width: 45, height: 45, objectFit: 'cover', borderRadius: 4 }} 
                                             />
                                         </TableCell>
-                                        <TableCell>{item.nombre}</TableCell>
-                                        <TableCell align="center">
+                                        <TableCell sx={{ verticalAlign: 'middle' }}>
+                                            {item.nombre}
+                                        </TableCell>
+                                        
+                                        {/* Celda de Cantidad Inicial optimizada */}
+                                        <TableCell align="center" sx={{ verticalAlign: 'middle' }}>
                                             <TextField
                                                 type="number"
                                                 size="small"
@@ -223,9 +291,62 @@ const EditarNota = () => {
                                                 value={item.cantidad_inicial}
                                                 onChange={(e) => handleCantidadChange(item.helado_id, e.target.value)}
                                                 placeholder="0"
-                                                inputProps={{ min: 0, style: { textAlign: 'center' } }}
-                                                fullWidth
+                                                // Aumentamos el padding interno del input para que sea más fácil tocarlo
+                                                inputProps={{ 
+                                                    min: 0, 
+                                                    style: { 
+                                                        textAlign: 'center',
+                                                        padding: '6px 4px' 
+                                                    } 
+                                                }}
+                                                sx={{ 
+                                                    backgroundColor: '#fff',
+                                                    maxWidth: '80px' // Evita que el input sea absurdamente gigante si hay espacio
+                                                }}
                                             />
+                                        </TableCell>
+                                        
+                                        <TableCell sx={{ verticalAlign: 'middle' }}>
+                                            <Box display="flex" flexWrap="wrap" gap={1} alignItems="center">
+                                                {item.recargas.map((recarga, index) => (
+                                                    <Box 
+                                                        key={index} 
+                                                        display="flex" 
+                                                        alignItems="center" 
+                                                        bgcolor="#f5f5f5" 
+                                                        border="1px solid #ddd" // Borde para definirlo mejor en móvil
+                                                        borderRadius={1} 
+                                                        p={0.5}
+                                                    >
+                                                        <TextField
+                                                            type="number"
+                                                            variant="standard"
+                                                            size="small"
+                                                            value={recarga}
+                                                            onChange={(e) => handleRecargaValueChange(item.helado_id, index, e.target.value)}
+                                                            InputProps={{ disableUnderline: true }}
+                                                            inputProps={{ 
+                                                                style: { textAlign: 'center', width: '45px', fontWeight: 'bold' } 
+                                                            }}
+                                                        />
+                                                        <IconButton 
+                                                            size="small" 
+                                                            color="error" 
+                                                            onClick={() => handleRemoveRecarga(item.helado_id, index)}
+                                                        >
+                                                            <RemoveCircleOutline fontSize="small" />
+                                                        </IconButton>
+                                                    </Box>
+                                                ))}
+                                                
+                                                <IconButton 
+                                                    size="medium" // Un poco más grande para facilitar el toque
+                                                    color="primary" 
+                                                    onClick={() => handleAddRecarga(item.helado_id)}
+                                                >
+                                                    <AddCircleOutline />
+                                                </IconButton>
+                                            </Box>
                                         </TableCell>
                                     </TableRow>
                                 ))}

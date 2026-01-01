@@ -55,6 +55,10 @@ const RecargarCatalogo = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Evitar doble envío si ya se está procesando
+        if (isSubmitting) return; 
+
         setIsSubmitting(true);
         try {
             await api.put(`/nota/recargar/${id}`, { recargas });
@@ -63,7 +67,7 @@ const RecargarCatalogo = () => {
         } catch (error) {
             console.error('Error en la solicitud de recarga:', error.response || error);
             Swal.fire('Error', 'Hubo un problema al recargar el catálogo', 'error');
-            setIsSubmitting(false);
+            setIsSubmitting(false); // Reactivar botón solo si falla
         }
     };
 

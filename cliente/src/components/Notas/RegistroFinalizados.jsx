@@ -1,37 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-//import axios from 'axios';
 import api from '../../utils/api';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import BeachDateFilter from './BeachDateFilter.jsx'; // Importa el componente de filtrado
+import { 
+    Container, Typography, Grid, Paper, Button, Divider, 
+    Box, Pagination, CircularProgress 
+} from '@mui/material';
+import BeachDateFilter from './BeachDateFilter.jsx';
 
 const RegistroFinalizados = () => {
-    const [notasFinalizadas, setNotasFinalizadas] = useState([]);
-    const [filteredNotas, setFilteredNotas] = useState([]);
+    const [notas, setNotas] = useState([]); // Notas de la página actual
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchNotasFinalizadas = async () => {
-            try {
-                const response = await api.get('/nota/finalizadas');
-                setNotasFinalizadas(response.data);
-                setFilteredNotas(response.data);
-            } catch (error) {
-                console.error('Error al cargar las notas finalizadas:', error);
-            }
-        };
+    // Función para cargar notas con paginación
+    const fetchNotasFinalizadas = async (currentPage) => {
+        setLoading(true);
+        try {
+            // Enviamos el número de página a la API
+            const response = await api.get(`/nota/finalizadas?page=${currentPage}&limit=20`);
+            
+            // La API ahora devuelve { notas, totalPages, currentPage, totalRecords }
+            setNotas(response.data.notas);
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error('Error al cargar las notas finalizadas:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        fetchNotasFinalizadas();
-    }, []);
+    useEffect(() => {
+        fetchNotasFinalizadas(page);
+    }, [page]); // Se dispara cada vez que "page" cambia
+
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        window.scrollTo(0, 0); // Sube al inicio al cambiar de página
+    };
+
+    // Nota: El filtrado local se mantiene igual, pero recuerda que 
+    // solo filtrará sobre los registros de la página actual.
+    const [filteredNotas, setFilteredNotas] = useState([]);
+    useEffect(() => {
+        setFilteredNotas(notas);
+    }, [notas]);
 
     const handleFilter = (filters) => {
         const { beach, startDate, endDate } = filters;
-        let filtered = notasFinalizadas;
+        let filtered = notas;
 
         if (beach) {
             filtered = filtered.filter((nota) => nota.playa === beach);
@@ -43,90 +62,93 @@ const RegistroFinalizados = () => {
                 return noteDate >= new Date(startDate) && noteDate <= new Date(endDate);
             });
         }
-
         setFilteredNotas(filtered);
-    };
-
-    const handleVerDetalle = (id) => {
-        navigate(`/nota-detalle/${id}`);
-    };
-
-    const handleVerFactura = (id) => {
-        navigate(`/factura/${id}`);
     };
 
     const formatearGs = (valor) => {
         return new Intl.NumberFormat('es-PY', {
             style: 'decimal',
-            maximumFractionDigits: 0,
-            minimumFractionDigits: 0
+            maximumFractionDigits: 0
         }).format(valor);
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 0 }}>
-            <Typography variant="h4" align="center" color="black" gutterBottom>
-                Registro de Notas Finalizadas 
+        <Container maxWidth="lg" sx={{ mt: 2, pb: 5 }}>
+            <Typography variant="h4" align="center" color="black" gutterBottom sx={{ fontWeight: 'bold' }}>
+                Registro de Notas Finalizadas
             </Typography>
             <Divider sx={{ my: 3 }} />
 
             <BeachDateFilter onFilter={handleFilter} /> 
 
-            {filteredNotas.map((nota) => {
-                const fechaNota = new Date(nota.createdAt).toLocaleDateString();
+            {loading ? (
+                <Box display="flex" justifyContent="center" my={5}>
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <>
+                    {filteredNotas.map((nota) => (
+                        <Paper key={nota._id} sx={{ p: 3, mb: 3, border: '1px solid #eee' }} elevation={2}>
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Typography variant="subtitle2" color="textSecondary">Vendedor</Typography>
+                                    <Typography variant="body1" fontWeight="bold">
+                                        {nota.vendedor_id?.nombre} {nota.vendedor_id?.apellido}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={6} sm={3} md={2}>
+                                    <Typography variant="subtitle2" color="textSecondary">Playa</Typography>
+                                    <Typography variant="body1">{nota.playa}</Typography>
+                                </Grid>
+                                <Grid item xs={6} sm={3} md={2}>
+                                    <Typography variant="subtitle2" color="textSecondary">Fecha</Typography>
+                                    <Typography variant="body1">{new Date(nota.createdAt).toLocaleDateString()}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={2}>
+                                    <Typography variant="subtitle2" color="textSecondary">Ganancia Base</Typography>
+                                    <Typography variant="body1" color="primary" fontWeight="bold">
+                                        {formatearGs(nota.gananciaBaseTotal)} Gs
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <Box display="flex" gap={1}>
+                                        <Button 
+                                            fullWidth 
+                                            variant="contained" 
+                                            size="small"
+                                            onClick={() => navigate(`/nota-detalle/${nota._id}`)}
+                                        >
+                                            Detalle
+                                        </Button>
+                                        <Button 
+                                            fullWidth 
+                                            variant="outlined" 
+                                            color="secondary" 
+                                            size="small"
+                                            onClick={() => navigate(`/factura/${nota._id}`)}
+                                        >
+                                            Factura
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </Paper>
+                    ))}
 
-                return (
-                    <Paper key={nota._id} sx={{ p: 3, mb: 3 }}>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1" color="black">
-                                    <strong>Vendedor:</strong> {nota.vendedor_id?.nombre} {nota.vendedor_id?.apellido}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1" color="black">
-                                    <strong>Playa:</strong> {nota.playa}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1" color="black">
-                                    <strong>Clima:</strong> {nota.clima}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1" color="black">
-                                    <strong>Ganancia Base Total:</strong> {formatearGs(nota.gananciaBaseTotal)} Gs
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography variant="body1">
-                                    <strong>Fecha:</strong> {fechaNota}
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={() => handleVerDetalle(nota._id)}
-                                    sx={{ mt: 2, width: '100%' }}
-                                >
-                                    Ver Detalle
-                                </Button>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    onClick={() => handleVerFactura(nota._id)}
-                                    sx={{ mt: 2, width: '100%' }}
-                                >
-                                    Ver Factura
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Paper>
-                );
-            })}
+                    {/* CONTROL DE PAGINACIÓN */}
+                    <Box display="flex" justifyContent="center" mt={4}>
+                        <Pagination 
+                            count={totalPages} 
+                            page={page} 
+                            onChange={handlePageChange} 
+                            color="primary" 
+                            size="large"
+                            showFirstButton 
+                            showLastButton
+                        />
+                    </Box>
+                </>
+            )}
         </Container>
     );
 };

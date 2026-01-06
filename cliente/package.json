@@ -25,6 +25,7 @@
     "axios": "^1.7.7",
     "client": "file:",
     "date-fns": "^4.1.0",
+    "html-to-image": "^1.11.13",
     "react": "^18.3.1",
     "react-document-title": "^2.0.3",
     "react-dom": "^18.3.1",

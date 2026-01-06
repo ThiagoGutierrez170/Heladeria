@@ -261,9 +261,20 @@ const EditarNotaActiva = async (req, res) => {
 // Lista de notas finalizadas (usando cantidad vendida para calcular la ganancia base total)
 const ListaNotasFinalizada = async (req, res) => {
     try {
+        // 1. Obtener parámetros de la query (con valores por defecto)
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        // 2. Ejecutar la consulta con paginación
         const notasFinalizadas = await Nota.find({ estado: 'finalizado' })
             .populate('vendedor_id', 'nombre apellido')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .skip(skip)   // Salta los registros anteriores
+            .limit(limit); // Trae solo la cantidad deseada
+
+        // 3. Obtener el total de registros (útil para el frontend)
+        const totalNotas = await Nota.countDocuments({ estado: 'finalizado' });
 
         const notasConGanancias = notasFinalizadas.map(nota => {
             return {
@@ -277,7 +288,13 @@ const ListaNotasFinalizada = async (req, res) => {
             };
         });
 
-        res.status(200).json(notasConGanancias);
+        // 4. Responder con los datos y metadatos de paginación
+        res.status(200).json({
+            notas: notasConGanancias,
+            totalRecords: totalNotas,
+            totalPages: Math.ceil(totalNotas / limit),
+            currentPage: page
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener notas finalizadas', detalle: error.message });
     }

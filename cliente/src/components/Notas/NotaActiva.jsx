@@ -38,7 +38,7 @@ const NotaActiva = () => {
         });
 
         // Configuración para una imagen limpia y sin scroll
-        const width = 325; // Ancho fijo ideal para móviles y PC
+        const width = 370; // Ancho fijo ideal para móviles y PC
 
         toPng(node, { 
             backgroundColor: '#ffffff',

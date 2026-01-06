@@ -62,7 +62,7 @@ const Factura = () => {
             didOpen: () => Swal.showLoading()
         });
 
-        const width = 300; // Ajustado para que el total y las tablas quepan bien
+        const width = 370; // Ajustado para que el total y las tablas quepan bien
 
         toPng(node, { 
             backgroundColor: '#ffffff',

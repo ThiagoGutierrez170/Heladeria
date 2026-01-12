@@ -261,20 +261,40 @@ const EditarNotaActiva = async (req, res) => {
 // Lista de notas finalizadas (usando cantidad vendida para calcular la ganancia base total)
 const ListaNotasFinalizada = async (req, res) => {
     try {
-        // 1. Obtener parámetros de la query (con valores por defecto)
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 20;
-        const skip = (page - 1) * limit;
+        // 1. Obtener parámetros de la query
+        const { page = 1, limit = 20, playa, startDate, endDate } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        // 2. Ejecutar la consulta con paginación
-        const notasFinalizadas = await Nota.find({ estado: 'finalizado' })
+        // 2. Construir el objeto de búsqueda (Query Dinámica)
+        let query = { estado: 'finalizado' };
+
+        // Filtro por Playa
+        if (playa && playa.trim() !== "") {
+            query.playa = playa;
+        }
+
+        // Filtro por Rango de Fechas
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) {
+                query.createdAt.$gte = new Date(startDate); // Desde las 00:00:00 de esa fecha
+            }
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999); // Hasta el último milisegundo de ese día
+                query.createdAt.$lte = end;
+            }
+        }
+
+        // 3. Ejecutar la consulta con el objeto 'query' dinámico
+        const notasFinalizadas = await Nota.find(query)
             .populate('vendedor_id', 'nombre apellido')
             .sort({ createdAt: -1 })
-            .skip(skip)   // Salta los registros anteriores
-            .limit(limit); // Trae solo la cantidad deseada
+            .skip(skip)
+            .limit(parseInt(limit));
 
-        // 3. Obtener el total de registros (útil para el frontend)
-        const totalNotas = await Nota.countDocuments({ estado: 'finalizado' });
+        // 4. Obtener el total basado en la MISMA query (importante para la paginación)
+        const totalNotas = await Nota.countDocuments(query);
 
         const notasConGanancias = notasFinalizadas.map(nota => {
             return {
@@ -284,16 +304,14 @@ const ListaNotasFinalizada = async (req, res) => {
                 clima: nota.clima,
                 createdAt: nota.createdAt,
                 gananciaBaseTotal: nota.totalBase, 
-                gananciaVentaTotal: nota.totalVenta
             };
         });
 
-        // 4. Responder con los datos y metadatos de paginación
         res.status(200).json({
             notas: notasConGanancias,
             totalRecords: totalNotas,
-            totalPages: Math.ceil(totalNotas / limit),
-            currentPage: page
+            totalPages: Math.ceil(totalNotas / parseInt(limit)),
+            currentPage: parseInt(page)
         });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener notas finalizadas', detalle: error.message });

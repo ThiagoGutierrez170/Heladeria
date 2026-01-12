@@ -300,6 +300,57 @@ const ListaNotasFinalizada = async (req, res) => {
     }
 };
 
+const ListaNotasSupervisor = async (req, res) => {
+    try {
+        const { page = 1, limit = 20, playa, startDate, endDate } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Filtro base: solo notas finalizadas
+        let query = { estado: 'finalizado' };
+
+        // Filtro por Playa
+        if (playa && playa !== "") {
+            query.playa = playa;
+        }
+
+        // Filtro por Rango de Fechas
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) query.createdAt.$gte = new Date(startDate);
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setHours(23, 59, 59, 999); // Incluir todo el día final
+                query.createdAt.$lte = end;
+            }
+        }
+
+        const notasFinalizadas = await Nota.find(query)
+            .populate('vendedor_id', 'nombre apellido')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const totalNotas = await Nota.countDocuments(query);
+
+        const notasParaSupervisor = notasFinalizadas.map(nota => ({
+            _id: nota._id,
+            vendedor_id: nota.vendedor_id, // Para que el frontend acceda a nombre/apellido
+            playa: nota.playa,
+            createdAt: nota.createdAt,
+            recaudacionTotal: nota.totalVenta 
+        }));
+
+        res.status(200).json({
+            notas: notasParaSupervisor,
+            totalRecords: totalNotas,
+            totalPages: Math.ceil(totalNotas / parseInt(limit)),
+            currentPage: parseInt(page)
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener listado' });
+    }
+};
+
 const TraerFactura = async (req, res) => {
     try {
         const { id } = req.params;
@@ -406,6 +457,37 @@ const DetalleNota = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al obtener el detalle de la nota', detalle: error.message });
+    }
+};
+
+const getDetalleNotaSupervisor = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const nota = await Nota.findById(id)
+            .populate('vendedor_id', 'nombre apellido')
+            .populate('catalogo.helado_id', 'nombre imagen');
+
+        if (!nota) return res.status(404).json({ error: "Nota no encontrada" });
+
+        // Mapeamos solo los datos permitidos para supervisores
+        const detallesVenta = nota.catalogo.map(item => ({
+            nombre: item.helado_id.nombre,
+            imagen: item.helado_id.imagen,
+            cantidadVendida: item.cantidad_vendida,
+            // El supervisor solo ve el subtotal de venta (cantidad * precio_venta)
+            subtotalVenta: item.subtotal 
+        }));
+
+        res.json({
+            vendedor: nota.vendedor_id,
+            playa: nota.playa,
+            clima: nota.clima,
+            fecha: nota.createdAt,
+            detallesVenta,
+            totalGeneralVenta: nota.totalVenta // Solo el total final de ventas
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener detalle para supervisor" });
     }
 };
 
@@ -674,8 +756,10 @@ export default {
     RecargarCatalogo,
     EditarNotaActiva,
     ListaNotasFinalizada,
+    ListaNotasSupervisor,
     TraerFactura,
     DetalleNota,
+    getDetalleNotaSupervisor,
     FinalizarNota,
     EditarFinalizado,
     Eliminar,

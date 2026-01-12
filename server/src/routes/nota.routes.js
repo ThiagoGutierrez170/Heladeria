@@ -18,8 +18,10 @@ NotaRouter.put('/activas/:id/finalizar', notaController.FinalizarNota);
 
 // Rutas para las notas finalizadas
 NotaRouter.get('/finalizadas', notaController.ListaNotasFinalizada);
+NotaRouter.get('/finalizadas/supervisor', notaController.ListaNotasSupervisor);
 NotaRouter.get('/finalizadas/:id/factura', notaController.TraerFactura);
 NotaRouter.get('/finalizadas/:id/detalle', notaController.DetalleNota);
+NotaRouter.get('/finalizadas/:id/detalle-supervisor', notaController.getDetalleNotaSupervisor);
 NotaRouter.put('/finalizadas/:id', notaController.EditarFinalizado);
 //NotaRouter.post('/migrar-notas-viejas', notaController.MigrarNotasViejas);
 //NotaRouter.post('/migrar-turno-clima', notaController.MigrarTurnoYClima);
